@@ -1,0 +1,17 @@
+# CLAUDE RULES & AGENT SHIELD POLICIES — BOXTOOLS (PEVC V5)
+
+## 1. Zero Docker Rule for Databases
+- Under NO circumstances shall `supabase start` or local Docker containers be required for database operations.
+- All DDL/DML, migrations and schema inspections MUST be performed against Supabase Cloud via the official MCP server or remote HTTPS API.
+
+## 2. Visual-First Verification Barrier
+- Product and business logic code shall NEVER be considered ready for merge without visual inspection.
+- Every UI surface MUST be tested across 1440px (Desktop), 768px (Tablet), and 375px (Mobile).
+- Horizontal overflow (`scrollWidth > clientWidth`) is strictly forbidden.
+
+## 3. Strict TDD Flow (Red ➔ Green ➔ Blue)
+- Every user-facing feature must be accompanied by automated E2E tests (Playwright) verifying both state transitions and visual stability.
+
+## 4. Secret & Token Isolation (AgentShield)
+- `SUPABASE_ACCESS_TOKEN`, `SUPABASE_SERVICE_ROLE_KEY`, and AI Provider keys (Gemini, OpenAI) must never be committed to source control or exposed in client bundles.
+- All sensitive credentials must remain in `.env.local` or encrypted in `ai_settings` with strict RLS (`auth.uid() = user_id`).

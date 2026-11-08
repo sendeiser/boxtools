@@ -1,0 +1,31 @@
+{
+  "projectId": "14968934769207649755",
+  "designSystemName": "BoxTools Neo-Brutalist Visual Playbook",
+  "colors": {
+    "orange": "#FF6B35",
+    "orangeDark": "#E8551E",
+    "yellow": "#FFD166",
+    "cyan": "#06D6A0",
+    "teal": "#22D3EE",
+    "purple": "#9B5DE5",
+    "red": "#EF476F",
+    "black": "#121214",
+    "canvas": "#FFFDF7",
+    "surface": "#F4F4F0"
+  },
+  "fontFamily": {
+    "sans": ["Plus Jakarta Sans", "sans-serif"],
+    "display": ["Space Grotesk", "Bricolage Grotesque", "sans-serif"],
+    "mono": ["JetBrains Mono", "monospace"]
+  },
+  "borderRadius": {
+    "DEFAULT": "0.25rem",
+    "lg": "0.5rem"
+  },
+  "boxShadow": {
+    "brutal": "4px 4px 0px #121214",
+    "brutal-sm": "2px 2px 0px #121214",
+    "brutal-lg": "6px 6px 0px #121214"
+  }
+}
+

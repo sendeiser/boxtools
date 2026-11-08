@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+}
+
+/* Neo-Brutalist Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f4efe6;
+  border-left: 2px solid #121214;
+}
+::-webkit-scrollbar-thumb {
+  background: #ff6b35;
+  border: 2px solid #121214;
+}
+.dark ::-webkit-scrollbar-track {
+  background: #18181b;
+  border-left: 2px solid #3f3f46;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #ff6b35;
+  border: 2px solid #27272a;
+}
+
+.grid-dots {
+  background-image: radial-gradient(#12121426 1.25px, transparent 1.25px);
+  background-size: 20px 20px;
+}
+.dark .grid-dots {
+  background-image: radial-gradient(#ffffff1a 1.25px, transparent 1.25px);
+}
+
+.brutal-btn {
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.brutal-btn:hover {
+  transform: translate(-1px, -1px);
+}
+.brutal-btn:active {
+  transform: translate(2px, 2px);
+}
+
