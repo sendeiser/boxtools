@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { ToolItem, AiSettingsConfig } from '../types/boxtools';
 import { MermaidViewer } from './MermaidViewer';
 import { SvgInfographic } from './SvgInfographic';
+import { AiSettingsModal } from './AiSettingsModal';
+import { getAiConfig, callRealAiSynthesis } from '../lib/aiService';
 
 export interface AdminStudioProps {
   readonly tools: readonly ToolItem[];
@@ -26,13 +28,7 @@ export const AdminStudio: React.FC<AdminStudioProps> = ({
 
   // AI settings modal state
   const [showAiSettings, setShowAiSettings] = useState(false);
-  const [aiConfig, setAiConfig] = useState<AiSettingsConfig>({
-    provider: 'gemini',
-    apiKey: '',
-    modelText: 'gemini-2.5-flash',
-    modelImage: 'imagen-3.0-generate-002',
-    enableSvgFallback: true,
-  });
+  const [aiConfig, setAiConfig] = useState<AiSettingsConfig>(getAiConfig());
 
   const handleToolSelect = (slug: string) => {
     setSelectedToolSlug(slug);
@@ -40,12 +36,21 @@ export const AdminStudio: React.FC<AdminStudioProps> = ({
     if (found) setFormData(found);
   };
 
-  const handleSimulateAiIngest = () => {
+  const handleSimulateAiIngest = async () => {
     setIsAiProcessing(true);
-    setTimeout(() => {
-      setIsAiProcessing(false);
-      onShowToast('✨ Ingesta con IA completada: Analogía, diagrama y comandos estructurados');
-    }, 1200);
+    const realResult = await callRealAiSynthesis({
+      sourceType: 'link',
+      rawInput: githubUrl,
+    });
+
+    setIsAiProcessing(false);
+    if (realResult && realResult.length > 0) {
+      const generated = realResult[0].tool;
+      setFormData(generated);
+      onShowToast(`✨ Ingesta con ${aiConfig.provider.toUpperCase()} completada exitosamente`);
+    } else {
+      onShowToast('✨ Ingesta completada (Modo estructurado)');
+    }
   };
 
   const handleSave = () => {
@@ -266,78 +271,12 @@ export const AdminStudio: React.FC<AdminStudioProps> = ({
       </div>
 
       {/* AI Settings Modal */}
-      {showAiSettings && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#15161A] border-[3px] border-[#121214] rounded-lg max-w-md w-full p-5 shadow-brutal-lg space-y-4">
-            <div className="flex items-center justify-between border-b-2 border-black pb-2">
-              <h3 className="font-display font-black text-sm uppercase">
-                🔑 Ajustes del Motor de IA
-              </h3>
-              <button
-                onClick={() => setShowAiSettings(false)}
-                className="w-6 h-6 bg-black text-white rounded font-bold text-xs"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="space-y-3 font-mono text-xs">
-              <div>
-                <label className="block font-bold mb-1">Proveedor Principal:</label>
-                <select
-                  value={aiConfig.provider}
-                  onChange={(e) =>
-                    setAiConfig({ ...aiConfig, provider: e.target.value as any })
-                  }
-                  className="w-full p-2 border-2 border-black rounded bg-white dark:bg-neutral-800 font-bold"
-                >
-                  <option value="gemini">Google Gemini API (Texto + Imagen)</option>
-                  <option value="openai">OpenAI API (GPT-4o + DALL-E)</option>
-                  <option value="openrouter">OpenRouter (Modelos abiertos)</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block font-bold mb-1">API Key:</label>
-                <input
-                  type="password"
-                  value={aiConfig.apiKey}
-                  onChange={(e) => setAiConfig({ ...aiConfig, apiKey: e.target.value })}
-                  placeholder="AIzaSy... o sk-..."
-                  className="w-full p-2 border-2 border-black rounded"
-                />
-              </div>
-
-              <div className="flex items-center gap-2 pt-1">
-                <input
-                  type="checkbox"
-                  id="fallbackSvg"
-                  checked={aiConfig.enableSvgFallback}
-                  onChange={(e) =>
-                    setAiConfig({ ...aiConfig, enableSvgFallback: e.target.checked })
-                  }
-                  className="w-4 h-4 accent-brand-orange"
-                />
-                <label htmlFor="fallbackSvg" className="text-[11px] font-bold">
-                  Fallback Gráfico SVG Nativo (sin huecos si falla cuota)
-                </label>
-              </div>
-            </div>
-
-            <div className="pt-2 flex justify-end gap-2">
-              <button
-                onClick={() => {
-                  setShowAiSettings(false);
-                  onShowToast('Configuración de API Key guardada con éxito');
-                }}
-                className="px-4 py-2 bg-brand-orange text-white font-display font-black text-xs uppercase rounded border-2 border-black shadow-brutal-sm"
-              >
-                Guardar Ajustes
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <AiSettingsModal
+        isOpen={showAiSettings}
+        onClose={() => setShowAiSettings(false)}
+        onShowToast={onShowToast}
+        onConfigSaved={(updatedConfig) => setAiConfig(updatedConfig)}
+      />
     </div>
   );
 };

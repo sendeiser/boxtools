@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
-import { ToolItem, CategorySlug, PhaseSlug } from '../types/boxtools';
+import React, { useState, useEffect } from 'react';
+import { ToolItem, CategorySlug, PhaseSlug, AiSettingsConfig } from '../types/boxtools';
 import { MermaidViewer } from './MermaidViewer';
 import { SvgInfographic } from './SvgInfographic';
+import { AiSettingsModal } from './AiSettingsModal';
+import { getAiConfig, callRealAiSynthesis } from '../lib/aiService';
 
 export interface ToolVariationOption {
   readonly id: string;
@@ -36,6 +38,16 @@ export const AddToolModal: React.FC<AddToolModalProps> = ({
   const [variations, setVariations] = useState<ToolVariationOption[]>([]);
   const [selectedVariationIndex, setSelectedVariationIndex] = useState(0);
 
+  // AI settings state
+  const [showAiSettingsModal, setShowAiSettingsModal] = useState(false);
+  const [aiConfig, setAiConfig] = useState<AiSettingsConfig>(getAiConfig());
+
+  useEffect(() => {
+    if (isOpen) {
+      setAiConfig(getAiConfig());
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,7 +64,7 @@ export const AddToolModal: React.FC<AddToolModalProps> = ({
     reader.readAsText(file);
   };
 
-  const synthesizeToolWithAi = () => {
+  const synthesizeToolWithAi = async () => {
     const rawInput = sourceType === 'link' ? inputUrl.trim() : fileContent.trim();
     if (!rawInput) {
       onShowToast('⚠️ Ingresa una URL o selecciona un archivo para procesar');
@@ -61,6 +73,28 @@ export const AddToolModal: React.FC<AddToolModalProps> = ({
 
     setIsSynthesizing(true);
 
+    // 1. Intentar con IA Real (Gemini / OpenRouter / OpenAI) si hay API Key
+    if (aiConfig.apiKey.trim()) {
+      try {
+        const realAiResults = await callRealAiSynthesis({
+          sourceType,
+          rawInput,
+          fileName,
+        });
+
+        if (realAiResults && realAiResults.length === 3) {
+          setVariations(realAiResults);
+          setSelectedVariationIndex(0);
+          setIsSynthesizing(false);
+          onShowToast(`✨ IA Real (${aiConfig.provider.toUpperCase()}) analizó el recurso y generó 3 variaciones`);
+          return;
+        }
+      } catch (err) {
+        console.warn('Fallo en IA remota, usando motor estructurado:', err);
+      }
+    }
+
+    // 2. Si no hay API Key o falló la conexión, usar el motor estructurado local
     setTimeout(() => {
       let candidateName = 'Nueva Herramienta Agéntica';
       let defaultCategory: Exclude<CategorySlug, 'all' | 'combo'> = 'skill';
@@ -498,6 +532,40 @@ Sistema de diseño y refinamiento estético multimodal.
             </div>
           )}
 
+          {/* AI Connection Status Bar */}
+          <div className="p-3 bg-neutral-100 dark:bg-neutral-800 border-2 border-black rounded flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs font-mono">
+            <div className="flex items-center gap-2">
+              <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${aiConfig.apiKey.trim() ? 'bg-emerald-500 animate-pulse' : 'bg-neutral-400'}`}></span>
+              <div>
+                <p className="font-bold">
+                  {aiConfig.apiKey.trim() ? (
+                    <span className="text-emerald-700 dark:text-emerald-400">
+                      MOTOR IA REAL ACTIVO: {aiConfig.provider.toUpperCase()} ({aiConfig.modelText})
+                    </span>
+                  ) : (
+                    <span className="text-neutral-600 dark:text-neutral-400">
+                      Modo Síntesis Local (Sin API Key conectada)
+                    </span>
+                  )}
+                </p>
+                <p className="text-[10px] text-neutral-500">
+                  {aiConfig.apiKey.trim()
+                    ? 'Genera fichas y análisis con la API oficial en tiempo real.'
+                    : 'Puedes conectar tu clave de Gemini u OpenRouter para análisis en vivo.'}
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowAiSettingsModal(true)}
+              className="shrink-0 px-3 py-1.5 bg-[#FFD166] text-black font-display font-black text-[11px] border-2 border-black rounded shadow-brutal-xs hover:bg-yellow-400 transition flex items-center justify-center gap-1.5"
+            >
+              <span>🔑</span>
+              <span>{aiConfig.apiKey.trim() ? 'Cambiar / Probar API Key' : 'Conectar API Key IA'}</span>
+            </button>
+          </div>
+
           {/* AI Trigger Button */}
           <div className="pt-2">
             <button
@@ -675,6 +743,14 @@ Sistema de diseño y refinamiento estético multimodal.
           </button>
         </footer>
       </div>
+
+      {/* AI Key Settings Modal */}
+      <AiSettingsModal
+        isOpen={showAiSettingsModal}
+        onClose={() => setShowAiSettingsModal(false)}
+        onShowToast={onShowToast}
+        onConfigSaved={(cfg) => setAiConfig(cfg)}
+      />
     </div>
   );
 };
