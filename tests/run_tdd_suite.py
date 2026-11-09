@@ -6,7 +6,7 @@ from playwright.sync_api import sync_playwright
 def test_suite():
     proc = subprocess.Popen(
         ["npm", "run", "preview", "--", "--port", "4173"],
-        cwd=r"d:\boxtools\.worktrees\feat-boxtools-v1",
+        cwd=r"d:\boxtools",
         shell=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE
