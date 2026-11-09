@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AiSettingsConfig } from '../types/boxtools';
-import { getAiConfig, saveAiConfig, testAiApiKey } from '../lib/aiService';
+import { getAiConfig, saveAiConfig, saveAiConfigToDatabase, testAiApiKey } from '../lib/aiService';
 
 export interface AiSettingsModalProps {
   readonly isOpen: boolean;
@@ -47,10 +47,16 @@ export const AiSettingsModal: React.FC<AiSettingsModalProps> = ({
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     saveAiConfig(config);
     if (onConfigSaved) onConfigSaved(config);
-    onShowToast(`✓ Configuración de ${config.provider.toUpperCase()} guardada permanentemente`);
+
+    const res = await saveAiConfigToDatabase(config);
+    if (res.supabaseSuccess) {
+      onShowToast(`🎉 API Key de ${config.provider.toUpperCase()} guardada en Supabase Cloud`);
+    } else {
+      onShowToast(`💾 API Key de ${config.provider.toUpperCase()} guardada`);
+    }
     onClose();
   };
 

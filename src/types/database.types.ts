@@ -156,6 +156,41 @@ export interface Database {
           created_at?: string;
         };
       };
+      ai_settings: {
+        Row: {
+          id: string;
+          provider: 'gemini' | 'openai' | 'openrouter';
+          model_text: string;
+          model_image: string | null;
+          enable_svg_fallback: boolean;
+          api_key: string | null;
+          api_key_encrypted: string | null;
+          is_active: boolean;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          provider: 'gemini' | 'openai' | 'openrouter';
+          model_text?: string;
+          model_image?: string | null;
+          enable_svg_fallback?: boolean;
+          api_key?: string | null;
+          api_key_encrypted?: string | null;
+          is_active?: boolean;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          provider?: 'gemini' | 'openai' | 'openrouter';
+          model_text?: string;
+          model_image?: string | null;
+          enable_svg_fallback?: boolean;
+          api_key?: string | null;
+          api_key_encrypted?: string | null;
+          is_active?: boolean;
+          updated_at?: string;
+        };
+      };
     };
   };
 }

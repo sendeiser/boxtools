@@ -9,6 +9,7 @@ import {
 } from './types/boxtools';
 import { INITIAL_TOOLS, INITIAL_COMBOS } from './data/mockData';
 import { fetchAllToolsMerged, persistNewTool, testSupabaseConnection } from './lib/toolService';
+import { fetchAiConfigFromDatabase } from './lib/aiService';
 import { ToolCard } from './components/ToolCard';
 import { ToolDetailModal } from './components/ToolDetailModal';
 import { ComboDrawer } from './components/ComboDrawer';
@@ -55,6 +56,8 @@ export const App: React.FC = () => {
     testSupabaseConnection().then((connected) => {
       setIsCloudConnected(connected);
     });
+
+    fetchAiConfigFromDatabase();
   }, []);
 
   // Toast System

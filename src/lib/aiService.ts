@@ -1,5 +1,6 @@
 import { AiSettingsConfig, ToolItem, CategorySlug, PhaseSlug } from '../types/boxtools';
 import { ToolVariationOption } from '../components/AddToolModal';
+import { supabase } from './supabase';
 
 const LOCAL_STORAGE_AI_KEY = 'boxtools_ai_config_v2';
 
@@ -31,6 +32,74 @@ export function saveAiConfig(config: AiSettingsConfig): void {
     localStorage.setItem(LOCAL_STORAGE_AI_KEY, JSON.stringify(config));
   } catch (err) {
     console.error('Error al guardar configuración de IA en localStorage:', err);
+  }
+}
+
+export async function fetchAiConfigFromDatabase(): Promise<AiSettingsConfig> {
+  try {
+    const { data, error } = await (supabase as any)
+      .from('ai_settings')
+      .select('*')
+      .order('updated_at', { ascending: false });
+
+    if (!error && data && data.length > 0) {
+      // Tomar la fila activa o la más recientemente actualizada
+      const activeRow = (data as any[]).find((r: any) => r.is_active) || (data as any[])[0];
+      const key = activeRow.api_key || activeRow.api_key_encrypted || '';
+
+      if (key) {
+        const loadedConfig: AiSettingsConfig = {
+          provider: (activeRow.provider as any) || 'gemini',
+          apiKey: key,
+          modelText: activeRow.model_text || 'gemini-2.0-flash',
+          modelImage: activeRow.model_image || 'imagen-3.0-generate-002',
+          enableSvgFallback: activeRow.enable_svg_fallback ?? true,
+        };
+        saveAiConfig(loadedConfig);
+        return loadedConfig;
+      }
+    }
+  } catch (err) {
+    console.warn('No se pudo leer ai_settings de Supabase Cloud, usando local:', err);
+  }
+
+  return getAiConfig();
+}
+
+export async function saveAiConfigToDatabase(
+  config: AiSettingsConfig
+): Promise<{ success: boolean; supabaseSuccess: boolean; error?: string }> {
+  // 1. Siempre guardar en localStorage inmediatamente (doble capa de seguridad)
+  saveAiConfig(config);
+
+  // 2. Persistir en la tabla ai_settings de Supabase Cloud
+  try {
+    if (!config.apiKey.trim()) {
+      return { success: true, supabaseSuccess: false };
+    }
+
+    const payload: any = {
+      provider: config.provider,
+      model_text: config.modelText,
+      api_key: config.apiKey,
+      api_key_encrypted: config.apiKey,
+      is_active: true,
+      updated_at: new Date().toISOString(),
+    };
+
+    const { error } = await (supabase as any)
+      .from('ai_settings')
+      .upsert(payload, { onConflict: 'provider' });
+
+    if (error) {
+      console.warn('Aviso al guardar en Supabase ai_settings:', error.message);
+      return { success: true, supabaseSuccess: false, error: error.message };
+    }
+
+    return { success: true, supabaseSuccess: true };
+  } catch (err: any) {
+    console.error('Error al sincronizar con Supabase ai_settings:', err);
+    return { success: true, supabaseSuccess: false, error: err?.message };
   }
 }
 
