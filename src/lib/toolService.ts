@@ -203,6 +203,31 @@ export async function testSupabaseConnection(): Promise<boolean> {
   }
 }
 
+export async function deleteTool(slug: string): Promise<{ success: boolean; supabaseSuccess: boolean; error?: string }> {
+  // 1. Siempre eliminar inmediatamente de LocalStorage
+  try {
+    const current = getLocalTools();
+    const updated = current.filter((t) => t.slug !== slug);
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
+  } catch (err) {
+    console.error('Error al eliminar de localStorage:', err);
+  }
+
+  // 2. Eliminar de Supabase Cloud
+  try {
+    const { error, data } = await supabase.from('tools').delete().eq('slug', slug).select();
+    if (error) {
+      console.warn('Aviso de Supabase al eliminar herramienta:', error.message);
+      return { success: true, supabaseSuccess: false, error: error.message };
+    }
+    const supabaseDeleted = Boolean(data && data.length > 0);
+    return { success: true, supabaseSuccess: supabaseDeleted };
+  } catch (err: any) {
+    console.error('Error al eliminar de Supabase:', err);
+    return { success: true, supabaseSuccess: false, error: err?.message };
+  }
+}
+
 export async function persistNewTool(tool: ToolItem): Promise<{ supabaseSuccess: boolean; error?: string }> {
   // 1. Siempre guardar inmediatamente en LocalStorage (NUNCA desaparece al recargar)
   saveLocalTool(tool);

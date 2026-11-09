@@ -8,7 +8,7 @@ import {
   ToolMediaItem,
 } from './types/boxtools';
 import { INITIAL_TOOLS, INITIAL_COMBOS } from './data/mockData';
-import { fetchAllToolsMerged, persistNewTool, testSupabaseConnection } from './lib/toolService';
+import { fetchAllToolsMerged, persistNewTool, deleteTool, testSupabaseConnection } from './lib/toolService';
 import { fetchAiConfigFromDatabase } from './lib/aiService';
 import { ToolCard } from './components/ToolCard';
 import { ToolDetailModal } from './components/ToolDetailModal';
@@ -127,6 +127,27 @@ export const App: React.FC = () => {
     }
   };
 
+  const handleDeleteTool = async (slug: string) => {
+    const target = tools.find((t) => t.slug === slug);
+    const title = target?.title || slug;
+
+    // 1. Quitar inmediatamente de la vista en pantalla
+    setTools((prev) => prev.filter((t) => t.slug !== slug));
+    setSelectedComboSlugs((prev) => prev.filter((s) => s !== slug));
+
+    if (activeDetailTool?.slug === slug) {
+      setActiveDetailTool(null);
+    }
+
+    // 2. Eliminar de Supabase Cloud y de LocalStorage
+    const res = await deleteTool(slug);
+    if (res.supabaseSuccess) {
+      showToast(`🗑️ "${title}" eliminada de Supabase Cloud`);
+    } else {
+      showToast(`🗑️ "${title}" eliminada del catálogo`);
+    }
+  };
+
   return (
     <div className={`h-full flex flex-col font-sans selection:bg-brand-orange selection:text-white ${isDarkMode ? 'dark' : ''}`}>
       {currentSection === 'admin' ? (
@@ -140,6 +161,7 @@ export const App: React.FC = () => {
             await persistNewTool(updated);
             showToast(`Guardado exitoso: ${updated.title}`);
           }}
+          onDeleteTool={handleDeleteTool}
           onShowToast={showToast}
           onCloseAdmin={() => setCurrentSection('vault')}
         />
@@ -677,6 +699,7 @@ export const App: React.FC = () => {
                           onToggleCombo={toggleComboItem}
                           onOpenDetail={setActiveDetailTool}
                           onCopy={handleCopy}
+                          onDeleteTool={handleDeleteTool}
                         />
                       ))}
                     </div>
@@ -1210,6 +1233,7 @@ export const App: React.FC = () => {
         isSelectedInCombo={activeDetailTool ? selectedComboSlugs.includes(activeDetailTool.slug) : false}
         onOpenLightbox={(url, caption) => setLightboxMedia({ id: 'lb-1', url, caption, isAiGenerated: false })}
         onCopy={handleCopy}
+        onDeleteTool={handleDeleteTool}
       />
 
       {/* Lightbox Modal */}

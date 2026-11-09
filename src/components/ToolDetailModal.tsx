@@ -11,6 +11,7 @@ export interface ToolDetailModalProps {
   readonly isSelectedInCombo: boolean;
   readonly onOpenLightbox: (url: string, caption: string) => void;
   readonly onCopy: (text: string, label: string) => void;
+  readonly onDeleteTool?: (slug: string) => void;
 }
 
 export const ToolDetailModal: React.FC<ToolDetailModalProps> = ({
@@ -21,6 +22,7 @@ export const ToolDetailModal: React.FC<ToolDetailModalProps> = ({
   isSelectedInCombo,
   onOpenLightbox,
   onCopy,
+  onDeleteTool,
 }) => {
   if (!tool) return null;
 
@@ -83,6 +85,21 @@ export const ToolDetailModal: React.FC<ToolDetailModalProps> = ({
             >
               📥 Descargar .md
             </button>
+            {onDeleteTool && (
+              <button
+                onClick={() => {
+                  if (window.confirm(`¿Estás seguro de que deseas eliminar permanentemente "${tool.title}" del Baúl y de Supabase?`)) {
+                    onDeleteTool(tool.slug);
+                    onClose();
+                  }
+                }}
+                className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white font-display font-bold text-xs rounded border-2 border-[#121214] shadow-brutal-sm transition flex items-center gap-1.5"
+                title="Eliminar herramienta del Baúl"
+              >
+                <span>🗑️</span>
+                <span className="hidden sm:inline">Eliminar</span>
+              </button>
+            )}
             <button
               onClick={onClose}
               className="w-8 h-8 bg-neutral-800 hover:bg-red-600 text-white rounded font-mono font-bold text-sm transition"

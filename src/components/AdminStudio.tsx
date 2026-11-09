@@ -10,6 +10,7 @@ export interface AdminStudioProps {
   readonly onSaveTool: (tool: ToolItem) => void;
   readonly onShowToast: (msg: string) => void;
   readonly onCloseAdmin: () => void;
+  readonly onDeleteTool?: (slug: string) => void;
 }
 
 export const AdminStudio: React.FC<AdminStudioProps> = ({
@@ -17,6 +18,7 @@ export const AdminStudio: React.FC<AdminStudioProps> = ({
   onSaveTool,
   onShowToast,
   onCloseAdmin,
+  onDeleteTool,
 }) => {
   const [selectedToolSlug, setSelectedToolSlug] = useState<string>(tools[0]?.slug || '');
   const activeTool = tools.find((t) => t.slug === selectedToolSlug) || tools[0];
@@ -207,14 +209,28 @@ export const AdminStudio: React.FC<AdminStudioProps> = ({
             />
           </div>
 
-          {/* Save Button */}
-          <div className="pt-2">
+          {/* Save & Delete Buttons */}
+          <div className="pt-2 flex items-center gap-2">
             <button
               onClick={handleSave}
-              className="w-full py-2.5 bg-brand-orange text-white font-display font-black text-xs uppercase rounded border-2 border-black shadow-brutal-sm hover:bg-orange-600 transition"
+              className="flex-1 py-2.5 bg-brand-orange text-white font-display font-black text-xs uppercase rounded border-2 border-black shadow-brutal-sm hover:bg-orange-600 transition"
             >
-              💾 Guardar Cambios en la Ficha
+              💾 Guardar Cambios
             </button>
+            {onDeleteTool && (
+              <button
+                type="button"
+                onClick={() => {
+                  if (window.confirm(`¿Estás seguro de que deseas eliminar permanentemente "${formData.title}" del Baúl y de Supabase?`)) {
+                    onDeleteTool(formData.slug);
+                  }
+                }}
+                className="py-2.5 px-3 bg-red-600 hover:bg-red-700 text-white font-display font-black text-xs uppercase rounded border-2 border-black shadow-brutal-sm transition"
+                title="Eliminar herramienta"
+              >
+                🗑️ Eliminar
+              </button>
+            )}
           </div>
         </section>
 

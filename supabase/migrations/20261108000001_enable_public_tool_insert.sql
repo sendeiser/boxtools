@@ -12,6 +12,7 @@ CREATE POLICY "Public update for tools" ON public.tools
     FOR UPDATE TO public USING (true) WITH CHECK (true);
 
 -- 3. Permitir borrado de herramientas si fuera necesario
+DROP POLICY IF EXISTS "Public delete for tools" ON public.tools;
 CREATE POLICY "Public delete for tools" ON public.tools
     FOR DELETE TO public USING (true);
 

@@ -8,6 +8,7 @@ export interface ToolCardProps {
   readonly onToggleCombo: (slug: string) => void;
   readonly onOpenDetail: (tool: ToolItem) => void;
   readonly onCopy: (text: string, label: string) => void;
+  readonly onDeleteTool?: (slug: string) => void;
 }
 
 export const ToolCard: React.FC<ToolCardProps> = ({
@@ -17,6 +18,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({
   onToggleCombo,
   onOpenDetail,
   onCopy,
+  onDeleteTool,
 }) => {
   return (
     <article
@@ -33,16 +35,32 @@ export const ToolCard: React.FC<ToolCardProps> = ({
             {tool.phaseLabel}
           </span>
         </div>
-        <button
-          onClick={() => onToggleCombo(tool.slug)}
-          className={`text-[11px] font-mono font-bold px-2 py-1 rounded border-2 border-[#121214] shadow-brutal-sm transition ${
-            isSelectedInCombo
-              ? 'bg-[#FFD166] text-[#121214]'
-              : 'bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 hover:bg-[#FFD166]'
-          }`}
-        >
-          {isSelectedInCombo ? '✓ En Combo' : '+ Mi Combo'}
-        </button>
+        <div className="flex items-center gap-1.5">
+          <button
+            onClick={() => onToggleCombo(tool.slug)}
+            className={`text-[11px] font-mono font-bold px-2 py-1 rounded border-2 border-[#121214] shadow-brutal-sm transition ${
+              isSelectedInCombo
+                ? 'bg-[#FFD166] text-[#121214]'
+                : 'bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 hover:bg-[#FFD166]'
+            }`}
+          >
+            {isSelectedInCombo ? '✓ En Combo' : '+ Mi Combo'}
+          </button>
+          {onDeleteTool && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (window.confirm(`¿Estás seguro de que deseas eliminar "${tool.title}" del Baúl y de Supabase?`)) {
+                  onDeleteTool(tool.slug);
+                }
+              }}
+              className="text-[11px] px-1.5 py-1 rounded border-2 border-[#121214] bg-white dark:bg-neutral-800 hover:bg-red-500 hover:text-white transition shadow-brutal-xs"
+              title="Eliminar herramienta"
+            >
+              🗑️
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Card Body */}
