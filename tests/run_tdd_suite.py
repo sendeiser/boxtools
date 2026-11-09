@@ -60,6 +60,15 @@ def test_suite():
             page.wait_for_timeout(400)
             assert page.is_visible('text="Armador de Setup (Mi Combo)"'), "Drawer abierto"
             page.click('text="✕"')
+            page.wait_for_timeout(300)
+
+            # 4. Test Dedicated Section: Workflow Continuidad V7 (Repomix)
+            page.locator('button:has-text("Continuidad V7")').first.click()
+            page.wait_for_timeout(600)
+            assert page.locator('text=Workflow V7: Continuidad').count() > 0, "Sección V7 abierta"
+            assert page.locator('text=¿Por qué es un workflow aparte de PEVC V5?').count() > 0, "Comparativa de workflows visible"
+            page.locator('button:has-text("← Volver al Baúl")').first.click()
+            page.wait_for_timeout(400)
 
             print("✅ TODOS LOS TESTS TDD PASARON EN VERDE")
             browser.close()

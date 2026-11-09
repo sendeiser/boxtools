@@ -4,7 +4,7 @@ export type PhaseSlug = 'all' | 'fase0' | 'fase1' | 'fase2' | 'fase3' | 'fase4';
 
 export type ViewMode = 'criollo' | 'tecnico';
 
-export type ActiveSection = 'vault' | 'pevc' | 'combos' | 'onboarding' | 'admin';
+export type ActiveSection = 'vault' | 'pevc' | 'repomix-v7' | 'combos' | 'onboarding' | 'admin';
 
 export interface SvgFlowStep {
   readonly icon: string;

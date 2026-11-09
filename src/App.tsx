@@ -3,6 +3,7 @@ import {
   CategorySlug,
   PhaseSlug,
   ViewMode,
+  ActiveSection,
   ToolItem,
   ToolMediaItem,
 } from './types/boxtools';
@@ -23,7 +24,7 @@ export const App: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   // App Sections
-  const [currentSection, setCurrentSection] = useState<'vault' | 'pevc' | 'combos' | 'onboarding' | 'admin'>('vault');
+  const [currentSection, setCurrentSection] = useState<ActiveSection>('vault');
 
   // Interactive Modals & Drawers
   const [activeDetailTool, setActiveDetailTool] = useState<ToolItem | null>(null);
@@ -170,9 +171,23 @@ export const App: React.FC = () => {
                     }`}
                   >
                     <span className="flex items-center gap-2">
-                      <span>📘</span> Workflow PEVC V5
+                      <span>📘</span> PEVC V5 (Creación)
                     </span>
                     <span className="font-mono text-[9px] text-brand-orange font-bold">5 Fases</span>
+                  </button>
+
+                  <button
+                    onClick={() => setCurrentSection('repomix-v7')}
+                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded border transition ${
+                      currentSection === 'repomix-v7'
+                        ? 'border-[#121214] bg-cyan-100 dark:bg-cyan-950/50 font-bold text-cyan-900 dark:text-cyan-200'
+                        : 'border-transparent hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <span>📦</span> Continuidad V7
+                    </span>
+                    <span className="font-mono text-[9px] bg-cyan-200 text-cyan-950 px-1 rounded font-bold">Repomix</span>
                   </button>
 
                   <button
@@ -452,7 +467,13 @@ export const App: React.FC = () => {
                             onClick={() => setCurrentSection('pevc')}
                             className="px-4 py-2 bg-brand-orange text-white font-display font-bold text-xs rounded border-2 border-[#121214] shadow-brutal-sm hover:bg-orange-600 transition"
                           >
-                            Abrir Manual Interactivo
+                            Abrir PEVC V5 (Creación)
+                          </button>
+                          <button
+                            onClick={() => setCurrentSection('repomix-v7')}
+                            className="px-3.5 py-2 bg-cyan-100 dark:bg-cyan-950/40 text-cyan-950 dark:text-cyan-200 font-display font-bold text-xs rounded border-2 border-[#121214] shadow-brutal-sm hover:bg-cyan-200 transition"
+                          >
+                            📦 Ver Workflow V7 Continuidad
                           </button>
                           <button
                             onClick={() => handleCopy(INITIAL_TOOLS[4]?.rawMarkdown || '', 'PEVC V5.md')}
@@ -612,6 +633,139 @@ export const App: React.FC = () => {
                         </p>
                       </div>
                     </div>
+
+                    <div className="p-4 bg-cyan-50 dark:bg-cyan-950/20 border-2 border-cyan-600 rounded flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-4">
+                      <div>
+                        <p className="font-bold text-cyan-900 dark:text-cyan-200 text-xs">
+                          📦 ¿No estás creando desde cero y necesitas retomar un proyecto existente?
+                        </p>
+                        <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-0.5">
+                          Para proyectos existentes utiliza el <strong>Workflow V7 Continuidad con Repomix</strong> para absorber el contexto 360° sin romper nada.
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => setCurrentSection('repomix-v7')}
+                        className="shrink-0 px-3 py-1.5 bg-cyan-600 text-white font-mono text-xs font-bold rounded shadow-brutal-sm hover:bg-cyan-700 transition"
+                      >
+                        Abrir Workflow V7 →
+                      </button>
+                    </div>
+                  </div>
+                </section>
+              )}
+
+              {/* SECTION: WORKFLOW CONTINUIDAD V7 (REPOMIX) */}
+              {currentSection === 'repomix-v7' && (
+                <section className="p-6 bg-white dark:bg-[#15161A] border-[3px] border-[#121214] rounded-lg shadow-brutal-lg space-y-6">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between border-b-2 border-black pb-3 gap-3">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-mono font-bold text-cyan-600 dark:text-cyan-400 uppercase">
+                          // WORKFLOW INDEPENDIENTE // RETOMAR & AUDITAR PROYECTOS
+                        </span>
+                        <span className="bg-cyan-100 text-cyan-900 border border-cyan-800 text-[10px] font-mono px-2 py-0.5 rounded font-black">
+                          V7 REPOMIX
+                        </span>
+                      </div>
+                      <h2 className="font-display font-black text-2xl mt-1">
+                        Workflow V7: Continuidad & Contexto Profundo
+                      </h2>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => {
+                          const repomixTool = tools.find((t) => t.slug === 'system-rol-repomix-v7');
+                          if (repomixTool) handleCopy(repomixTool.rawMarkdown, 'system_rol_and_analysis_spec.md');
+                        }}
+                        className="px-3 py-1.5 bg-neutral-100 dark:bg-neutral-800 border-2 border-black font-bold text-xs rounded shadow-brutal-sm hover:bg-neutral-200 transition"
+                      >
+                        📋 Copiar Spec .md
+                      </button>
+                      <button
+                        onClick={() => setCurrentSection('vault')}
+                        className="px-3 py-1.5 bg-[#FFD166] border-2 border-black font-bold text-xs rounded shadow-brutal-sm hover:bg-yellow-400 transition"
+                      >
+                        ← Volver al Baúl
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="prose dark:prose-invert max-w-none text-xs md:text-sm leading-relaxed space-y-5 font-sans">
+                    {/* Comparison Callout */}
+                    <div className="p-4 bg-cyan-50 dark:bg-cyan-950/20 border-2 border-cyan-600 rounded flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div>
+                        <p className="font-bold text-cyan-900 dark:text-cyan-200 text-xs md:text-sm">
+                          ⚡ ¿Por qué es un workflow aparte de PEVC V5?
+                        </p>
+                        <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-0.5">
+                          <strong>PEVC V5</strong> está diseñado para construir productos <strong>desde cero (de 0 a 1)</strong> mediante ideación y maquetación inicial. <strong>V7 Continuidad</strong> está diseñado específicamente para <strong>entrar a repositorios existentes</strong>, entender la historia del código con <code>repomix</code> y continuar exactamente desde el último hito sin romper nada.
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => setCurrentSection('pevc')}
+                        className="shrink-0 px-3 py-1.5 bg-white dark:bg-neutral-900 border border-cyan-800 text-cyan-950 dark:text-cyan-100 font-mono text-[11px] font-bold rounded shadow-xs hover:bg-cyan-100 transition"
+                      >
+                        Ver PEVC V5 (0 a 1) →
+                      </button>
+                    </div>
+
+                    <p className="p-4 bg-red-50 dark:bg-red-950/20 border-2 border-red-600 rounded font-bold text-red-900 dark:text-red-200">
+                      🛑 Regla Categórica V7: "ESTRICTAMENTE PROHIBIDO alterar la arquitectura base, la pila tecnológica existente o los estilos visuales aprobados. Es obligatorio ejecutar Fase -1 con Repomix y plantear la pregunta de continuidad antes de tocar una sola línea de código."
+                    </p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="p-4 border-2 border-black rounded shadow-brutal-sm bg-neutral-50 dark:bg-[#1A1C22]">
+                        <div className="flex items-center justify-between">
+                          <h3 className="font-display font-black text-sm">Fase -1: Análisis Masivo con Repomix</h3>
+                          <span className="font-mono text-[10px] bg-orange-100 text-orange-900 px-1.5 py-0.5 rounded font-bold">npx repomix</span>
+                        </div>
+                        <p className="text-xs text-neutral-600 dark:text-neutral-300 mt-2">
+                          Empaqueta todo el repositorio en un único contexto estructurado para que el agente entienda dependencias reales, arquitectura de carpetas, specs previas y deudas técnicas.
+                        </p>
+                      </div>
+
+                      <div className="p-4 border-2 border-black rounded shadow-brutal-sm bg-neutral-50 dark:bg-[#1A1C22]">
+                        <div className="flex items-center justify-between">
+                          <h3 className="font-display font-black text-sm">Fase 0: Verificación de Skills & MCPs</h3>
+                          <span className="font-mono text-[10px] bg-purple-100 text-purple-900 px-1.5 py-0.5 rounded font-bold">Tooling</span>
+                        </div>
+                        <p className="text-xs text-neutral-600 dark:text-neutral-300 mt-2">
+                          Verifica la disponibilidad de Repomix, Superpowers (SDLC), ECC (AgentShield), Stitch MCP, Impeccable, Supabase Cloud (cero Docker) y Playwright.
+                        </p>
+                      </div>
+
+                      <div className="p-4 border-2 border-black rounded shadow-brutal-sm bg-neutral-50 dark:bg-[#1A1C22]">
+                        <div className="flex items-center justify-between">
+                          <h3 className="font-display font-black text-sm">Fase 1: Diagnóstico & Checkpoint Obligatorio</h3>
+                          <span className="font-mono text-[10px] bg-cyan-100 text-cyan-900 px-1.5 py-0.5 rounded font-bold">Pregunta</span>
+                        </div>
+                        <p className="text-xs text-neutral-600 dark:text-neutral-300 mt-2">
+                          El agente presenta el informe de situación y realiza la pregunta textual: <em>"He completado el análisis exhaustivo del repositorio utilizando Repomix... ¿Confirmamos continuar exactamente desde este punto?"</em>.
+                        </p>
+                      </div>
+
+                      <div className="p-4 border-2 border-black rounded shadow-brutal-sm bg-neutral-50 dark:bg-[#1A1C22]">
+                        <div className="flex items-center justify-between">
+                          <h3 className="font-display font-black text-sm">Fase 2 & 3: Worktrees, TDD & Cierre</h3>
+                          <span className="font-mono text-[10px] bg-emerald-100 text-emerald-900 px-1.5 py-0.5 rounded font-bold">Cero Roturas</span>
+                        </div>
+                        <p className="text-xs text-neutral-600 dark:text-neutral-300 mt-2">
+                          Aislamiento en Git Worktrees, TDD sistemático (Rojo ➔ Verde ➔ Azul), control visual multimodal con Playwright e Impeccable, y validación E2E con AgentShield.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="pt-2 flex flex-wrap gap-3">
+                      <button
+                        onClick={() => {
+                          const repomixTool = tools.find((t) => t.slug === 'system-rol-repomix-v7');
+                          if (repomixTool) setActiveDetailTool(repomixTool);
+                        }}
+                        className="px-4 py-2 bg-cyan-600 text-white font-display font-bold text-xs rounded border-2 border-[#121214] shadow-brutal-sm hover:bg-cyan-700 transition"
+                      >
+                        Ver Ficha Completa + Diagramas de V7 →
+                      </button>
+                    </div>
                   </div>
                 </section>
               )}
@@ -758,7 +912,16 @@ export const App: React.FC = () => {
                   }}
                   className="w-full text-left p-2 rounded bg-neutral-100 dark:bg-neutral-800"
                 >
-                  📘 Workflow PEVC V5
+                  📘 PEVC V5 (Creación de Cero)
+                </button>
+                <button
+                  onClick={() => {
+                    setCurrentSection('repomix-v7');
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full text-left p-2 rounded bg-cyan-100 dark:bg-cyan-950/40 text-cyan-950 dark:text-cyan-200"
+                >
+                  📦 Workflow Continuidad V7 (Repomix)
                 </button>
                 <button
                   onClick={() => {
