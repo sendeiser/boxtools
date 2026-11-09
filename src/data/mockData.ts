@@ -552,6 +552,97 @@ Incluye soporte para:
     repoUrl: 'https://github.com/boxtools/pevc-v5',
     compatibilityTags: ['Antigravity', 'OpenCode', 'Cursor', 'Claude Code'],
   },
+  {
+    id: 't-system-rol-repomix',
+    slug: 'system-rol-repomix-v7',
+    codeId: 'MD-002',
+    title: 'System Rol & Análisis Continuo V7 (Repomix)',
+    tagline: 'Protocolo de continuidad agéntica con Repomix: absorción de contexto profundo (Fase -1), auditoría de issues y cero roturas al retomar proyectos.',
+    emoji: '📦',
+    category: 'markdown',
+    categoryLabel: '📝 WORKFLOW MARKDOWN',
+    phase: 'fase0',
+    phaseLabel: 'FASE 0 // ANÁLISIS & CONTEXTO',
+    status: 'published',
+    isFeatured: true,
+    criolloAnalogy: 'Es como cuando llamás a un mecánico de confianza para que le meta mano a un auto que ya tocó otro taller: lo primero que hace no es desarmar el motor a lo loco, sino conectar el scanner Repomix para leer la computadora de a bordo, revisar el manual y preguntarte "Mirá, encontré esto así, ¿arrancamos por acá?" antes de tocar un solo tornillo.',
+    criolloWithout: [
+      'El agente arranca a escribir código a ciegas, borra funciones que ya estaban hechas, cambia librerías a la mitad del proyecto y rompe todo lo que andaba.',
+      'Tener que explicarle en cada prompt toda la estructura del proyecto una y otra vez porque pierde el hilo de lo que ya se programó.',
+    ],
+    criolloWith: [
+      'Empaquetado quirúrgico con repomix que le da al agente la foto 360° del repo en segundos: dependencias, specs, componentes e issues abiertos.',
+      'Checkpoint obligatorio de diagnóstico de continuidad para acordar el siguiente paso antes de tocar una sola línea de código.',
+    ],
+    semaforoGreen: [
+      'Al retomar cualquier proyecto existente o branch en curso.',
+      'Para auditar repositorios heredados, resolver issues sin romper código previo y mapear deuda técnica.',
+    ],
+    semaforoRed: [
+      'PROHIBIDO alterar la arquitectura base, la pila tecnológica o estilos visuales existentes sin justificación estricta.',
+      'PROHIBIDO codificar antes de presentar el diagnóstico de la Fase 1 y recibir confirmación.',
+    ],
+    riskLevel: 'low',
+    mermaidCode: `flowchart TD
+    A[📂 Repo Existente] --> B[📦 Repomix Packager: Fase -1]
+    B --> C[🧠 Ingesta de Contexto Profundo]
+    C --> D[🛠️ Verificación Skills & MCPs: Fase 0]
+    D --> E[📋 Diagnóstico Ejecutivo & Checkpoint: Fase 1]
+    E -->|Confirmación del Usuario| F[🌲 Worktree + TDD + Impeccable: Fase 2]
+    F --> G[🛡️ E2E + AgentShield + Merge: Fase 3]`,
+    svgConfig: {
+      title: 'Protocolo de Continuidad V7',
+      badge: 'CONTEXTO PROFUNDO & REPOMIX',
+      steps: [
+        { icon: '📦', label: 'Fase -1: Repomix Pack', sublabel: 'Empaquetado total', tone: 'orange' },
+        { icon: '📋', label: 'Fase 0 & 1: Diagnóstico', sublabel: 'Pregunta de continuidad', tone: 'cyan' },
+        { icon: '🚀', label: 'Fase 2 & 3: TDD + Cierre', sublabel: 'Cero regresiones', tone: 'emerald' },
+      ],
+      summaryNote: 'Garantiza la continuidad absoluta al retomar proyectos sin alterar la arquitectura previa.',
+    },
+    mediaGallery: [
+      {
+        id: 'm-repo-1',
+        url: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80',
+        caption: 'Auditoría contextual profunda de repositorio y empaquetado con Repomix',
+        isAiGenerated: false,
+      },
+    ],
+    cliQuickCommand: 'npx repomix',
+    installCommands: {
+      antigravity: 'Copiar como system_rol_and_analysis_spec.md y referenciar en el prompt inicial',
+      opencode: 'Guardar en .opencode/instructions.md o como prompt de inicio de sesión',
+      cursor: 'Agregar al context prompt de Cursor o .cursorrules',
+      claudeCode: 'Incluir en CLAUDE.md como directiva de sesión continua',
+    },
+    rawMarkdown: `# ROL Y CONFIGURACIÓN DEL SISTEMA AGÉNTICO CONTINUO (V7 - CONTEXTO PROFUNDO CON REPOMIX)
+
+Actúa como un Arquitecto de Software Senior, Diseñador UI/UX Principal e Ingeniero QA operando bajo la metodología de "Vibe Coding Profesional".
+
+Tienes **ESTRICTAMENTE PROHIBIDO** alterar la arquitectura base, la pila tecnológica existente, el estilo visual aprobado o los flujos de trabajo previos a menos que sea estrictamente necesario para la continuidad del proyecto.
+
+## FASE -1: ANÁLISIS EXHAUSTIVO DEL REPOSITORIO CON REPOMIX
+1. \`npx repomix\`: Empaquetar el repo en un único archivo consolidado de contexto.
+2. Ingesta y auditoría: Pila real, arquitectura de carpetas, specs previas e issues abiertos.
+
+## FASE 0: VERIFICACIÓN DE SKILLS Y MCPS
+- repomix, superpowers, ECC, find skills, frontend design, stitch MCP, impeccable, supabase MCP (Cloud sin Docker), playwright.
+
+## FASE 1: DIAGNÓSTICO EJECUTIVO Y EMPALME DE CONTINUIDAD
+- Pregunta de continuidad obligatoria antes de avanzar:
+  *"He completado el análisis exhaustivo del repositorio utilizando Repomix y revisado las especificaciones previas..."*
+
+## FASE 2: WORKFLOW DE DESARROLLO, RESOLUCIÓN DE ISSUES Y TDD
+- Worktrees aislados (\`using-git-worktrees\`).
+- Ciclo TDD sistemático (Rojo ➔ Verde ➔ Azul).
+- Control visual estricto con Playwright + Impeccable (Desktop, Tablet, Mobile).
+
+## FASE 3: PRUEBAS INTEGRALES, SEGURIDAD Y CIERRE
+- Validación E2E, auditoría de seguridad con AgentShield y merge limpio.
+`,
+    repoUrl: 'https://github.com/yamadashy/repomix',
+    compatibilityTags: ['Antigravity', 'OpenCode', 'Cursor', 'Claude Code'],
+  },
 ];
 
 export const INITIAL_COMBOS: readonly ComboPreset[] = [
@@ -594,6 +685,16 @@ export const INITIAL_COMBOS: readonly ComboPreset[] = [
     criolloSummary: 'Conectás tu base de datos en la nube sin tocar Docker y el agente programa la lógica verificando cada paso con tests en verde.',
     toolSlugs: ['supabase-cloud', 'superpowers', 'playwright-mcp'],
     workflowNote: 'Ideal para la Fase 3 de implementación de datos y reglas de negocio.',
+  },
+  {
+    id: 'c-continuous-v7',
+    slug: 'continuidad-repomix-v7',
+    title: 'Continuidad Agéntica V7 (Repomix + Superpowers)',
+    subtitle: 'Para retomar proyectos existentes sin romper código anterior.',
+    badgeColor: 'cyan',
+    criolloSummary: 'El scanner total: empaqueta el repo con Repomix para que el agente entienda todo el contexto histórico, diagnostica lo que falta y trabaja aislado con Worktrees y TDD.',
+    toolSlugs: ['system-rol-repomix-v7', 'superpowers', 'impeccable', 'playwright-mcp'],
+    workflowNote: 'Protocolo de ingreso y continuidad agéntica bajo contexto profundo.',
   },
 ];
 

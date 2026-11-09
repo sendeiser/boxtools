@@ -46,6 +46,15 @@ def test_suite():
             page.locator('button:has-text("✕")').first.click()
             page.wait_for_timeout(400)
 
+            # 2c. Test system-rol-repomix-v7 markdown workflow card & modal
+            page.locator('[data-testid="tool-card-system-rol-repomix-v7"] button:has-text("Ver Ficha + Gráficos")').scroll_into_view_if_needed()
+            page.locator('[data-testid="tool-card-system-rol-repomix-v7"] button:has-text("Ver Ficha + Gráficos")').click()
+            page.wait_for_timeout(800)
+            assert page.locator('text=MD-002').count() > 0, "Modal de system-rol-repomix-v7 abierto con MD-002"
+            assert page.locator('text=Protocolo de Continuidad V7').count() > 0, "Infografía SVG de Repomix visible"
+            page.locator('button:has-text("✕")').first.click()
+            page.wait_for_timeout(400)
+
             # 3. Test Combo Drawer
             page.click('text="Mi Combo"')
             page.wait_for_timeout(400)
