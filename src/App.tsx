@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   CategorySlug,
   PhaseSlug,
@@ -8,6 +8,7 @@ import {
   ToolMediaItem,
 } from './types/boxtools';
 import { INITIAL_TOOLS, INITIAL_COMBOS } from './data/mockData';
+import { fetchAllToolsMerged, persistNewTool } from './lib/toolService';
 import { ToolCard } from './components/ToolCard';
 import { ToolDetailModal } from './components/ToolDetailModal';
 import { ComboDrawer } from './components/ComboDrawer';
@@ -39,6 +40,15 @@ export const App: React.FC = () => {
     'stitch-mcp',
     'impeccable',
   ]);
+
+  // Load tools from LocalStorage + Supabase Cloud on mount
+  useEffect(() => {
+    fetchAllToolsMerged().then((loaded) => {
+      if (loaded && loaded.length > 0) {
+        setTools(loaded);
+      }
+    });
+  }, []);
 
   // Toast System
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -87,10 +97,16 @@ export const App: React.FC = () => {
 
   const selectedComboTools = tools.filter((t) => selectedComboSlugs.includes(t.slug));
 
-  const handleAddTool = (newTool: ToolItem) => {
-    setTools([newTool, ...tools]);
-    showToast(`🎉 Herramienta "${newTool.title}" agregada al baúl`);
+  const handleAddTool = async (newTool: ToolItem) => {
+    setTools((prev) => [newTool, ...prev.filter((t) => t.slug !== newTool.slug)]);
     setActiveDetailTool(newTool);
+
+    const res = await persistNewTool(newTool);
+    if (res.supabaseSuccess) {
+      showToast(`🎉 "${newTool.title}" sincronizada en Supabase Cloud`);
+    } else {
+      showToast(`💾 "${newTool.title}" guardada localmente (permanente)`);
+    }
   };
 
   return (
@@ -98,13 +114,13 @@ export const App: React.FC = () => {
       {currentSection === 'admin' ? (
         <AdminStudio
           tools={tools}
-          onSaveTool={(updated) => {
-            const exists = tools.some((t) => t.slug === updated.slug);
-            if (exists) {
-              setTools(tools.map((t) => (t.slug === updated.slug ? updated : t)));
-            } else {
-              setTools([updated, ...tools]);
-            }
+          onSaveTool={async (updated) => {
+            setTools((prev) => {
+              const exists = prev.some((t) => t.slug === updated.slug);
+              return exists ? prev.map((t) => (t.slug === updated.slug ? updated : t)) : [updated, ...prev];
+            });
+            await persistNewTool(updated);
+            showToast(`Guardado exitoso: ${updated.title}`);
           }}
           onShowToast={showToast}
           onCloseAdmin={() => setCurrentSection('vault')}
