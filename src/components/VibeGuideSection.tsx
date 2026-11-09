@@ -323,3 +323,4 @@ Tienes ESTRICTAMENTE PROHIBIDO modificar la arquitectura existente o instalar li
     </section>
   );
 };
+
