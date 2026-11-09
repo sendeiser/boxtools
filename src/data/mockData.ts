@@ -2,6 +2,185 @@ import { ToolItem, ComboPreset } from '../types/boxtools';
 
 export const INITIAL_TOOLS: readonly ToolItem[] = [
   {
+    id: 't-pevc-android-ios',
+    slug: 'pevc-android-ios-workflow',
+    codeId: 'MD-003',
+    title: 'PEVC Mobile: Desarrollo Móvil Multiplataforma iOS & Android (.md)',
+    tagline:
+      'Workflow maestro secuencial de 6 fases (Fase 0 a Fase 5) para idear, diseñar, construir y publicar aplicaciones móviles nativas de alta gama en iPhone (iOS) y Android con Expo, React Native, Expo Router y el sistema de diseño fluido de Emil Kowalski (apple-design + animate-expo). Guía al agente desde el Brainstorming Socrático en 5 dimensiones y el contrato maestro en docs/specs/SPEC.md hasta las pruebas extremas con break-ui y el lanzamiento en App Store y Google Play con EAS Build.',
+    emoji: '📱',
+    category: 'markdown',
+    categoryLabel: '📝 WORKFLOW MARKDOWN',
+    phase: 'fase1',
+    phaseLabel: 'FASE 0 A 5 // MOBILE NATIVO',
+    status: 'published',
+    isFeatured: true,
+    criolloAnalogy:
+      'Es como tener el plano maestro de una fábrica automotriz de alta gama para armar una camioneta 4x4 que tiene que andar igual de suave en el asfalto de la ciudad (iPhone/iOS) que en el ripio de la montaña (Android): primero el ingeniero jefe te sienta a definir las 5 dimensiones del vehículo sin tocar una sola chapa (Fase 1), te firma los planos en una carpeta aparte en docs/specs/SPEC.md (Fase 2), arma el chasis modular con Expo Router (Fase 3), le instala amortiguadores con resortes de relojería suiza de Emil Kowalski para que cada toque en pantalla se sienta real (Fase 4), lo mete a la pista de pruebas extremas con break-ui y te entrega las llaves listas para patentar en App Store y Google Play (Fase 5).',
+    criolloWithout: [
+      'Apps móviles hechas a las apuradas con sabor a página web empaquetada, botones duros sin respuesta táctil inmediata, textos tapados por el notch del iPhone (Safe Areas) y listas que tironean.',
+      'El agente empieza a tirar pantallas y componentes de React Native al azar sin definir primero el flujo de navegación en Expo Router, la persistencia offline-first ni los permisos de cámara, GPS o notificaciones.',
+      'Llegar al final del desarrollo y descubrir que la interfaz se rompe cuando un usuario tiene el nombre largo o que falta toda la estructura de EAS Build para publicar en App Store y Google Play Console.',
+    ],
+    criolloWith: [
+      'Interrogatorio socrático profundo en 5 Dimensiones Esenciales (Negocio, UX/Navegación, Datos/Offline, Hardware y Alcance MVP) en la Fase 1 antes de escribir una sola línea de código.',
+      'Contrato maestro generado automáticamente por fuera del código en docs/specs/SPEC.md con la Matriz Exhaustiva de Pantallas (Screen Flow), rutas de Expo Router y criterios de aceptación.',
+      'Acabado nativo de nivel Apple Design con física de resortes interrumpibles (animate-expo), validación en vivo con Expo Go, pruebas de estrés con break-ui y publicación guiada con EAS.',
+    ],
+    semaforoGreen: [
+      'Al iniciar cualquier aplicación móvil nativa o multiplataforma para iPhone (iOS) y Android utilizando Expo y React Native.',
+      'Cuando buscás una interfaz móvil de élite con respuesta táctil instantánea, animaciones de resorte naturales, respeto estricto de Safe Areas y Modo Claro/Oscuro.',
+      'Para llevar un producto móvil desde la idea en crudo hasta los paquetes listos para subir a App Store y Google Play Console sin huecos de arquitectura.',
+    ],
+    semaforoRed: [
+      'PROHIBIDO escribir código o redactar la especificación definitiva durante la Fase 1 (Brainstorming Socrático) antes de que el usuario responda las 5 dimensiones y dé su visto bueno.',
+      'No usar para aplicaciones exclusivamente web de escritorio que no requieran entorno React Native / Expo.',
+    ],
+    riskLevel: 'low',
+    mermaidCode: `flowchart TD
+    F0["📋 Fase 0: Setup Node + Expo Go + 4 Skills Mobile"] --> F1["🧠 Fase 1: Brainstorming Socrático (5 Dimensiones)"]
+    F1 -->|"OK del Usuario"| F2["📐 Fase 2: Spec Maestro en docs/specs/SPEC.md"]
+    F2 --> F3["💻 Fase 3: create-expo-app + Expo Router Modular"]
+    F3 --> F4["✨ Fase 4: Apple Design + Física de Resortes (animate-expo)"]
+    F4 --> F5["🚀 Fase 5: Stress Test (break-ui) + EAS App Store & Google Play"]`,
+    svgConfig: {
+      title: 'PEVC Mobile: Flujo de 6 Fases (iOS & Android)',
+      badge: 'EXPO + APPLE DESIGN + EAS',
+      steps: [
+        { icon: '🧠', label: 'F0-F2: Brainstorm & Spec', sublabel: '5 Dimensiones + SPEC.md', tone: 'orange' },
+        { icon: '📱', label: 'F3-F4: Expo + Apple UI', sublabel: 'Router + Spring Physics', tone: 'purple' },
+        { icon: '🚀', label: 'F5: Break-UI & Tiendas', sublabel: 'App Store & Google Play', tone: 'emerald' },
+      ],
+      summaryNote:
+        'Flujo secuencial obligatorio de la Fase 0 a la Fase 5: verifica las skills móviles, entrevista en 5 dimensiones, firma el contrato en docs/specs/SPEC.md, construye con Expo Router, refina con Apple Design y publica con EAS.',
+    },
+    mediaGallery: [
+      {
+        id: 'm-pevc-mobile-1',
+        url: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=1200&q=80',
+        caption: 'Desarrollo móvil multiplataforma iOS & Android con Expo, Apple Design y animación de resortes',
+        isAiGenerated: false,
+      },
+    ],
+    cliQuickCommand:
+      'npx skills add superpowers && npx skills add https://github.com/emilkowalski/skills --skill apple-design && npx skills add https://github.com/emilkowalski/skills --skill animate-expo',
+    installCommands: {
+      antigravity: '@[PEVC ANDROID IOS.md] activa este workflow para crear mi app móvil iOS y Android',
+      opencode: 'Guardar como PEVC ANDROID IOS.md e invocar en el prompt inicial de OpenCode',
+      cursor: 'Pegar en .cursorrules o referenciar con @PEVC ANDROID IOS.md en el chat de Cursor',
+      claudeCode: 'Incluir en CLAUDE.md y ejecutar /plugin install expo@claude-plugins-official',
+    },
+    rawMarkdown: `# 🪐 PROMPT MAESTRO PARA ANTIGRAVITY: DESARROLLO MÓVIL MULTIPLATAFORMA (iOS & ANDROID)
+
+Actúa como un **Arquitecto de Software Senior, Experto en Producto Móvil y Diseñador UI/UX de Élite**. Tu misión es guiar al usuario desde la ideación hasta la publicación de una aplicación nativa de alta gama para **iPhone (iOS) y Android** utilizando Expo, React Native y principios de diseño fluido (*Apple Design* / Emil Kowalski).
+
+Para lograrlo, **DEBES SEGUIR ESTRICTAMENTE EL SIGUIENTE FLUJO SECUENCIAL DE 6 FASES (Fase 0 a Fase 5)**.
+
+## 📋 FASE 0: INICIALIZACIÓN Y CONFIGURACIÓN DEL ENTORNO
+
+Antes de ejecutar comandos o diseñar, verifica que el entorno esté preparado:
+
+1. Asegúrate de que el usuario tenga instalado Node.js (LTS), Expo Go en su dispositivo físico y sesión iniciada en Expo (\`npx expo login\`).
+
+2. Verifica la carga de las habilidades (*skills*) requeridas en tu entorno de ejecución:
+
+   \`\`\`bash
+   npx skills add superpowers
+   /plugin install expo@claude-plugins-official
+   npx skills add https://github.com/emilkowalski/skills --skill apple-design
+   npx skills add https://github.com/emilkowalski/skills --skill animate-expo
+   \`\`\`
+
+## 🧠 FASE 1: BRAINSTORMING SOCRÁTICO PROFUNDO (EXCLUSIVO DE ESTA FASE)
+
+**REGLA CRÍTICA:** *Esta es la ÚNICA fase donde harás preguntas al usuario. Está estrictamente prohibido escribir código o generar especificaciones técnicas definitivas aquí.*
+
+Activa la skill de **\`superpowers\` (Brainstorming Specialist)**. Tu objetivo es exprimir la idea del usuario mediante un interrogatorio estructurado y profundo dividido en **5 Dimensiones Esenciales**:
+
+1. **Dimensión de Propuesta de Valor y Negocio:** Problema que resuelve, usuario objetivo (*persona*), modelo de monetización (si aplica) y las 3 acciones principales (*Core Actions*).
+
+2. **Dimensión de Experiencia de Usuario (UX) y Navegación:** Estructura de navegación (pestañas inferiores, cajón lateral, pilas), interacciones físicas/gestuales deseadas y compatibilidad obligatoria con Modo Oscuro/Claro.
+
+3. **Dimensión de Datos y Estado:** Gestión de datos (local mock, Supabase, Firebase, API REST), persistencia de sesión y requerimiento de funcionamiento *offline-first*.
+
+4. **Dimensión de Hardware y Restricciones:** Uso de APIs nativas (cámara, GPS, notificaciones push, Bluetooth) y dependencias complejas.
+
+5. **Dimensión de Alcance del MVP:** Funcionalidades críticas para la versión inicial versus características postergables.
+
+* Haz las preguntas **de a una o en grupos lógicos pequeños (máximo 3)** para no abrumar al usuario.
+
+* Una vez respondidas todas las preguntas por el usuario, emite un resumen consolidado y pídele su visto bueno.
+
+## 📐 FASE 2: CREACIÓN DEL SPEC MAESTRO COMPLETO POR FUERA (\`docs/specs/\`)
+
+Inmediatamente después de recibir el OK del usuario en la Fase 1, **activa la skill de redacción de especificaciones de \`superpowers\`** para procesar toda la información obtenida en el brainstorming y redactar automáticamente el contrato de desarrollo por fuera del código fuente, guardándolo en la ruta **\`docs/specs/SPEC.md\`**. El archivo debe estructurarse bajo el siguiente formato:
+
+\`\`\`markdown
+# 📱 Especificación Técnica Maestra: [NOMBRE DE LA APP]
+
+## 1. Visión General y Alcance del MVP
+- **Propósito del Negocio:** [Resumen analítico obtenido en la Fase 1]
+- **Plataformas Objetivo:** [iOS / Android / Web Preview]
+- **Perfil del Usuario:** [Segmento de audiencia]
+
+## 2. Arquitectura Tecnológica y Stack
+- **Framework Core:** React Native con Expo SDK (Latest)
+- **Ruteo:** Expo Router (File-based routing nativo)
+- **Diseño & Animación:** Sistema Emil Kowalski (\`apple-design\` + \`animate-expo\`)
+- **Gestión de Datos:** [Local Mock State / Supabase / etc.]
+
+## 3. Matriz Exhaustiva de Pantallas (Screen Flow)
+| ID | Nombre de Pantalla | Ruta en Expo Router | Descripción Funcional Detallada | Acciones / Eventos del Usuario |
+|:---|:---|:---|:---|:---|
+| \`SCR-01\` | Splash / Auth | \`/\` | Pantalla de bienvenida o autenticación | Inicio de sesión / Ingreso invitado |
+| \`SCR-02\` | Dashboard Principal | \`/tabs/home\` | Panel con resumen de datos y accesos rápidos | Pull-to-refresh, toque en tarjetas |
+
+## 4. Modelo de Datos y Esquema Inicial
+- Definición de entidades, tipos de interfaces TypeScript y estados globales necesarios.
+
+## 5. Criterios de Aceptación y Calidad (Definition of Done)
+- [ ] Respuesta táctil instantánea en todos los elementos interactivos.
+- [ ] Curvas de animación de resorte validadas.
+- [ ] Comprobación de seguridad en áreas seguras (*Safe Areas* de iPhone y barras de sistema de Android).
+\`\`\`
+
+## 💻 FASE 3: DESARROLLO ITERATIVO Y ESTRUCTURACIÓN (TDD & EXPO)
+
+Una vez validado el \`docs/specs/SPEC.md\`:
+
+1. Ejecuta la creación del proyecto base mediante:
+
+   \`\`\`bash
+   npx create-expo-app@latest [nombre-de-la-app] --template tabs
+   \`\`\`
+
+2. Organiza la estructura de directorios (\`app/\`, \`components/ui/\`, \`constants/\`, \`types/\`).
+
+3. Construye la aplicación de manera modular (pantalla por pantalla), integrando datos de prueba (*mock data*) estructurados para permitir validaciones inmediatas sin fricción de bases de datos externas.
+
+## ✨ FASE 4: REFINAMIENTO DE INTERFAZ (APPLE DESIGN & MOBILE NATIVE UI)
+
+Estando la app ejecutándose localmente (\`npx expo start\` y escaneada en el dispositivo móvil mediante **Expo Go**), aplica el pulido estético de alta gama integrando \`apple-design\` y \`animate-expo\`:
+
+1. Implementa **feedback táctil inmediato** al presionar elementos (sin esperar la liberación del dedo).
+
+2. Configura **física de resortes natural** en modales, hojas deslizantes y listas (\`spring animations\` interrumptibles).
+
+3. Asegura tipografía jerarquizada, espacios limpios y soporte estricto para modo claro/oscuro.
+
+4. Elimina rastros visuales genéricos de IA (degradés violetas recargados, sombras excesivas, elementos descentralizados sin propósito).
+
+## 🚀 FASE 5: VALIDACIÓN, TESTING EXTREMO (\`break-ui\`) Y PUBLICACIÓN
+
+1. **Pruebas de Estrés (\`break-ui\`):** Simula casos límite como nombres de usuario extremadamente largos, avatares ausentes, textos multilínea en botones compactos y estados vacíos.
+
+2. **Validación en Dispositivo Físico:** Comprueba la inercia de desplazamiento, rebotes elásticos (\`rubber-banding\`) y accesibilidad (*Reducir Movimiento*).
+
+3. **Compilación y Publicación (EAS):** Cuando el producto esté listo para lanzarse al mercado, guía al usuario en la configuración de EAS Build y la generación de paquetes de distribución para **App Store (iOS)** y **Google Play Console (Android)** usando \`eas-app-stores\`.`,
+    repoUrl: 'https://github.com/emilkowalski/skills',
+    compatibilityTags: ['Antigravity', 'OpenCode', 'Cursor', 'Claude Code'],
+  },
+  {
     id: 't-superpowers',
     slug: 'superpowers',
     codeId: 'SKILL-001',
@@ -798,6 +977,16 @@ Tienes **ESTRICTAMENTE PROHIBIDO** alterar la arquitectura base, la pila tecnol�
 ];
 
 export const INITIAL_COMBOS: readonly ComboPreset[] = [
+  {
+    id: 'c-mobile-ios-android',
+    slug: 'stack-mobile-ios-android-expo',
+    title: 'Stack Mobile Nativo: iOS & Android (Expo + Apple Design)',
+    subtitle: 'El flujo completo de 6 fases para crear apps móviles fluidas y publicarlas en App Store y Google Play.',
+    badgeColor: 'orange',
+    criolloSummary: 'La fábrica móvil llave en mano: arrancás con el Brainstorming Socrático en 5 dimensiones y el contrato en docs/specs/SPEC.md, armás la app con Expo Router, le ponés física de resortes de Emil Kowalski (apple-design + animate-expo) y la llevás directo a las tiendas.',
+    toolSlugs: ['pevc-android-ios-workflow', 'superpowers', 'frontend-design', 'ui-ux-pro-max', 'supabase-cloud'],
+    workflowNote: 'Cubre de la Fase 0 a la Fase 5 del protocolo móvil multiplataforma (iOS & Android).',
+  },
   {
     id: 'c-full-pevc',
     slug: 'stack-pevc-v5-completo',
