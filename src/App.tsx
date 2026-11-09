@@ -8,7 +8,7 @@ import {
   ToolMediaItem,
 } from './types/boxtools';
 import { INITIAL_TOOLS, INITIAL_COMBOS } from './data/mockData';
-import { fetchAllToolsMerged, persistNewTool } from './lib/toolService';
+import { fetchAllToolsMerged, persistNewTool, testSupabaseConnection } from './lib/toolService';
 import { ToolCard } from './components/ToolCard';
 import { ToolDetailModal } from './components/ToolDetailModal';
 import { ComboDrawer } from './components/ComboDrawer';
@@ -41,12 +41,19 @@ export const App: React.FC = () => {
     'impeccable',
   ]);
 
+  // Cloud Connection Status
+  const [isCloudConnected, setIsCloudConnected] = useState<boolean | null>(null);
+
   // Load tools from LocalStorage + Supabase Cloud on mount
   useEffect(() => {
     fetchAllToolsMerged().then((loaded) => {
       if (loaded && loaded.length > 0) {
         setTools(loaded);
       }
+    });
+
+    testSupabaseConnection().then((connected) => {
+      setIsCloudConnected(connected);
     });
   }, []);
 
@@ -98,11 +105,19 @@ export const App: React.FC = () => {
   const selectedComboTools = tools.filter((t) => selectedComboSlugs.includes(t.slug));
 
   const handleAddTool = async (newTool: ToolItem) => {
+    // 1. Limpiar filtros para garantizar que la nueva herramienta se visualice de inmediato
+    setSelectedCategory('all');
+    setSelectedPhase('all');
+    setSearchQuery('');
+
+    // 2. Insertar al principio del catálogo en pantalla
     setTools((prev) => [newTool, ...prev.filter((t) => t.slug !== newTool.slug)]);
     setActiveDetailTool(newTool);
 
+    // 3. Persistir en almacenamiento dual (Local + Supabase Cloud)
     const res = await persistNewTool(newTool);
     if (res.supabaseSuccess) {
+      setIsCloudConnected(true);
       showToast(`🎉 "${newTool.title}" sincronizada en Supabase Cloud`);
     } else {
       showToast(`💾 "${newTool.title}" guardada localmente (permanente)`);
@@ -147,9 +162,13 @@ export const App: React.FC = () => {
                     </span>
                   </div>
                 </div>
-                <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold bg-[#E6F4EA] text-[#137333] border-2 border-[#121214] px-1.5 py-0.5 shadow-brutal-sm">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                  LIVE
+                <span className={`inline-flex items-center gap-1 text-[9px] font-mono font-bold border-2 border-[#121214] px-1.5 py-0.5 shadow-brutal-sm ${
+                  isCloudConnected
+                    ? 'bg-[#E6F4EA] text-[#137333] dark:bg-emerald-950 dark:text-emerald-300'
+                    : 'bg-[#FFF3E8] text-brand-orange dark:bg-amber-950 dark:text-amber-300'
+                }`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${isCloudConnected ? 'bg-emerald-500 animate-pulse' : 'bg-brand-orange'}`}></span>
+                  {isCloudConnected ? 'SUPABASE' : 'LOCAL'}
                 </span>
               </div>
 
@@ -414,6 +433,28 @@ export const App: React.FC = () => {
 
                 {/* Right controls on Mobile Row 1 */}
                 <div className="flex items-center gap-2">
+                  {isCloudConnected !== null && (
+                    <div
+                      className={`hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 border-2 border-[#121214] rounded text-[11px] font-mono font-bold shadow-brutal-sm ${
+                        isCloudConnected
+                          ? 'bg-[#E6F4EA] text-[#137333] dark:bg-emerald-950/60 dark:text-emerald-300'
+                          : 'bg-[#FFF3E8] text-brand-orange dark:bg-amber-950/60 dark:text-amber-300'
+                      }`}
+                      title={
+                        isCloudConnected
+                          ? 'Supabase Cloud activo y sincronizado en tiempo real'
+                          : 'Almacenamiento Local persistente activo'
+                      }
+                    >
+                      <span
+                        className={`w-2 h-2 rounded-full ${
+                          isCloudConnected ? 'bg-emerald-500 animate-pulse' : 'bg-brand-orange'
+                        }`}
+                      />
+                      <span>{isCloudConnected ? 'SUPABASE CONECTADO' : 'MODO LOCAL'}</span>
+                    </div>
+                  )}
+
                   <button
                     onClick={() => setIsAddToolModalOpen(true)}
                     className="flex items-center gap-1.5 px-2.5 py-1.5 md:py-2 border-2 border-[#121214] rounded bg-brand-orange text-white font-display font-black text-xs shadow-brutal-sm hover:translate-y-[-1px] transition"

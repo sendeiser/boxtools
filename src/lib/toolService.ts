@@ -142,42 +142,65 @@ export function mapToolToRow(tool: ToolItem) {
 export async function fetchAllToolsMerged(): Promise<ToolItem[]> {
   const local = getLocalTools();
 
+  let cloudTools: ToolItem[] = [];
   try {
-    const { data, error } = await supabase.from('tools').select('*');
-    if (!error && data && data.length > 0) {
-      const cloudTools = data.map(mapRowToTool);
-      
-      // Combinar: herramientas nube + locales + iniciales, deduplicadas por slug
-      const slugMap = new Map<string, ToolItem>();
-      
-      // 1. Iniciales
-      for (const t of INITIAL_TOOLS) {
-        slugMap.set(t.slug, t);
-      }
-      // 2. Nube (tienen prioridad sobre iniciales si se actualizaron)
-      for (const t of cloudTools) {
-        slugMap.set(t.slug, t);
-      }
-      // 3. Locales (creadas recientemente)
-      for (const t of local) {
-        slugMap.set(t.slug, t);
-      }
+    const { data, error } = await supabase
+      .from('tools')
+      .select('*')
+      .order('created_at', { ascending: false });
 
-      return Array.from(slugMap.values());
+    if (!error && data && data.length > 0) {
+      cloudTools = data
+        .filter((row: any) => !row.slug?.startsWith('test-')) // Filtrar tests automatizados
+        .map(mapRowToTool);
     }
   } catch (err) {
     console.warn('No se pudo conectar con Supabase Cloud, usando almacenamiento local:', err);
   }
 
-  // Fallback: Iniciales + locales
-  const slugMap = new Map<string, ToolItem>();
-  for (const t of INITIAL_TOOLS) {
-    slugMap.set(t.slug, t);
-  }
+  // 1. Mapa de herramientas custom creadas por el usuario (Nube + Locales)
+  // Las de la nube y locales van primero para que aparezcan arriba en el baúl
+  const customMap = new Map<string, ToolItem>();
+  
+  // Agregar locales
   for (const t of local) {
-    slugMap.set(t.slug, t);
+    if (!t.slug.startsWith('test-')) {
+      customMap.set(t.slug, t);
+    }
   }
-  return Array.from(slugMap.values());
+  // Agregar nube (tienen prioridad sobre locales)
+  for (const t of cloudTools) {
+    customMap.set(t.slug, t);
+  }
+
+  // 2. Mapa de herramientas iniciales
+  const baseMap = new Map<string, ToolItem>();
+  for (const t of INITIAL_TOOLS) {
+    baseMap.set(t.slug, t);
+  }
+
+  // Si alguna herramienta inicial fue editada en la nube, actualizarla en baseMap
+  for (const [slug, tool] of customMap.entries()) {
+    if (baseMap.has(slug)) {
+      baseMap.set(slug, tool);
+      customMap.delete(slug);
+    }
+  }
+
+  // Las herramientas nuevas/custom van AL PRINCIPIO de la lista para que nunca se pierdan de vista
+  const customList = Array.from(customMap.values());
+  const baseList = Array.from(baseMap.values());
+
+  return [...customList, ...baseList];
+}
+
+export async function testSupabaseConnection(): Promise<boolean> {
+  try {
+    const { error } = await supabase.from('tools').select('id').limit(1);
+    return !error;
+  } catch {
+    return false;
+  }
 }
 
 export async function persistNewTool(tool: ToolItem): Promise<{ supabaseSuccess: boolean; error?: string }> {

@@ -10,3 +10,8 @@ CREATE POLICY "Public insert for tools" ON public.tools
 -- 2. Permitir que se actualicen herramientas existentes
 CREATE POLICY "Public update for tools" ON public.tools
     FOR UPDATE TO public USING (true) WITH CHECK (true);
+
+-- 3. Permitir borrado de herramientas si fuera necesario
+CREATE POLICY "Public delete for tools" ON public.tools
+    FOR DELETE TO public USING (true);
+

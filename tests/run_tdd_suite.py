@@ -11,14 +11,22 @@ def test_suite():
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE
     )
-    time.sleep(3)
+    time.sleep(5)
 
     try:
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
             page = browser.new_page(viewport={"width": 1440, "height": 900})
-            page.goto("http://localhost:4173")
-            page.wait_for_load_state("networkidle")
+            
+            # Retry connection if server is still starting
+            for attempt in range(5):
+                try:
+                    page.goto("http://localhost:4173", timeout=5000)
+                    break
+                except Exception:
+                    time.sleep(1)
+            
+            page.wait_for_load_state("domcontentloaded")
 
             # 1. Test Mode Switch
             page.click('button:has-text("TÉCNICO")')
