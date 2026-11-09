@@ -37,6 +37,15 @@ def test_suite():
             page.locator('button:has-text("✕")').first.click()
             page.wait_for_timeout(400)
 
+            # 2b. Test ui-ux-pro-max skill card & modal
+            page.locator('[data-testid="tool-card-ui-ux-pro-max"] button:has-text("Ver Ficha + Gráficos")').scroll_into_view_if_needed()
+            page.locator('[data-testid="tool-card-ui-ux-pro-max"] button:has-text("Ver Ficha + Gráficos")').click()
+            page.wait_for_timeout(800)
+            assert page.locator('text=SKILL-003').count() > 0, "Modal de ui-ux-pro-max abierto con SKILL-003"
+            assert page.locator('text=Motor de Inteligencia de Diseño').count() > 0, "Infografía SVG de ui-ux-pro-max visible"
+            page.locator('button:has-text("✕")').first.click()
+            page.wait_for_timeout(400)
+
             # 3. Test Combo Drawer
             page.click('text="Mi Combo"')
             page.wait_for_timeout(400)

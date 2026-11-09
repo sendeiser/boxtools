@@ -229,6 +229,97 @@ Comandos disponibles:
     compatibilityTags: ['Antigravity', 'OpenCode', 'Cursor', 'Claude Code'],
   },
   {
+    id: 't-ui-ux-pro-max',
+    slug: 'ui-ux-pro-max',
+    codeId: 'SKILL-003',
+    title: 'ui-ux-pro-max (Inteligencia de Diseño UI/UX)',
+    tagline: 'Motor de decisiones UI/UX local: 79 estilos, 192 paletas de producto, 74 font pairings y 119 reglas heurísticas de accesibilidad y microinteracciones.',
+    emoji: '✨',
+    category: 'skill',
+    categoryLabel: '⚡ SKILL AGÉNTICA',
+    phase: 'fase2',
+    phaseLabel: 'FASE 2 // VIBE UI',
+    status: 'published',
+    isFeatured: true,
+    criolloAnalogy: 'Es como tener a un Director de Arte y Diseñador UX Senior sentado al lado tuyo que te canta la posta: te dice la paleta cromática exacta para tu nicho, los tamaños de tipografía según la jerarquía visual y las reglas para que la app no parezca un engendro hecho con Tailwind genérico.',
+    criolloWithout: [
+      'Interfaces con "olor a IA": grises lavados sin contraste, tipografías desproporcionadas y botones sin estados hover o focus.',
+      'Perder horas probando colores al azar en Coolors o inventando reglas de accesibilidad que se rompen en celulares.',
+    ],
+    criolloWith: [
+      'Recomendaciones deterministas basadas en 192 perfiles de producto y 79 estilos (Neobrutalismo, Minimal, Glassmorphism, Bento, etc.).',
+      'Auditoría heurística con 119 reglas de accesibilidad WCAG (contraste 4.5:1, targets táctiles de 44px, navegación por teclado).',
+    ],
+    semaforoGreen: [
+      'Al idear el Design System de una nueva web, landing o producto SaaS.',
+      'Cuando necesitas resolver paletas de color con fundamento psicológico y pairings tipográficos sólidos.',
+      'Para consultar reglas específicas de accesibilidad, microinteracciones GSAP o visualización de gráficos.',
+    ],
+    semaforoRed: [
+      'Para diseñar tablas de base de datos Postgres o escribir queries SQL.',
+      'Para infraestructura DevOps, Dockerfiles o endpoints de backend puros.',
+    ],
+    riskLevel: 'low',
+    mermaidCode: `flowchart LR
+    A[🎯 Tipo de Producto + Nicho] --> B[🔍 Search Script ui-ux-pro-max]
+    B --> C[🎨 Design System Master]
+    C --> D[📐 Tokens: Colores + Tipografía + Reglas]
+    D --> E[🚀 Componentes Frontend Alta Fidelidad]`,
+    svgConfig: {
+      title: 'Motor de Inteligencia de Diseño',
+      badge: 'DESIGN SYSTEM DETERMINISTA',
+      steps: [
+        { icon: '🎯', label: 'Tipo & Nicho', sublabel: 'Contexto de producto', tone: 'orange' },
+        { icon: '🎨', label: '79 Estilos & 192 Paletas', sublabel: 'Razonamiento visual', tone: 'purple' },
+        { icon: '📐', label: 'Design System Master', sublabel: 'Tokens + 119 Reglas UX', tone: 'emerald' },
+      ],
+      summaryNote: 'Elimina el diseño genérico de IA dotando al agente de criterios estéticos y heurísticos profesionales.',
+    },
+    mediaGallery: [
+      {
+        id: 'm-uiux-1',
+        url: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=1200&q=80',
+        caption: 'Catálogo de estilos, paletas y tipografías para interfaces de usuario modernas',
+        isAiGenerated: false,
+      },
+    ],
+    cliQuickCommand: 'python .agents/skills/ui-ux-pro-max/scripts/search.py "<query>" --design-system',
+    installCommands: {
+      antigravity: 'npx skills add ui-ux-pro-max',
+      opencode: 'npx skills add ui-ux-pro-max',
+      cursor: 'npx skills add ui-ux-pro-max',
+      claudeCode: 'npx skills add ui-ux-pro-max',
+    },
+    rawMarkdown: `# UI/UX Pro Max - Design Intelligence
+
+Inteligencia de diseño UI/UX local y determinista para Web, Mobile y Desktop.
+
+## Base de conocimiento indexada:
+- 79 estilos visuales (Minimalismo, Neo-brutalismo, Bento Grid, Dark Mode, etc.).
+- 192 paletas de producto con justificación y roles de color (60-30-10).
+- 74 pairings tipográficos balanceados para lectura y display.
+- 119 reglas heurísticas de UX clasificadas por prioridad (Accesibilidad WCAG, Táctil 44px, Performance, Animación).
+- 105 iconos curados, 17 presets de animación GSAP y 25 tipos de gráficos.
+
+## Modos de búsqueda disponibles:
+\`\`\`bash
+# 1. Generar sistema de diseño completo para un nicho
+python .agents/skills/ui-ux-pro-max/scripts/search.py "fintech dashboard" --design-system -p "MiProyecto"
+
+# 2. Consultar reglas de accesibilidad o interacción
+python .agents/skills/ui-ux-pro-max/scripts/search.py "touch target size" --domain ux
+
+# 3. Consultar paletas y armonías cromáticas
+python .agents/skills/ui-ux-pro-max/scripts/search.py "saas analytics" --domain color
+
+# 4. Consultar pairings tipográficos
+python .agents/skills/ui-ux-pro-max/scripts/search.py "editorial modern" --domain typography
+\`\`\`
+`,
+    repoUrl: 'https://github.com/obra/ui-ux-pro-max',
+    compatibilityTags: ['Antigravity', 'OpenCode', 'Cursor', 'Claude Code'],
+  },
+  {
     id: 't-supabase-cloud',
     slug: 'supabase-cloud',
     codeId: 'MCP-002',
@@ -471,8 +562,18 @@ export const INITIAL_COMBOS: readonly ComboPreset[] = [
     subtitle: 'El arsenal definitivo para arrancar y finalizar una web moderna con IA.',
     badgeColor: 'orange',
     criolloSummary: 'El combo completo con papas y gaseosa: tenés capataz, maquetador de lujo, auditor implacable, base de datos en la nube sin Docker y ojos mecánicos para probar todo.',
-    toolSlugs: ['superpowers', 'stitch-mcp', 'impeccable', 'supabase-cloud', 'playwright-mcp'],
+    toolSlugs: ['superpowers', 'ui-ux-pro-max', 'stitch-mcp', 'impeccable', 'supabase-cloud', 'playwright-mcp'],
     workflowNote: 'Cubre de la Fase 0 a la Fase 4 sin huecos.',
+  },
+  {
+    id: 'c-design-trinity',
+    slug: 'trinidad-diseno-vibe',
+    title: 'Tríada Visual: Stitch + UI/UX Pro Max + Impeccable',
+    subtitle: 'De la idea al diseño de alta costura con maquetación asistida y auditoría multimodal.',
+    badgeColor: 'purple',
+    criolloSummary: 'El dream team estético: UI/UX Pro Max te define la paleta y reglas para no inventar fruta, Stitch te genera la pantalla en minutos e Impeccable te audita hasta el último pixel para que quede perfecto.',
+    toolSlugs: ['ui-ux-pro-max', 'stitch-mcp', 'impeccable'],
+    workflowNote: 'El combo definitivo para la Fase 2 de PEVC V5 (Vibe UI & Design System).',
   },
   {
     id: 'c-visual-audit',
