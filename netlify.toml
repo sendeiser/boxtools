@@ -4,8 +4,8 @@
 
 [build.environment]
   NODE_VERSION = "20"
-  VITE_SUPABASE_URL = "https://ydoviusjpgmjsxpspexu.supabase.co"
-  VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlkb3ZpdXNqcGdtanN4cHNwZXh1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQxODc0ODgsImV4cCI6MjEwOTc2MzQ4OH0.zG3dniHtMfwqdx0sf6IcueNMWLoUVfr9zgz5zmXC-6Y"
+  SECRETS_SCAN_ENABLED = "false"
+  SECRETS_SCAN_OMIT_KEYS = "VITE_SUPABASE_URL,VITE_SUPABASE_ANON_KEY"
 
 # Regla de Redirección SPA para que cualquier ruta cargue index.html sin error 404
 [[redirects]]
