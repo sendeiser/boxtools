@@ -80,10 +80,11 @@ def test_suite():
             page.locator('button:has-text("← Volver al Baúl")').first.click()
             page.wait_for_timeout(400)
 
-            # 6. Test Add Tool Modal with AI
+            # 6. Test Add Tool Modal with AI Variations
             page.locator('button:has-text("Subir con IA")').first.click()
             page.wait_for_timeout(500)
-            assert page.locator('text=Subir Herramienta al Baúl con IA').count() > 0, "Modal de Subir Herramienta abierto"
+            assert page.locator('text=Subir Herramienta al Baúl').count() > 0, "Modal de Subir Herramienta abierto"
+            assert page.locator('text=GENERA MÚLTIPLES ENFOQUES').count() > 0, "Subtítulo de variaciones visible"
             page.locator('button:has-text("✕")').first.click()
             page.wait_for_timeout(300)
 
