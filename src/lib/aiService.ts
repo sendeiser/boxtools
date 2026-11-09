@@ -315,51 +315,79 @@ export async function fetchSourceContext(params: {
 // 2. PROMPT + LLAMADA AL PROVEEDOR
 // ==============================================================================
 
-const SYSTEM_PROMPT = `Eres el Analista Técnico Oficial de BoxTools (catálogo interno de herramientas de IA de un equipo de desarrollo argentino).
-Recibes el CONTENIDO REAL de un repositorio, documentación o archivo. Tu trabajo es leerlo con atención y producir 3 fichas distintas de la MISMA herramienta.
+const SYSTEM_PROMPT = `Eres el Arquitecto y Analista Técnico Principal de BoxTools (el Baúl de Herramientas Agénticas de un equipo de ingeniería argentino).
+Recibes el CONTENIDO REAL de un repositorio, documentación o archivo. Tu trabajo es estudiarlo a fondo y producir 3 fichas técnicas EXTENSAS, RICAS y DETALLADAS de la MISMA herramienta.
 
-REGLAS ESTRICTAS:
-1. Básate EXCLUSIVAMENTE en el contenido proporcionado. Menciona funcionalidades, comandos, conceptos y nombres REALES que aparecen en el texto. Prohibido inventar features.
-2. Si el contenido trae comandos de instalación reales (npm, npx, pip, uv, brew, docker, etc.), úsalos en "installCommand".
-3. Cada variación debe ser genuinamente diferente en enfoque, no sólo cambiar el título:
-   - var1 "Práctico": uso diario, quick start, analogía criolla argentina de la vida cotidiana (mecánico, asado, obra, colectivo, etc.).
-   - var2 "Arquitectura Enterprise": cómo se integra en una arquitectura seria: componentes internos, flujo de datos, seguridad, contratos, testing, riesgos.
-   - var3 "Vibe UI & Prototipado": cómo acelera la iteración rápida, la experiencia de desarrollo y el prototipado (si aplica a frontend, enfocarlo ahí).
-4. "architecture" de cada variación son 3 pasos (icon emoji, label corto ≤ 22 caracteres, sublabel ≤ 28 caracteres) que describen el flujo REAL de la herramienta desde esa perspectiva. Deben ser distintos entre variaciones.
-5. "mermaid" debe ser un diagrama Mermaid válido que empiece con "flowchart LR" o "flowchart TD", entre 4 y 8 nodos, con TODAS las etiquetas entre comillas dobles escapadas, por ejemplo: flowchart LR\\n  A[\\"Usuario\\"] --> B[\\"CLI uv\\"]. Usa \\n para saltos de línea. Debe reflejar la arquitectura real descrita en el contenido.
-6. "phase": número entero 0-4 según el flujo PEVC (0 setup/instalación, 1 especificación/brainstorming, 2 diseño UI/vibe coding, 3 backend/datos/TDD, 4 QA/deploy/cierre).
-7. "category": "mcp" si es un servidor MCP, "markdown" si es un workflow/prompt/regla en markdown, "skill" en cualquier otro caso.
-8. Escribe todo en español rioplatense claro. Listas de 2 a 3 ítems concretos.
-9. Responde SOLO con un objeto JSON válido. Sin markdown, sin comentarios, sin texto adicional.`;
+REGLAS ESTRICTAS DE EXTENSIÓN Y PROFUNDIDAD (PROHIBIDO HACER RESÚMENES CORTOS):
+1. Básate EXCLUSIVAMENTE en el contenido proporcionado. Menciona funcionalidades reales, módulos, flags, comandos, lenguajes y conceptos que aparecen en el documento.
+2. "tagline" (Descripción Principal de la herramienta): DEBE SER UN PÁRRAFO EXTENSO Y COMPLETO de 3 a 5 oraciones (entre 320 y 550 caracteres). Debe explicar con claridad: qué es exactamente la herramienta, qué problema técnico resuelve, cómo funciona internamente según la documentación leída y qué ventaja competitiva aporta al flujo de trabajo del desarrollador. ¡NO hagas una frase corta de un solo renglón!
+3. "variationSummary": 2 a 3 oraciones completas (180 a 300 caracteres) explicando el enfoque específico de esa variante sobre esta herramienta.
+4. "criolloAnalogy": Una analogía argentina criolla NARRATIVA, RICA Y EXTENSA de 4 a 5 oraciones completas (350 a 600 caracteres). Desarrolla la historia con lujo de detalles cotidianos (taller mecánico, obra en construcción, cocina/asado, boxes de carrera, etc.) conectando cada parte de la metáfora con el funcionamiento real de la herramienta.
+5. "criolloWithout" y "criolloWith": 3 a 4 ítems por lista. Cada ítem debe ser una oración explicativa completa de 18 a 35 palabras detallando el dolor real sin la herramienta vs. la solución concreta con la herramienta.
+6. "semaforoGreen" y "semaforoRed": 3 a 4 ítems por lista. Cada ítem debe ser una oración completa y bien fundamentada explicando exactamente en qué escenarios técnicos sí usarla y cuándo evitarla.
+7. Cada variación debe tener un ángulo técnico genuinamente distinto:
+   - var1 "Práctico & Velocidad": Uso diario, comandos directos, productividad inmediata en consola/IDE y resolución sin burocracia.
+   - var2 "Arquitectura Enterprise": Integración en sistemas críticos, arquitectura interna de componentes, flujo de datos, seguridad, contratos y prevención de fallos.
+   - var3 "Vibe UI & Prototipado": Aceleración de iteración rápida, experiencia de desarrollador (DX), automatización creativa y flujo ágil.
+8. "architecture" de cada variación son 3 pasos (icon emoji, label corto ≤ 24 caracteres, sublabel ≤ 34 caracteres) que describen el flujo REAL de la herramienta desde esa perspectiva. Deben ser distintos entre las 3 variaciones.
+9. "architectureNote": Explicación detallada de 2 a 3 oraciones (200 a 350 caracteres) describiendo cómo viajan los datos o comandos a través de los 3 pasos de la arquitectura.
+10. "mermaid": Diagrama Mermaid válido que empiece con "flowchart LR" o "flowchart TD", entre 5 y 8 nodos reales de la herramienta, con TODAS las etiquetas entre comillas dobles escapadas (ej: flowchart LR\\n  A[\\"Entrada CLI\\"] --> B[\\"Motor Principal\\"]). Usa \\n para saltos de línea. Cada variación debe tener un diagrama Mermaid diferente.
+11. "markdown": Documentación técnica EXTENSA y COMPLETA en Markdown (mínimo 300 palabras) con estas secciones detalladas:
+   - # Nombre y Enfoque
+   - ## 📖 Descripción Profunda y Propósito
+   - ## ⚙️ Arquitectura y Cómo Funciona por Dentro
+   - ## 🚀 Instalación y Comandos Reales de Uso
+   - ## 💡 Casos de Uso Prácticos en el Equipo
+   - ## 🛡️ Buenas Prácticas y Consideraciones
+12. Responde SOLO con un objeto JSON válido. Sin bloques markdown alrededor, sin comentarios.`;
 
 function buildUserPrompt(ctx: SourceContext): string {
   const variationSchema = `{
-      "title": "string",
-      "tagline": "string (máx 140 caracteres, concreto)",
-      "emoji": "un emoji",
+      "title": "string (nombre + enfoque claro)",
+      "variationSummary": "string (2 a 3 oraciones detallando por qué elegir esta variante, 180-300 caracteres)",
+      "tagline": "string EXTENSO (párrafo completo de 3 a 5 oraciones bien desarrolladas, entre 320 y 550 caracteres, explicando qué hace, cómo funciona y qué resuelve en detalle)",
+      "emoji": "un emoji representativo",
       "phase": 2,
       "riskLevel": "low | medium | high",
-      "criolloAnalogy": "string",
-      "criolloWithout": ["string", "string"],
-      "criolloWith": ["string", "string"],
-      "semaforoGreen": ["string", "string"],
-      "semaforoRed": ["string", "string"],
-      "architecture": [
-        {"icon": "emoji", "label": "string", "sublabel": "string"},
-        {"icon": "emoji", "label": "string", "sublabel": "string"},
-        {"icon": "emoji", "label": "string", "sublabel": "string"}
+      "criolloAnalogy": "string EXTENSO (analogía criolla argentina narrativa de 4 a 5 oraciones completas, 350-600 caracteres, bien explicada y gráfica)",
+      "criolloWithout": [
+        "Oración completa y detallada explicando el primer problema grave de trabajar sin esta herramienta (18-35 palabras)",
+        "Oración completa y detallada explicando el segundo problema o pérdida de tiempo (18-35 palabras)",
+        "Oración completa y detallada explicando el tercer riesgo técnico o fricción manual (18-35 palabras)"
       ],
-      "architectureNote": "string (1 frase que resuma el flujo)",
-      "mermaid": "flowchart LR\\n  A[\\"...\\"] --> B[\\"...\\"]",
-      "markdown": "string en Markdown con secciones ## Qué es, ## Cómo se usa (con comandos reales), ## Cuándo usarla"
+      "criolloWith": [
+        "Oración completa y detallada explicando la primera mejora directa al usar la herramienta (18-35 palabras)",
+        "Oración completa y detallada explicando la segunda ventaja técnica o automatización lograda (18-35 palabras)",
+        "Oración completa y detallada explicando el resultado final en velocidad y calidad (18-35 palabras)"
+      ],
+      "semaforoGreen": [
+        "Escenario detallado 1 donde es ideal usar esta herramienta",
+        "Escenario detallado 2 con caso de uso real",
+        "Escenario detallado 3 de máximo aprovechamiento"
+      ],
+      "semaforoRed": [
+        "Caso detallado 1 donde NO conviene usarla o es contraproducente",
+        "Error común o mala práctica 2 que se debe evitar",
+        "Límite técnico 3 a tener en cuenta"
+      ],
+      "architecture": [
+        {"icon": "emoji", "label": "Paso 1 real", "sublabel": "Detalle técnico del paso 1"},
+        {"icon": "emoji", "label": "Paso 2 real", "sublabel": "Detalle técnico del paso 2"},
+        {"icon": "emoji", "label": "Paso 3 real", "sublabel": "Detalle técnico del paso 3"}
+      ],
+      "architectureNote": "string (2 a 3 oraciones completas explicando el flujo técnico de punta a punta)",
+      "mermaid": "flowchart LR\\n  A[\\"...\\"] --> B[\\"...\\"]\\n  B --> C[\\"...\\"]\\n  C --> D[\\"...\\"]\\n  D --> E[\\"...\\"]",
+      "markdown": "string EXTENSO en Markdown (mínimo 300 palabras) con secciones ## 📖 Descripción Profunda, ## ⚙️ Arquitectura Interna, ## 🚀 Instalación y Comandos Reales, ## 💡 Casos de Uso, ## 🛡️ Buenas Prácticas"
     }`;
 
   return `FUENTE ANALIZADA: ${ctx.label}
 URL DE REFERENCIA: ${ctx.repoUrl}
 
-=== CONTENIDO REAL (léelo completo) ===
+=== CONTENIDO REAL EXTRAÍDO DEL LINK (léelo completo para describir la herramienta en profundidad) ===
 ${ctx.content}
 === FIN DEL CONTENIDO ===
+
+IMPORTANTE: La descripción ("tagline"), la analogía ("criolloAnalogy") y la documentación ("markdown") NO deben ser cortas. El usuario necesita textos largos, ricos, explicativos y bien desarrollados basados en el contenido real.
 
 Devuelve un JSON con exactamente esta forma:
 {
@@ -397,7 +425,7 @@ async function callProvider(config: AiSettingsConfig, system: string, user: stri
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: system }] },
           contents: [{ role: 'user', parts: [{ text: user }] }],
-          generationConfig: { temperature: 0.4, responseMimeType: 'application/json', maxOutputTokens: 8192 },
+          generationConfig: { temperature: 0.45, responseMimeType: 'application/json', maxOutputTokens: 12000 },
         }),
       }
     );
@@ -415,8 +443,8 @@ async function callProvider(config: AiSettingsConfig, system: string, user: stri
           { role: 'system', content: system },
           { role: 'user', content: user },
         ],
-        temperature: 0.4,
-        max_tokens: 8000,
+        temperature: 0.45,
+        max_tokens: 12000,
       };
       if (withJsonMode) body.response_format = { type: 'json_object' };
       return fetch('https://openrouter.ai/api/v1/chat/completions', {
@@ -453,7 +481,8 @@ async function callProvider(config: AiSettingsConfig, system: string, user: stri
         { role: 'system', content: system },
         { role: 'user', content: user },
       ],
-      temperature: 0.4,
+      temperature: 0.45,
+      max_tokens: 12000,
       response_format: { type: 'json_object' },
     }),
   });
@@ -477,7 +506,7 @@ const PHASE_LABELS: Record<number, string> = {
 function toStringList(value: any, fallback: string[]): string[] {
   if (Array.isArray(value)) {
     const list = value.map((v) => String(v).trim()).filter(Boolean);
-    if (list.length > 0) return list.slice(0, 4);
+    if (list.length > 0) return list.slice(0, 5);
   }
   return fallback;
 }
@@ -559,8 +588,8 @@ export async function synthesizeWithRealAi(params: {
     const rawSteps: any[] = Array.isArray(v.architecture) ? v.architecture : [];
     const steps = [0, 1, 2].map((i) => ({
       icon: String(rawSteps[i]?.icon || ['💡', '⚙️', '🚀'][i]),
-      label: String(rawSteps[i]?.label || ['Entrada', 'Proceso', 'Resultado'][i]).slice(0, 26),
-      sublabel: String(rawSteps[i]?.sublabel || '').slice(0, 32),
+      label: String(rawSteps[i]?.label || ['Entrada', 'Proceso', 'Resultado'][i]).slice(0, 28),
+      sublabel: String(rawSteps[i]?.sublabel || '').slice(0, 38),
       tone: tones[i],
     })) as unknown as [SvgFlowStep, SvgFlowStep, SvgFlowStep];
 
@@ -626,7 +655,9 @@ export async function synthesizeWithRealAi(params: {
       badge: 'PRÁCTICO & DIRECTO',
       badgeColor: 'orange',
       icon: '🛠️',
-      description: 'Uso diario, quick start real y analogía criolla basada en el contenido analizado.',
+      description:
+        String(parsed.var1?.variationSummary || '').trim() ||
+        'Enfoque pragmático de ejecución diaria: prioriza comandos directos, configuración instantánea y una explicación criolla sin vueltas basada en la documentación oficial.',
       tool: buildTool('var1', 'practico', 'PRÁCTICO & DIRECTO', '🛠️'),
     },
     {
@@ -635,7 +666,9 @@ export async function synthesizeWithRealAi(params: {
       badge: 'CONTRATOS & SEGURIDAD',
       badgeColor: 'cyan',
       icon: '🛡️',
-      description: 'Componentes internos, flujo de datos, seguridad y riesgos de integración.',
+      description:
+        String(parsed.var2?.variationSummary || '').trim() ||
+        'Análisis profundo de arquitectura interna, flujo de datos entre componentes, garantías de seguridad, contratos de integración y prevención de fallos en producción.',
       tool: buildTool('var2', 'enterprise', 'ARQUITECTURA ENTERPRISE', '🛡️'),
     },
     {
@@ -644,7 +677,9 @@ export async function synthesizeWithRealAi(params: {
       badge: 'DISEÑO & EXPERIENCIA',
       badgeColor: 'purple',
       icon: '✨',
-      description: 'Cómo acelera la iteración rápida y el prototipado según lo que realmente hace.',
+      description:
+        String(parsed.var3?.variationSummary || '').trim() ||
+        'Orientado a la experiencia de desarrollo (DX), prototipado rápido, iteración fluida con agentes de IA y aceleración del ciclo creativo del equipo.',
       tool: buildTool('var3', 'vibe-ui', 'VIBE UI & PROTOTIPADO', '✨'),
     },
   ];

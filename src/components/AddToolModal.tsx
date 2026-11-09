@@ -157,7 +157,7 @@ export const AddToolModal: React.FC<AddToolModalProps> = ({
         slug: `${slugBase}-practico`,
         codeId: defaultCategory === 'mcp' ? `MCP-0${randomSuffix}` : defaultCategory === 'markdown' ? `MD-0${randomSuffix}` : `SKILL-0${randomSuffix}`,
         title: `${titleFormatted} (Enfoque Práctico)`,
-        tagline: `Solución directa sin vueltas: automatización agéntica para no perder tiempo renegando con código manual en ${titleFormatted}.`,
+        tagline: `Solución agéntica directa y sin vueltas para ${titleFormatted}: automatiza las tareas repetitivas de configuración, ejecución y diagnóstico directamente desde tu entorno de trabajo. Permite que el agente resuelva en minutos lo que manualmente llevaría horas de lectura de documentación y pruebas de ensayo y error, manteniendo el foco en entregar código funcional y limpio en el día a día.`,
         emoji: '🛠️',
         category: defaultCategory,
         categoryLabel: defaultCategoryLabel,
@@ -165,36 +165,41 @@ export const AddToolModal: React.FC<AddToolModalProps> = ({
         phaseLabel: 'FASE 2 // VIBE CODING',
         status: 'published',
         isFeatured: false,
-        criolloAnalogy: `Es como cuando llamás al mecánico del barrio que viene con la llave justa: en vez de pasarte horas adivinando con el capó abierto, te ajusta la tuerca exacta y te deja el auto regulando en 5 minutos.`,
+        criolloAnalogy: `Es como cuando llamás al mecánico de confianza del barrio que ya conoce el ruido del motor de memoria y viene con la llave tubo exacta en el bolsillo: en vez de hacerte desarmar medio auto ni pasarte toda la tarde adivinando con el capó levantado, conecta el escáner, ajusta la pieza justa en cinco minutos y te deja el coche regulando parejito para salir a la ruta sin renegar.`,
         criolloWithout: [
-          `Perder horas buscando ejemplos rotos en StackOverflow y renegando con configuraciones manuales.`,
-          `Picar código repetitivo para ${titleFormatted} que la IA podría resolver en un parpadeo.`,
+          `Perder horas valiosas buscando ejemplos desactualizados en foros y renegando con configuraciones manuales que fallan a mitad de camino.`,
+          `Escribir código repetitivo de integración para ${titleFormatted} que un agente especializado podría resolver de forma automática y sin errores de tipeo.`,
+          `Depender de prueba y error constante en consola sin una guía clara de comandos probados para el proyecto.`,
         ],
         criolloWith: [
-          `Automatización directa y comandos estandarizados listos para correr sin fricción.`,
-          `El agente sabe exactamente qué tocar sin romper lo que ya andaba bien.`,
+          `Automatización directa con comandos estandarizados listos para ejecutar sin fricción desde el primer minuto en el repositorio.`,
+          `El agente comprende exactamente qué archivos e interfaces tocar sin romper lo que ya estaba funcionando en el sistema.`,
+          `Resolución pragmática orientada a resultados rápidos para destrabar el desarrollo diario del equipo.`,
         ],
         semaforoGreen: [
-          `Cuando necesitás velocidad inmediata para integrar ${titleFormatted} en tu flujo diario.`,
-          `Para resolver tareas rutinarias sin inventar la rueda de nuevo.`,
+          `Cuando necesitás velocidad inmediata para integrar y operar ${titleFormatted} en tu flujo de desarrollo cotidiano.`,
+          `Para automatizar tareas operativas recurrentes y configurar el entorno sin tener que inventar la rueda en cada proyecto.`,
+          `Ideal para destrabar bloqueos técnicos rápidos con comandos directos de terminal.`,
         ],
         semaforoRed: [
-          `No usar si la tarea no involucra directamente este subsistema para no sobrecargar el contexto.`,
+          `No activar esta herramienta si la tarea actual no involucra directamente a ${titleFormatted}, para mantener limpio el contexto del agente.`,
+          `Evitar usar el enfoque rápido sin revisión previa cuando se estén modificando esquemas productivos irreversibles.`,
         ],
         riskLevel: 'low',
         mermaidCode: `flowchart LR
-    A[💡 Idea o Bug] --> B[🛠️ ${titleFormatted}]
-    B --> C[⚡ Ajuste Directo]
-    C --> D[🚀 Listo y Andando]`,
+    A["💡 Requerimiento o Bug"] --> B["🛠️ ${titleFormatted}"]
+    B --> C["⚡ Diagnóstico & Ajuste"]
+    C --> D["✅ Verificación Local"]
+    D --> E["🚀 Listo en Producción"]`,
         svgConfig: {
           title: `Flujo Práctico: ${titleFormatted}`,
           badge: 'VELOCIDAD & CERO VUELTAS',
           steps: [
-            { icon: '💡', label: 'Detección', sublabel: 'Cero demora', tone: 'orange' },
-            { icon: '🛠️', label: 'Ajuste Inmediato', sublabel: 'Sin burocracia', tone: 'cyan' },
-            { icon: '🚀', label: 'Entrega Rápida', sublabel: 'Producción', tone: 'emerald' },
+            { icon: '💡', label: 'Detección Rápida', sublabel: 'Lectura del contexto', tone: 'orange' },
+            { icon: '🛠️', label: 'Ejecución Directa', sublabel: 'Comandos sin fricción', tone: 'cyan' },
+            { icon: '🚀', label: 'Entrega Validada', sublabel: 'Listo para usar', tone: 'emerald' },
           ],
-          summaryNote: `Optimizado para velocidad de desarrollo y resolución pragmática en el día a día.`,
+          summaryNote: `Flujo optimizado de tres etapas para máxima velocidad de desarrollo: detecta la necesidad en el repositorio, ejecuta la automatización de ${titleFormatted} sin pasos burocráticos y entrega el resultado verificado.`,
         },
         mediaGallery: [
           {
@@ -211,12 +216,24 @@ export const AddToolModal: React.FC<AddToolModalProps> = ({
           cursor: `npx skills add ${repoUrl}`,
           claudeCode: `npx skills add ${repoUrl}`,
         },
-        rawMarkdown: `# ${titleFormatted} (Enfoque Práctico)
-Automatización y comandos para ejecución rápida.
+        rawMarkdown: `# ${titleFormatted} — Enfoque Práctico & Velocidad
 
-## Comandos rápidos:
-- Instalar: \`npx skills add ${repoUrl}\`
-- Objetivo: Reducir fricción y resolver en minutos.
+## 📖 Descripción Profunda y Propósito
+**${titleFormatted}** en su variante práctica está pensada para desarrolladores que necesitan resultados inmediatos sin empantanarse en configuraciones eternas. Integra directivas claras y comandos listos para usar que le permiten al agente de IA operar la herramienta con precisión quirúrgica desde la primera instrucción.
+
+## ⚙️ Arquitectura y Cómo Funciona por Dentro
+1. **Ingesta de Contexto Local:** Identifica los archivos clave del proyecto antes de ejecutar cualquier acción.
+2. **Automatización Directa:** Ejecuta los comandos nativos de \`${titleFormatted}\` con los parámetros óptimos.
+3. **Verificación Rápida:** Comprueba que la salida sea limpia y que el proyecto siga compilando sin errores.
+
+## 🚀 Instalación y Comandos Reales
+\`\`\`bash
+npx skills add ${repoUrl}
+\`\`\`
+
+## 💡 Casos de Uso en el Equipo
+- Configuración inicial rápida en repositorios nuevos o existentes.
+- Resolución de tareas repetitivas mediante comandos estandarizados.
 `,
         repoUrl,
         compatibilityTags: ['Antigravity', 'OpenCode', 'Cursor', 'Claude Code'],
@@ -228,7 +245,7 @@ Automatización y comandos para ejecución rápida.
         slug: `${slugBase}-enterprise`,
         codeId: defaultCategory === 'mcp' ? `MCP-E${randomSuffix}` : defaultCategory === 'markdown' ? `MD-E${randomSuffix}` : `SKILL-E${randomSuffix}`,
         title: `${titleFormatted} (Arquitectura Enterprise)`,
-        tagline: `Integración determinista de grado empresarial con contratos semánticos, aislamiento y tolerancia cero a regresiones para ${titleFormatted}.`,
+        tagline: `Integración determinista de grado empresarial para ${titleFormatted} diseñada bajo estándares estrictos de arquitectura de software. Incorpora validación rigurosa de contratos, aislamiento de responsabilidades, trazabilidad de cambios y tolerancia cero a regresiones para garantizar que cada operación sea predecible, auditable y segura en entornos de misión crítica.`,
         emoji: '🛡️',
         category: defaultCategory,
         categoryLabel: defaultCategoryLabel,
@@ -236,37 +253,41 @@ Automatización y comandos para ejecución rápida.
         phaseLabel: 'FASE 0 // ARQUITECTURA & SEGURIDAD',
         status: 'published',
         isFeatured: true,
-        criolloAnalogy: `Es como el sistema de chequeo de despegue en la cabina de un avión comercial: ningún parámetro se modifica a ciegas, cada función tiene su contrato firmado y si un sensor marca rojo, el sistema aísla la falla antes de que afecte a producción.`,
+        criolloAnalogy: `Es como el protocolo de chequeo pre-vuelo en la cabina de un avión comercial internacional: ningún interruptor se toca de memoria ni a las apuradas; cada subsistema tiene su lista de verificación firmada, su sensor de respaldo y su contrato de seguridad para garantizar que el avión despegue, vuele en medio de cualquier tormenta y aterrice con precisión milimétrica.`,
         criolloWithout: [
-          `Inconsistencias de contratos, tipos desincronizados y deuda técnica silenciosa en ${titleFormatted}.`,
-          `Commits gigantescos sin cobertura de tests que rompen entornos críticos de producción.`,
+          `Inconsistencias de contratos, tipos de datos desincronizados y acumulación de deuda técnica silenciosa al integrar ${titleFormatted} sin estándares.`,
+          `Despliegues riesgosos sin cobertura de pruebas automatizadas que terminan rompiendo servicios críticos en producción un viernes a la tarde.`,
+          `Falta de trazabilidad y control sobre qué permisos o recursos del sistema modifica la herramienta durante su ejecución.`,
         ],
         criolloWith: [
-          `Blindaje integral mediante tipado TypeScript estricto, políticas de seguridad y contratos inmutables.`,
-          `Pruebas TDD automatizadas y auditoría de seguridad previa a cualquier despliegue.`,
+          `Blindaje integral mediante contratos estrictos, validación de esquemas de entrada/salida y separación clara de capas arquitectónicas.`,
+          `Verificación continua bajo ciclo TDD (Rojo ➔ Verde ➔ Refactor) y auditoría preventiva antes de fusionar cualquier cambio a la rama principal.`,
+          `Documentación técnica clara y reproducible para que todo el equipo de ingeniería mantenga el mismo estándar de calidad.`,
         ],
         semaforoGreen: [
-          `En sistemas empresariales, aplicaciones financieras o código donde un fallo cueste dinero real.`,
-          `Cuando se requiere compliance de seguridad, trazabilidad de logs y arquitectura desacoplada.`,
+          `En arquitecturas empresariales, plataformas en producción o módulos críticos donde un fallo impacte directamente a los usuarios.`,
+          `Cuando se requiere trazabilidad completa, contratos de interfaz inmutables y validación automatizada en el pipeline CI/CD.`,
+          `Al escalar un proyecto entre múltiples desarrolladores y agentes trabajando en paralelo.`,
         ],
         semaforoRed: [
-          `PROHIBIDO modificar la arquitectura base sin test previo en rojo y aprobación del responsable técnico.`,
+          `PROHIBIDO alterar contratos principales o esquemas de base de datos sin contar con pruebas automatizadas previas y respaldo.`,
+          `Evitar saltearse las validaciones de tipos o desactivar reglas del linter para forzar un despliegue rápido.`,
         ],
         riskLevel: 'medium',
         mermaidCode: `flowchart TD
-    A[📄 Contrato Semántico] --> B[🛡️ ${titleFormatted}]
-    B --> C[🧪 Validación TDD Estricta]
-    C --> D[🔒 Auditoría de Seguridad]
-    D --> E[📦 Despliegue Inmutable]`,
+    A["📄 Contrato & Esquema"] --> B["🛡️ ${titleFormatted}"]
+    B --> C["🧪 Suite de Validación TDD"]
+    C --> D["🔒 Auditoría de Seguridad"]
+    D --> E["📦 Despliegue Inmutable"]`,
         svgConfig: {
           title: `Protocolo Enterprise: ${titleFormatted}`,
           badge: 'BLINDAJE & CONTRATOS ESTRICTOS',
           steps: [
-            { icon: '📄', label: 'Contrato y Tipos', sublabel: 'Cero ambigüedad', tone: 'cyan' },
-            { icon: '🛡️', label: 'Aislamiento Worktree', sublabel: 'TDD estricto', tone: 'purple' },
+            { icon: '📄', label: 'Contrato y Tipos', sublabel: 'Validación de esquema', tone: 'cyan' },
+            { icon: '🛡️', label: 'Ejecución Aislada', sublabel: 'Control y TDD estricto', tone: 'purple' },
             { icon: '🔒', label: 'Auditoría Final', sublabel: '100% blindado', tone: 'emerald' },
           ],
-          summaryNote: `Diseñado para ambientes de misión crítica con contratos estrictos y verificación continua.`,
+          summaryNote: `Arquitectura defensiva de tres capas: valida los contratos de entrada antes de invocar ${titleFormatted}, ejecuta los procesos en un entorno controlado con pruebas TDD y certifica la integridad antes de producción.`,
         },
         mediaGallery: [
           {
@@ -283,13 +304,24 @@ Automatización y comandos para ejecución rápida.
           cursor: `npx skills add ${repoUrl}`,
           claudeCode: `npx skills add ${repoUrl}`,
         },
-        rawMarkdown: `# ${titleFormatted} (Enterprise Edition)
-Especificación de arquitectura y protocolos de seguridad.
+        rawMarkdown: `# ${titleFormatted} — Edición Arquitectura Enterprise
 
-## Directivas Mandatorias:
-1. Validar tipos de entrada y salida con esquemas estrictos.
-2. Comprobar semáforo TDD (Rojo ➔ Verde ➔ Azul) antes de hacer merge.
-3. Prohibido alterar componentes del core sin documentación en docs/specs/.
+## 📖 Descripción Profunda y Propósito
+Esta variante de **${titleFormatted}** establece un marco de ingeniería robusto pensado para entornos productivos de alta exigencia. En lugar de ejecutar acciones aisladas, estructura el trabajo alrededor de contratos explícitos, control de errores determinista y validación automatizada de principio a fin.
+
+## ⚙️ Arquitectura y Flujo de Datos
+1. **Capa de Contratos y Validación:** Verifica precondiciones, tipos y configuraciones antes de iniciar.
+2. **Núcleo de Ejecución Controlada:** Aplica las capacidades de \`${titleFormatted}\` respetando límites de seguridad y aislamiento.
+3. **Certificación y Auditoría:** Ejecuta pruebas de regresión y comprueba la integridad del build de producción.
+
+## 🚀 Instalación y Comandos Reales
+\`\`\`bash
+npx skills add ${repoUrl}
+\`\`\`
+
+## 🛡️ Buenas Prácticas y Gobernanza
+- Validar siempre las entradas y salidas con tipado estricto.
+- Comprobar el semáforo de pruebas antes de integrar cambios en \`main\`.
 `,
         repoUrl,
         compatibilityTags: ['Antigravity', 'OpenCode', 'Cursor', 'Claude Code'],
@@ -301,7 +333,7 @@ Especificación de arquitectura y protocolos de seguridad.
         slug: `${slugBase}-vibe-ui`,
         codeId: defaultCategory === 'mcp' ? `MCP-V${randomSuffix}` : defaultCategory === 'markdown' ? `MD-V${randomSuffix}` : `SKILL-V${randomSuffix}`,
         title: `${titleFormatted} (Vibe UI & Prototipado)`,
-        tagline: `Acelerador visual de alta fidelidad: iteración estética instantánea, paletas y componentes de vanguardia para ${titleFormatted}.`,
+        tagline: `Acelerador de experiencia de desarrollo (DX) y prototipado interactivo con ${titleFormatted}: combina iteración creativa de alta velocidad, feedback visual continuo y orquestación fluida con agentes de IA. Diseñado para transformar ideas y bocetos en implementaciones pulidas, responsivas y listas para demostrar en tiempo récord.`,
         emoji: '✨',
         category: defaultCategory,
         categoryLabel: defaultCategoryLabel,
@@ -309,37 +341,41 @@ Especificación de arquitectura y protocolos de seguridad.
         phaseLabel: 'FASE 2 // VIBE UI & DESIGN',
         status: 'published',
         isFeatured: false,
-        criolloAnalogy: `Es como tener un taller de maquetación de alta costura trabajando a tu ritmo: le pasás las dimensiones de la pantalla y te devuelve los componentes ya planchados, con la paleta de colores armónica y el acabado artesanal listo para deslumbrar.`,
+        criolloAnalogy: `Es como trabajar en un estudio de diseño y prototipado de alta costura donde tenés a los mejores artesanos al lado tuyo: apenas tirás la idea sobre la mesa, te arman la maqueta a escala real, prueban cómo le da la luz desde todos los ángulos y ajustan cada costura en el acto para que el producto final entre por los ojos y funcione con total suavidad.`,
         criolloWithout: [
-          `Interfaces planas, desabridas y con "olor a IA" hechas con estilos genéricos sin personalidad.`,
-          `Perder horas maquetando CSS a mano y renegando con el responsive en celulares.`,
+          `Ciclos de iteración lentos y frustrantes donde cada pequeño cambio visual o funcional requiere rehacer configuraciones a mano.`,
+          `Prototipos desconectados de la realidad técnica que luego hay que tirar a la basura al pasar a la etapa de código real con ${titleFormatted}.`,
+          `Experiencias de usuario rígidas o genéricas por falta de tiempo para explorar y pulir variantes interactivas.`,
         ],
         criolloWith: [
-          `Prototipado a la velocidad del pensamiento con acabados artesanales Neo-Brutalistas o Minimal.`,
-          `Auditoría visual multimodal cruzando capturas reales a 375px con el código Tailwind.`,
+          `Prototipado a la velocidad del pensamiento integrando ${titleFormatted} en un flujo conversacional ágil con el agente.`,
+          `Iteración en tiempo real sobre componentes, flujos y estados interactivos con validación visual en escritorio y móvil (375px).`,
+          `Transición directa entre el prototipo inicial y el código definitivo sin duplicar esfuerzos de maquetación o lógica.`,
         ],
         semaforoGreen: [
-          `Al idear pantallas, dashboards, landing pages y componentes de alto impacto visual.`,
-          `Para iterar variantes estéticas y pulir la experiencia táctil en dispositivos móviles.`,
+          `Al idear, prototipar e iterar nuevas funcionalidades, interfaces interactivas o flujos de usuario con ${titleFormatted}.`,
+          `Cuando buscás explorar múltiples variantes de diseño o experiencia antes de comprometerte con una única implementación.`,
+          `En sesiones de Vibe Coding donde la prioridad es mantener el flujo creativo sin interrupciones técnicas.`,
         ],
         semaforoRed: [
-          `Para lógica pura de backend, migraciones SQL o tareas de infraestructura DevOps.`,
+          `No utilizar como sustituto de las pruebas de seguridad o migraciones críticas de base de datos en etapa de cierre.`,
+          `Evitar dejar estilos o configuraciones experimentales de prototipo sin consolidar antes del despliegue final.`,
         ],
         riskLevel: 'low',
         mermaidCode: `flowchart LR
-    A[🎨 Concepto Visual] --> B[✨ ${titleFormatted}]
-    B --> C[🖼️ Captura Playwright]
-    C --> D[👁️ Impeccable Audit]
-    D --> E[💎 UI 10/10 Publicada]`,
+    A["🎨 Idea & Prompt"] --> B["✨ ${titleFormatted}"]
+    B --> C["⚡ Prototipo Vivo"]
+    C --> D["👁️ Ajuste & Feedback"]
+    D --> E["💎 Experiencia Pulida"]`,
         svgConfig: {
           title: `Tubería Vibe UI: ${titleFormatted}`,
-          badge: 'DISEÑO & MULTIMODAL',
+          badge: 'DISEÑO & PROTOTIPADO ÁGIL',
           steps: [
-            { icon: '🎨', label: 'Concepto & Tokens', sublabel: 'Paleta & Jerarquía', tone: 'orange' },
-            { icon: '✨', label: 'Generación Canvas', sublabel: 'Stitch / Tailwind', tone: 'purple' },
-            { icon: '💎', label: 'Acabado Impeccable', sublabel: 'Perfección 375px', tone: 'emerald' },
+            { icon: '🎨', label: 'Concepto & Prompt', sublabel: 'Definición de intención', tone: 'orange' },
+            { icon: '✨', label: 'Iteración en Vivo', sublabel: 'Generación ágil', tone: 'purple' },
+            { icon: '💎', label: 'Acabado Pulido', sublabel: 'Validado en 375px+', tone: 'emerald' },
           ],
-          summaryNote: `Optimizado para crear interfaces memorables con terminaciones artesanales y diseño moderno.`,
+          summaryNote: `Flujo creativo de retroalimentación rápida: traduce la intención del usuario, acelera la construcción interactiva mediante ${titleFormatted} y refina cada detalle visual y funcional en vivo.`,
         },
         mediaGallery: [
           {
@@ -356,13 +392,20 @@ Especificación de arquitectura y protocolos de seguridad.
           cursor: `npx skills add ${repoUrl}`,
           claudeCode: `npx skills add ${repoUrl}`,
         },
-        rawMarkdown: `# ${titleFormatted} (Vibe UI Edition)
-Sistema de diseño y refinamiento estético multimodal.
+        rawMarkdown: `# ${titleFormatted} — Edición Vibe UI & Prototipado Ágil
 
-## Principios:
-- Jerarquía visual sólida y tipografía con buen contraste.
-- Estados interactivos (hover, active, focus) siempre presentes.
-- Verificación en resoluciones mobile (375px) obligatoria.
+## 📖 Descripción Profunda y Propósito
+La variante **Vibe UI & Prototipado** de **${titleFormatted}** pone la experiencia del desarrollador (DX) y la velocidad de iteración en el centro de la escena. Está estructurada para acompañar sesiones de co-programación con IA donde se necesita experimentar, visualizar cambios al instante y pulir la interfaz o el flujo de trabajo sin fricción.
+
+## ⚙️ Arquitectura del Flujo Iterativo
+1. **Captura de Intención:** Interpreta objetivos funcionales y estéticos de alto nivel.
+2. **Construcción Incremental:** Aplica \`${titleFormatted}\` generando bloques modulares fáciles de ajustar en caliente.
+3. **Pulido Multimodal:** Verifica responsividad (375px a 1440px), estados interactivos y consistencia general.
+
+## 🚀 Instalación y Comandos Reales
+\`\`\`bash
+npx skills add ${repoUrl}
+\`\`\`
 `,
         repoUrl,
         compatibilityTags: ['Antigravity', 'OpenCode', 'Cursor', 'Claude Code'],
@@ -375,7 +418,7 @@ Sistema de diseño y refinamiento estético multimodal.
           badge: 'PRÁCTICO & DIRECTO',
           badgeColor: 'orange',
           icon: '🛠️',
-          description: 'Metáforas de la vida cotidiana, explicaciones sin vueltas y foco en productividad inmediata.',
+          description: 'Metáforas de la vida cotidiana bien explicadas, comandos directos sin vueltas y foco total en destrabar el trabajo diario con productividad inmediata.',
           tool: toolVar1,
         },
         {
@@ -384,7 +427,7 @@ Sistema de diseño y refinamiento estético multimodal.
           badge: 'CONTRATOS & SEGURIDAD',
           badgeColor: 'cyan',
           icon: '🛡️',
-          description: 'Máximo rigor de ingeniería, contratos de tipos estrictos, tolerancia cero a regresiones y testing TDD.',
+          description: 'Máximo rigor de ingeniería de software: arquitectura interna detallada, contratos estrictos, prevención de fallos y ciclo de verificación TDD.',
           tool: toolVar2,
         },
         {
@@ -393,7 +436,7 @@ Sistema de diseño y refinamiento estético multimodal.
           badge: 'DISEÑO & EXPERIENCIA',
           badgeColor: 'purple',
           icon: '✨',
-          description: 'Enfocado en frontend, diseño artesanal de alta gama, auditoría multimodal y prototipado ágil.',
+          description: 'Enfocado en experiencia de desarrollo (DX), iteración creativa de alta velocidad, prototipado interactivo y acabado visual impecable.',
           tool: toolVar3,
         },
       ];
@@ -674,7 +717,7 @@ Sistema de diseño y refinamiento estético multimodal.
                         {v.badge}
                       </span>
                     </div>
-                    <p className="text-[10px] leading-tight opacity-90 line-clamp-2">
+                    <p className="text-[11px] leading-snug opacity-95">
                       {v.description}
                     </p>
                   </button>
@@ -698,10 +741,10 @@ Sistema de diseño y refinamiento estético multimodal.
                   </span>
                 </div>
 
-                {/* Editable Title & Tagline */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                {/* Editable Title & Extended Description */}
+                <div className="space-y-3 text-xs">
                   <div>
-                    <label className="font-mono text-[11px] font-bold block mb-1">Título:</label>
+                    <label className="font-mono text-[11px] font-bold block mb-1">Título de la Herramienta:</label>
                     <input
                       type="text"
                       value={activeTool.title}
@@ -712,14 +755,16 @@ Sistema de diseño y refinamiento estético multimodal.
                     />
                   </div>
                   <div>
-                    <label className="font-mono text-[11px] font-bold block mb-1">Tagline Breve:</label>
-                    <input
-                      type="text"
+                    <label className="font-mono text-[11px] font-bold block mb-1">
+                      📖 Descripción General Completa (se muestra en la tarjeta y en la ficha):
+                    </label>
+                    <textarea
+                      rows={4}
                       value={activeTool.tagline}
                       onChange={(e) =>
                         handleUpdateActiveTool({ ...activeTool, tagline: e.target.value })
                       }
-                      className="w-full p-2 border border-black rounded text-xs bg-white dark:bg-neutral-900 font-sans"
+                      className="w-full p-2.5 border border-black rounded text-xs bg-white dark:bg-neutral-900 font-sans leading-relaxed"
                     />
                   </div>
                 </div>
@@ -727,15 +772,15 @@ Sistema de diseño y refinamiento estético multimodal.
                 {/* Editable Analogia */}
                 <div className="space-y-1 text-xs">
                   <label className="font-bold text-brand-orangeDark dark:text-brand-orange font-mono">
-                    💡 Modo Criollo (La Analogía de esta Variante):
+                    💡 Modo Criollo (La Analogía Desarrollada de esta Variante):
                   </label>
                   <textarea
-                    rows={2}
+                    rows={4}
                     value={activeTool.criolloAnalogy}
                     onChange={(e) =>
                       handleUpdateActiveTool({ ...activeTool, criolloAnalogy: e.target.value })
                     }
-                    className="w-full p-2 border border-black rounded text-xs bg-orange-50/50 dark:bg-orange-950/20 font-sans leading-relaxed"
+                    className="w-full p-2.5 border border-black rounded text-xs bg-orange-50/50 dark:bg-orange-950/20 font-sans leading-relaxed"
                   />
                 </div>
 
@@ -745,7 +790,7 @@ Sistema de diseño y refinamiento estético multimodal.
                     <span className="font-bold text-red-800 dark:text-red-300 block font-mono text-[11px]">
                       Sin esta herramienta 💀:
                     </span>
-                    <ul className="list-disc pl-4 space-y-0.5 text-[11px] text-neutral-700 dark:text-neutral-300">
+                    <ul className="list-disc pl-4 space-y-1 text-[11px] text-neutral-700 dark:text-neutral-300 leading-snug">
                       {activeTool.criolloWithout.map((item, i) => (
                         <li key={i}>{item}</li>
                       ))}
@@ -756,7 +801,7 @@ Sistema de diseño y refinamiento estético multimodal.
                     <span className="font-bold text-emerald-800 dark:text-emerald-300 block font-mono text-[11px]">
                       Con esta herramienta 🚀:
                     </span>
-                    <ul className="list-disc pl-4 space-y-0.5 text-[11px] text-neutral-700 dark:text-neutral-300">
+                    <ul className="list-disc pl-4 space-y-1 text-[11px] text-neutral-700 dark:text-neutral-300 leading-snug">
                       {activeTool.criolloWith.map((item, i) => (
                         <li key={i}>{item}</li>
                       ))}
@@ -792,7 +837,7 @@ Sistema de diseño y refinamiento estético multimodal.
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                   <div className="p-2.5 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-400 rounded">
                     <span className="font-bold font-mono text-[11px] text-emerald-800 dark:text-emerald-300 block">🟢 Usala cuando:</span>
-                    <ul className="list-disc pl-4 text-[11px] text-neutral-700 dark:text-neutral-300">
+                    <ul className="list-disc pl-4 space-y-1 text-[11px] text-neutral-700 dark:text-neutral-300 leading-snug">
                       {activeTool.semaforoGreen.map((item, i) => (
                         <li key={i}>{item}</li>
                       ))}
@@ -800,12 +845,25 @@ Sistema de diseño y refinamiento estético multimodal.
                   </div>
                   <div className="p-2.5 bg-red-50 dark:bg-red-950/20 border border-red-400 rounded">
                     <span className="font-bold font-mono text-[11px] text-red-800 dark:text-red-300 block">🔴 No la uses para:</span>
-                    <ul className="list-disc pl-4 text-[11px] text-neutral-700 dark:text-neutral-300">
+                    <ul className="list-disc pl-4 space-y-1 text-[11px] text-neutral-700 dark:text-neutral-300 leading-snug">
                       {activeTool.semaforoRed.map((item, i) => (
                         <li key={i}>{item}</li>
                       ))}
                     </ul>
                   </div>
+                </div>
+
+                {/* Extended Markdown Documentation Preview & Editor */}
+                <div className="space-y-1.5 text-xs">
+                  <label className="font-mono text-[11px] font-bold block text-neutral-600 dark:text-neutral-300 uppercase">
+                    📄 Documentación Técnica Extendida (Markdown de la Variante):
+                  </label>
+                  <textarea
+                    rows={8}
+                    value={activeTool.rawMarkdown}
+                    onChange={(e) => handleUpdateActiveTool({ ...activeTool, rawMarkdown: e.target.value })}
+                    className="w-full p-3 border border-black rounded bg-neutral-50 dark:bg-neutral-900 font-mono text-[11px] leading-relaxed"
+                  />
                 </div>
 
                 <div className="text-[11px] font-mono p-2 bg-[#121214] text-emerald-300 rounded break-all">

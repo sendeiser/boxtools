@@ -146,6 +146,16 @@ export const ToolDetailModal: React.FC<ToolDetailModalProps> = ({
 
         {/* Modal Scroll Content */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          {/* Full Tool Description Box */}
+          <div className="p-4 bg-neutral-50 dark:bg-[#1A1C22] border-2 border-[#121214] dark:border-neutral-700 rounded-lg shadow-brutal-sm space-y-1.5">
+            <span className="font-mono text-[11px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider block">
+              📖 Descripción General y Propósito
+            </span>
+            <p className="text-sm md:text-base font-body text-neutral-800 dark:text-neutral-200 leading-relaxed">
+              {tool.tagline}
+            </p>
+          </div>
+
           {activeTab === 'criollo' ? (
             <>
               {/* Analogy Box */}

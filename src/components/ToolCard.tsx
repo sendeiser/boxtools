@@ -73,7 +73,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({
             </h3>
             <span className="text-xl shrink-0 ml-1.5">{tool.emoji}</span>
           </div>
-          <p className="text-xs text-neutral-600 dark:text-neutral-400 font-mono mt-1 leading-snug line-clamp-2">
+          <p className="text-xs text-neutral-600 dark:text-neutral-400 font-sans mt-1.5 leading-relaxed line-clamp-4">
             {tool.tagline}
           </p>
         </div>

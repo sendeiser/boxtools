@@ -166,12 +166,14 @@ export const AdminStudio: React.FC<AdminStudioProps> = ({
           </div>
 
           <div className="space-y-2">
-            <label className="font-mono text-xs font-bold block">Tagline breve:</label>
-            <input
-              type="text"
+            <label className="font-mono text-xs font-bold block">
+              📖 Descripción General Completa:
+            </label>
+            <textarea
+              rows={4}
               value={formData.tagline}
               onChange={(e) => setFormData({ ...formData, tagline: e.target.value })}
-              className="w-full p-2 border-2 border-[#121214] font-mono text-xs rounded bg-neutral-50 dark:bg-neutral-900"
+              className="w-full p-2.5 border-2 border-[#121214] font-body text-xs rounded bg-neutral-50 dark:bg-neutral-900 leading-relaxed"
             />
           </div>
 
@@ -189,7 +191,7 @@ export const AdminStudio: React.FC<AdminStudioProps> = ({
               </button>
             </div>
             <textarea
-              rows={3}
+              rows={4}
               value={formData.criolloAnalogy}
               onChange={(e) => setFormData({ ...formData, criolloAnalogy: e.target.value })}
               className="w-full p-2.5 border-2 border-brand-orange bg-orange-50/40 dark:bg-orange-950/20 font-body text-xs rounded leading-relaxed"
