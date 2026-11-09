@@ -817,7 +817,8 @@ Incluye soporte para:
     slug: 'pevc-v5-workflow',
     codeId: 'MD-001',
     title: 'PEVC V5: Metodología Vibe Coding (.md)',
-    tagline: 'El workflow maestro con las 5 fases obligatorias para construir sin alucinaciones ni deuda técnica.',
+    tagline:
+      'El workflow maestro de 5 fases para construir aplicaciones web de élite sin alucinaciones ni deuda técnica: entrevista socrática exhaustiva (Fase 1), suite de diseño en Fase 2 (Frontend Design, UI/UX Pro Max o la Mezcla Recomendada), implementación con Google Stitch MCP, auditoría multimodal Playwright + Impeccable (1440px / 768px / 375px), backend Supabase Cloud 100% sin Docker y semáforo TDD.',
     emoji: '📘',
     category: 'markdown',
     categoryLabel: '📝 WORKFLOW MARKDOWN',
@@ -825,43 +826,50 @@ Incluye soporte para:
     phaseLabel: 'FASE 1 // PROTOCOLO',
     status: 'published',
     isFeatured: true,
-    criolloAnalogy: 'Es la biblia y reglamento del equipo: define las reglas del juego para que nadie mande a picar código a lo loco sin antes pasar por el arquitecto, el diseñador y el auditor.',
+    criolloAnalogy:
+      'Es la biblia y reglamento del equipo: define las reglas del juego para que nadie mande a picar código a lo loco sin antes pasar por el arquitecto, la suite de diseño (donde elegís si vas por arquitectura con frontend-design, inteligencia de nicho con ui-ux-pro-max o la mezcla de las dos) y el auditor implacable antes de tocar una sola tabla en la base de datos.',
     criolloWithout: [
       'Proyectos caóticos donde cada programador usa un prompt distinto y todo explota en producción.',
-      'Docker colgando las máquinas y código que nadie sabe si fue testeado.',
+      'Docker colgando las máquinas, interfaces genéricas con "olor a IA" y código que nadie sabe si fue testeado.',
+      'Programar lógica de backend sobre pantallas rotas o diseños no aprobados que después hay que rehacer desde cero.',
     ],
     criolloWith: [
-      'Paso a paso estricto desde la entrevista hasta la entrega final con git limpio.',
-      'Checkpoints de aprobación humana obligatorios antes de escribir lógica.',
+      'Paso a paso estricto desde la entrevista socrática sin huecos hasta la entrega final con git limpio.',
+      'Fase 2 estructurada con las 3 opciones de diseño oficial (frontend-design, ui-ux-pro-max o la mezcla) con auditoría Impeccable en 3 resoluciones.',
+      'Checkpoints de aprobación humana obligatorios antes de escribir cualquier línea de lógica funcional.',
     ],
     semaforoGreen: [
-      'Al iniciar cualquier proyecto nuevo en el equipo.',
-      'Como system prompt base para cualquier agente de codificación.',
+      'Al iniciar cualquier proyecto nuevo en el equipo de desarrollo web.',
+      'Como system prompt base para cualquier agente de codificación autónoma.',
+      'Cuando necesitás que el diseño respete estándares profesionales de nicho antes de conectar bases de datos.',
     ],
     semaforoRed: [
-      'No saltear ninguna fase ni programar antes de aprobar capturas.',
+      'PROHIBIDO saltear ninguna fase o programar lógica antes de aprobar las capturas visuales en escritorio y celular.',
+      'PROHIBIDO usar Docker local para la base de datos; la conexión a Supabase debe ser 100% en la nube.',
     ],
     riskLevel: 'low',
     mermaidCode: `flowchart TD
-    F0[Fase 0: Setup 11 Skills & MCPs] --> F1[Fase 1: Entrevista Brainstorming]
-    F1 --> F2[Fase 2: Stitch + Playwright + Impeccable]
-    F2 -->|Aprobación Visual| F3[Fase 3: Supabase Cloud & TDD]
-    F3 --> F4[Fase 4: QA E2E, AgentShield & Merge]`,
+    F0["🛠️ Fase 0: Setup Skills & MCPs (Supabase + Stitch)"] --> F1["🧠 Fase 1: Entrevista Brainstorming (Cero Huecos)"]
+    F1 --> F2["🎨 Fase 2: Suite Diseño (Frontend Design, UI/UX Pro Max o Mezcla)"]
+    F2 -->|"Stitch MCP + Playwright + Impeccable"| F2B["👁️ Checkpoint Aprobación Visual (Cero Programar Sin OK)"]
+    F2B --> F3["⚡ Fase 3: Supabase Cloud & Semáforo TDD"]
+    F3 --> F4["🛡️ Fase 4: QA E2E, AgentShield & Merge"]`,
     svgConfig: {
       title: 'Las 5 Fases de PEVC V5',
       badge: 'METODOLOGÍA OFICIAL',
       steps: [
-        { icon: '🛠️', label: 'F0 & F1: Setup & Spec', sublabel: 'Cero huecos', tone: 'orange' },
-        { icon: '🎨', label: 'F2: Diseño & Impeccable', sublabel: 'Aprobación visual', tone: 'purple' },
+        { icon: '🧠', label: 'F0 & F1: Setup & Spec', sublabel: 'Cero huecos lógicos', tone: 'orange' },
+        { icon: '🎨', label: 'F2: Suite Diseño & Impeccable', sublabel: '3 Opciones + Aprobación', tone: 'purple' },
         { icon: '🚀', label: 'F3 & F4: DB & Deploy', sublabel: 'TDD + Cierre limpio', tone: 'emerald' },
       ],
-      summaryNote: 'El protocolo estandarizado de ingeniería asistida por IA.',
+      summaryNote:
+        'El protocolo estandarizado de ingeniería asistida por IA con la suite de diseño UI/UX integrada (Frontend Design, UI/UX Pro Max o Mezcla).',
     },
     mediaGallery: [
       {
         id: 'm-pevc-1',
         url: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80',
-        caption: 'Planificación de sprint y control de calidad bajo PEVC V5',
+        caption: 'Planificación de sprint y control de calidad bajo PEVC V5 con suite de diseño integrada',
         isAiGenerated: false,
       },
     ],
@@ -872,13 +880,69 @@ Incluye soporte para:
       cursor: 'Pegar en .cursorrules o Project Rules',
       claudeCode: 'Guardar como CLAUDE.md',
     },
-    rawMarkdown: `# PEVC V5: Protocolo de Ingeniería Vibe Coding Profesional
+    rawMarkdown: `# ROL Y CONFIGURACIÓN DEL SISTEMA AGÉNTICO (PEVC V5)
+Actúa como un Arquitecto de Software Senior, Diseñador UI/UX Principal e Ingeniero QA operando bajo la metodología de "Vibe Coding Profesional". 
+Tienes ESTRICTAMENTE PROHIBIDO asumir por tu cuenta la pila tecnológica, el estilo visual o los requerimientos, tienes prohibido dejar huecos lógicos sin preguntar, tienes prohibido usar Docker para la base de datos, y tienes prohibido programar la lógica funcional sin que yo antes haya aprobado las capturas finales del diseño.
 
-1. Fase 0: Verificación de 11 skills y servidores MCP.
-2. Fase 1: Entrevista socrática exhaustiva y generación de spec maestro.
-3. Fase 2: Generación visual con Stitch, capturas Playwright y pulido con Impeccable.
-4. Fase 3: Conexión Supabase Cloud (sin Docker) y desarrollo guiado por pruebas TDD.
-5. Fase 4: Pruebas integrales, auditoría de seguridad ECC AgentShield y cierre.
+---
+
+## FASE 0: INSTALACIÓN DE LAS SKILLS BASE Y CONFIGURACIÓN DE MCPs (SUPABASE CLOUD + STITCH)
+Antes de hacerme preguntas sobre mi proyecto, ejecuta o verifica en la terminal la instalación de las skills base y prepara los servidores MCP:
+
+1. **\`superpowers\` (Metodología SDLC, Brainstorming Exhaustivo, Worktrees y TDD):**
+   - Repositorio: \`https://github.com/obra/superpowers\`
+2. **\`ECC\` (Optimización de Contexto, Memoria \`.clauderules\` y \`AgentShield\`):**
+   - Repositorio: \`https://github.com/affaan-m/ECC\`
+3. **\`find skills\` (Buscador e Instalador Dinámico de Skills):**
+   - Repositorio: \`https://github.com/vercel-labs/agent-skills\`
+4. **\`frontend design\` (Opción 1: Arquitectura de Sistema de Diseño UI/UX y Pliego para Stitch):**
+   - Repositorio: \`https://github.com/anthropics/skills\`
+   - Rol clave: Estructura formal del sistema, pliego de tokens, escalas tipográficas y Prompt Maestro para Stitch.
+5. **\`ui-ux-pro-max\` (Opción 2: Inteligencia Heurística de Nicho, 192 Paletas y 79 Estilos Visuales):**
+   - Repositorio: \`https://github.com/obra/ui-ux-pro-max\`
+   - Rol clave: Motor de búsqueda e inteligencia con 192 paletas de producto fundamentadas, 79 estilos visuales y 119 reglas WCAG.
+6. **\`stitch\` + SERVIDOR MCP DE GOOGLE STITCH:**
+   - Repositorio: \`https://github.com/google-labs-code/stitch-skills\`
+7. **\`impeccable\` (Auditoría y Corrección Total de UI/UX mediante Imagen + Código):**
+   - Rol clave: Analizar capturas de Playwright + código fuente para corregir tipografías, tamaños, menús mobile, superposiciones y componentes.
+8. **\`supabase\` + SERVIDOR MCP CLOUD (100% SIN DOCKER):**
+   - Control total DDL/DML sobre base de datos Postgres en la nube sin Docker local.
+9. **\`playwright\` (Capturas de Diagnóstico, Inspección DOM y Tests E2E en 1440px, 768px y 375px):**
+   - Repositorio: \`https://github.com/microsoft/playwright-mcp\`
+10. Skills de reserva Android (\`compose-preview\`, \`android-cli\`, \`android-device-hub\`).
+
+---
+
+## FASE 1: ENTREVISTA EXHAUSTIVA CON TODO EL PODER DE BRAINSTORMING (CERO HUECOS)
+- PASO 1: Recepción de la Idea Inicial.
+- PASO 2: Interrogatorio Socrático Profundo (Etapa A: Auditoría Total de Módulos; Etapa B: Pila Tecnológica sin Asumir; Etapa C: Estrategia de Diseño UI/UX eligiendo entre Frontend Design, UI/UX Pro Max o la Mezcla Recomendada).
+- PASO 3: Creación del Spec Maestro Completo por Fuera (\`docs/specs/01-arquitectura-y-spec.md\`).
+
+---
+
+## FASE 2: DISEÑO UI/UX (FRONTEND DESIGN, UI/UX PRO MAX O MEZCLA) ➔ GOOGLE STITCH MCP ➔ PLAYWRIGHT ➔ IMPECCABLE ➔ APROBACIÓN
+1. **Aislamiento:** Git Worktrees (\`superpowers:using-git-worktrees\`).
+2. **Ejecución del Enfoque de Diseño UI/UX:**
+   - **// OPCIÓN 1: ARQUITECTURA (\`frontend-design\`):** Pliego de tokens, escalas tipográficas y Prompt Maestro para Stitch (\`docs/specs/02-stitch-master-prompt.md\`).
+   - **// OPCIÓN 2: INTELIGENCIA (\`ui-ux-pro-max\`):** 192 paletas de producto fundamentadas, 79 estilos visuales y 119 reglas WCAG.
+   - **// OPCIÓN 3: LA MEZCLA RECOMENDADA (Dúo Dinámico UI/UX ⭐):** \`ui-ux-pro-max\` investiga el nicho y paleta cromática ➔ \`frontend-design\` estructura la guía formal de componentes y redacta el Prompt Maestro de Stitch.
+3. **Inyección e Implementación Base vía MCP de Google Stitch.**
+4. **Ronda 1 de Capturas con Playwright:** Desktop (1440px), Tablet (768px) y Mobile (375px) + inspección DOM de desbordamiento horizontal.
+5. **Auditoría Multimodal con Impeccable:** Analizando capturas + código para corrección total de fuentes, tamaños, menús y espaciados.
+6. **Ronda 2 de Capturas de Verificación post-Impeccable con Playwright.**
+7. **CHECKPOINT OBLIGATORIO DE APROBACIÓN VISUAL (CERO PROGRAMAR SIN APROBACIÓN VISUAL).**
+
+---
+
+## FASE 3: BASE DE DATOS SUPABASE CLOUD & SEMÁFORO TDD (ROJO ➔ VERDE ➔ AZUL)
+- Construcción de tablas, relaciones, políticas RLS y tipos TypeScript vía MCP sin Docker.
+- TDD estricto conectando componentes pulidos por Impeccable con la base de datos en la nube.
+
+---
+
+## FASE 4: PRUEBA INTEGRAL, SEGURIDAD (AGENTSHIELD) Y CIERRE CON MERGE
+- Prueba E2E funcional + visual con Playwright en resoluciones reales.
+- Auditoría de seguridad ECC AgentShield y merge limpio a main.
 `,
     repoUrl: 'https://github.com/boxtools/pevc-v5',
     compatibilityTags: ['Antigravity', 'OpenCode', 'Cursor', 'Claude Code'],
