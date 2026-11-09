@@ -3,7 +3,7 @@ import { ToolItem, AiSettingsConfig } from '../types/boxtools';
 import { MermaidViewer } from './MermaidViewer';
 import { SvgInfographic } from './SvgInfographic';
 import { AiSettingsModal } from './AiSettingsModal';
-import { getAiConfig, callRealAiSynthesis } from '../lib/aiService';
+import { getAiConfig, synthesizeWithRealAi } from '../lib/aiService';
 
 export interface AdminStudioProps {
   readonly tools: readonly ToolItem[];
@@ -39,19 +39,27 @@ export const AdminStudio: React.FC<AdminStudioProps> = ({
   };
 
   const handleSimulateAiIngest = async () => {
+    if (!aiConfig.apiKey.trim()) {
+      onShowToast('⚠️ Conectá una API Key en "Ajustes API Key IA" para analizar links con IA real');
+      setShowAiSettings(true);
+      return;
+    }
     setIsAiProcessing(true);
-    const realResult = await callRealAiSynthesis({
+    const result = await synthesizeWithRealAi({
       sourceType: 'link',
       rawInput: githubUrl,
     });
 
     setIsAiProcessing(false);
-    if (realResult && realResult.length > 0) {
-      const generated = realResult[0].tool;
-      setFormData(generated);
-      onShowToast(`✨ Ingesta con ${aiConfig.provider.toUpperCase()} completada exitosamente`);
+    if (result.ok && result.variations && result.variations.length > 0) {
+      // Mantener el slug de la ficha que se está editando para actualizarla en lugar de duplicarla
+      const generated = result.variations[1].tool; // Variante "Arquitectura Enterprise" (la más técnica)
+      setFormData({ ...generated, id: formData.id, slug: formData.slug });
+      onShowToast(
+        `✨ ${aiConfig.provider.toUpperCase()} analizó ${result.source?.label}. Revisá y guardá los cambios.`
+      );
     } else {
-      onShowToast('✨ Ingesta completada (Modo estructurado)');
+      onShowToast(`⚠️ La IA falló: ${result.error}`);
     }
   };
 

@@ -3,7 +3,7 @@ import { ToolItem, CategorySlug, PhaseSlug, AiSettingsConfig } from '../types/bo
 import { MermaidViewer } from './MermaidViewer';
 import { SvgInfographic } from './SvgInfographic';
 import { AiSettingsModal } from './AiSettingsModal';
-import { getAiConfig, callRealAiSynthesis } from '../lib/aiService';
+import { getAiConfig, synthesizeWithRealAi, SourceContext } from '../lib/aiService';
 
 export interface ToolVariationOption {
   readonly id: string;
@@ -41,6 +41,13 @@ export const AddToolModal: React.FC<AddToolModalProps> = ({
   // AI settings state
   const [showAiSettingsModal, setShowAiSettingsModal] = useState(false);
   const [aiConfig, setAiConfig] = useState<AiSettingsConfig>(getAiConfig());
+  const [aiStatus, setAiStatus] = useState<
+    | { kind: 'real'; source: SourceContext }
+    | { kind: 'error'; message: string; source?: SourceContext }
+    | { kind: 'local' }
+    | null
+  >(null);
+  const [synthStep, setSynthStep] = useState('');
 
   useEffect(() => {
     if (isOpen) {
@@ -72,29 +79,41 @@ export const AddToolModal: React.FC<AddToolModalProps> = ({
     }
 
     setIsSynthesizing(true);
+    setAiStatus(null);
 
-    // 1. Intentar con IA Real (Gemini / OpenRouter / OpenAI) si hay API Key
+    // 1. IA Real (Gemini / OpenRouter / OpenAI): primero lee el contenido del link y luego analiza
     if (aiConfig.apiKey.trim()) {
-      try {
-        const realAiResults = await callRealAiSynthesis({
-          sourceType,
-          rawInput,
-          fileName,
-        });
+      setSynthStep(sourceType === 'link' ? '📥 Leyendo el contenido del link (README / web)...' : '📄 Preparando el archivo...');
+      const stepTimer = setTimeout(
+        () => setSynthStep(`🧠 ${aiConfig.provider.toUpperCase()} está analizando el contenido y armando las 3 fichas...`),
+        2500
+      );
 
-        if (realAiResults && realAiResults.length === 3) {
-          setVariations(realAiResults);
-          setSelectedVariationIndex(0);
-          setIsSynthesizing(false);
-          onShowToast(`✨ IA Real (${aiConfig.provider.toUpperCase()}) analizó el recurso y generó 3 variaciones`);
-          return;
-        }
-      } catch (err) {
-        console.warn('Fallo en IA remota, usando motor estructurado:', err);
+      const result = await synthesizeWithRealAi({ sourceType, rawInput, fileName });
+      clearTimeout(stepTimer);
+      setSynthStep('');
+
+      if (result.ok && result.variations && result.variations.length === 3) {
+        setVariations(result.variations);
+        setSelectedVariationIndex(0);
+        setIsSynthesizing(false);
+        setAiStatus({ kind: 'real', source: result.source! });
+        onShowToast(
+          `✨ ${aiConfig.provider.toUpperCase()} analizó ${result.source?.label} (${result.source?.chars.toLocaleString()} caracteres)`
+        );
+        return;
       }
+
+      // Si falló, NO esconder el error: mostrarlo y no generar plantillas genéricas
+      setIsSynthesizing(false);
+      setAiStatus({ kind: 'error', message: result.error || 'Error desconocido', source: result.source });
+      onShowToast(`⚠️ La IA falló: ${result.error}`);
+      return;
     }
 
-    // 2. Si no hay API Key o falló la conexión, usar el motor estructurado local
+    setAiStatus({ kind: 'local' });
+
+    // 2. Sin API Key: motor estructurado local (plantillas)
     setTimeout(() => {
       let candidateName = 'Nueva Herramienta Agéntica';
       let defaultCategory: Exclude<CategorySlug, 'all' | 'combo'> = 'skill';
@@ -576,11 +595,43 @@ Sistema de diseño y refinamiento estético multimodal.
               <span>{isSynthesizing ? '⏳' : '🤖'}</span>
               <span>
                 {isSynthesizing
-                  ? 'La IA está sintetizando 3 variaciones de ficha (Criollo, Enterprise y Vibe UI)...'
+                  ? synthStep || 'La IA está sintetizando 3 variaciones de ficha (Criollo, Enterprise y Vibe UI)...'
                   : 'Desarrollar con IA (Generar 3 Variaciones)'}
               </span>
             </button>
           </div>
+
+          {/* AI Result Status Banner */}
+          {aiStatus?.kind === 'error' && (
+            <div className="p-3 bg-[#FCE8E6] text-[#8C1D18] border-2 border-[#C5221F] rounded text-xs font-mono space-y-1" data-testid="ai-error-banner">
+              <p className="font-bold">⚠️ La IA no pudo generar las fichas</p>
+              <p className="break-words">{aiStatus.message}</p>
+              {aiStatus.source && (
+                <p className="text-[10px] opacity-80">
+                  Fuente leída: {aiStatus.source.label} ({aiStatus.source.chars.toLocaleString()} caracteres)
+                </p>
+              )}
+              <p className="text-[10px] opacity-80">
+                Revisá la API Key / créditos o probá otro modelo en "Cambiar / Probar API Key".
+              </p>
+            </div>
+          )}
+          {aiStatus?.kind === 'real' && (
+            <div className="p-3 bg-[#E6F4EA] text-[#0D5223] border-2 border-[#137333] rounded text-xs font-mono">
+              <p className="font-bold">
+                ✅ Fichas generadas por {aiConfig.provider.toUpperCase()} ({aiConfig.modelText}) leyendo el contenido real
+              </p>
+              <p className="text-[10px] mt-0.5">
+                Fuente analizada: {aiStatus.source.label} — {aiStatus.source.chars.toLocaleString()} caracteres
+                {aiStatus.source.kind === 'url-only' && ' (no se pudo leer la página: el análisis puede ser impreciso)'}
+              </p>
+            </div>
+          )}
+          {aiStatus?.kind === 'local' && (
+            <div className="p-3 bg-neutral-100 dark:bg-neutral-800 border-2 border-neutral-400 rounded text-xs font-mono">
+              ℹ️ Sin API Key: se usaron plantillas locales (no se analizó el contenido del link). Conectá Gemini u OpenRouter para un análisis real.
+            </div>
+          )}
 
           {/* VARIATIONS SELECTOR & PREVIEW */}
           {variations.length > 0 && activeTool && (
@@ -719,6 +770,46 @@ Sistema de diseño y refinamiento estético multimodal.
                     Infografía SVG de la Variante:
                   </span>
                   <SvgInfographic config={activeTool.svgConfig} />
+                </div>
+
+                <div className="space-y-2">
+                  <span className="font-mono text-[11px] font-bold block text-neutral-500 uppercase">
+                    Diagrama de Arquitectura (Mermaid) de la Variante:
+                  </span>
+                  <MermaidViewer key={`${activeTool.slug}-mermaid`} code={activeTool.mermaidCode} />
+                  <details className="text-[11px] font-mono">
+                    <summary className="cursor-pointer font-bold text-neutral-500">Editar código Mermaid</summary>
+                    <textarea
+                      rows={5}
+                      value={activeTool.mermaidCode}
+                      onChange={(e) => handleUpdateActiveTool({ ...activeTool, mermaidCode: e.target.value })}
+                      className="w-full mt-1 p-2 border border-black rounded bg-neutral-900 text-brand-cyan text-[11px]"
+                    />
+                  </details>
+                </div>
+
+                {/* Semáforo */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                  <div className="p-2.5 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-400 rounded">
+                    <span className="font-bold font-mono text-[11px] text-emerald-800 dark:text-emerald-300 block">🟢 Usala cuando:</span>
+                    <ul className="list-disc pl-4 text-[11px] text-neutral-700 dark:text-neutral-300">
+                      {activeTool.semaforoGreen.map((item, i) => (
+                        <li key={i}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="p-2.5 bg-red-50 dark:bg-red-950/20 border border-red-400 rounded">
+                    <span className="font-bold font-mono text-[11px] text-red-800 dark:text-red-300 block">🔴 No la uses para:</span>
+                    <ul className="list-disc pl-4 text-[11px] text-neutral-700 dark:text-neutral-300">
+                      {activeTool.semaforoRed.map((item, i) => (
+                        <li key={i}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="text-[11px] font-mono p-2 bg-[#121214] text-emerald-300 rounded break-all">
+                  $ {activeTool.cliQuickCommand}
                 </div>
               </div>
             </div>
