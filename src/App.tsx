@@ -13,6 +13,8 @@ import { ToolDetailModal } from './components/ToolDetailModal';
 import { ComboDrawer } from './components/ComboDrawer';
 import { MediaLightboxModal } from './components/MediaLightboxModal';
 import { AdminStudio } from './components/AdminStudio';
+import { VibeGuideSection } from './components/VibeGuideSection';
+import { AddToolModal } from './components/AddToolModal';
 
 export const App: React.FC = () => {
   // Global View States
@@ -31,6 +33,7 @@ export const App: React.FC = () => {
   const [lightboxMedia, setLightboxMedia] = useState<ToolMediaItem | null>(null);
   const [isComboDrawerOpen, setIsComboDrawerOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isAddToolModalOpen, setIsAddToolModalOpen] = useState(false);
   const [selectedComboSlugs, setSelectedComboSlugs] = useState<readonly string[]>([
     'superpowers',
     'stitch-mcp',
@@ -84,13 +87,24 @@ export const App: React.FC = () => {
 
   const selectedComboTools = tools.filter((t) => selectedComboSlugs.includes(t.slug));
 
+  const handleAddTool = (newTool: ToolItem) => {
+    setTools([newTool, ...tools]);
+    showToast(`🎉 Herramienta "${newTool.title}" agregada al baúl`);
+    setActiveDetailTool(newTool);
+  };
+
   return (
     <div className={`h-full flex flex-col font-sans selection:bg-brand-orange selection:text-white ${isDarkMode ? 'dark' : ''}`}>
       {currentSection === 'admin' ? (
         <AdminStudio
           tools={tools}
           onSaveTool={(updated) => {
-            setTools(tools.map((t) => (t.slug === updated.slug ? updated : t)));
+            const exists = tools.some((t) => t.slug === updated.slug);
+            if (exists) {
+              setTools(tools.map((t) => (t.slug === updated.slug ? updated : t)));
+            } else {
+              setTools([updated, ...tools]);
+            }
           }}
           onShowToast={showToast}
           onCloseAdmin={() => setCurrentSection('vault')}
@@ -188,6 +202,20 @@ export const App: React.FC = () => {
                       <span>📦</span> Continuidad V7
                     </span>
                     <span className="font-mono text-[9px] bg-cyan-200 text-cyan-950 px-1 rounded font-bold">Repomix</span>
+                  </button>
+
+                  <button
+                    onClick={() => setCurrentSection('vibe-guide')}
+                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded border transition ${
+                      currentSection === 'vibe-guide'
+                        ? 'border-[#121214] bg-[#FFD166] text-[#121214] font-bold shadow-brutal-xs'
+                        : 'border-transparent hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <span>💡</span> Jerga & Markdowns
+                    </span>
+                    <span className="font-mono text-[9px] bg-orange-100 text-orange-950 px-1 rounded font-bold">Guía</span>
                   </button>
 
                   <button
@@ -371,6 +399,15 @@ export const App: React.FC = () => {
                 {/* Right controls on Mobile Row 1 */}
                 <div className="flex items-center gap-2">
                   <button
+                    onClick={() => setIsAddToolModalOpen(true)}
+                    className="flex items-center gap-1.5 px-2.5 py-1.5 md:py-2 border-2 border-[#121214] rounded bg-brand-orange text-white font-display font-black text-xs shadow-brutal-sm hover:translate-y-[-1px] transition"
+                    title="Subir Herramienta al Baúl con IA"
+                  >
+                    <span>➕</span>
+                    <span className="hidden sm:inline">Subir con IA</span>
+                  </button>
+
+                  <button
                     onClick={() => setIsComboDrawerOpen(true)}
                     className="flex items-center gap-1.5 px-2.5 py-1.5 md:py-2 border-2 border-[#121214] rounded bg-[#FFD166] text-[#121214] font-display font-black text-xs shadow-brutal-sm hover:translate-y-[-1px] transition"
                   >
@@ -473,13 +510,19 @@ export const App: React.FC = () => {
                             onClick={() => setCurrentSection('repomix-v7')}
                             className="px-3.5 py-2 bg-cyan-100 dark:bg-cyan-950/40 text-cyan-950 dark:text-cyan-200 font-display font-bold text-xs rounded border-2 border-[#121214] shadow-brutal-sm hover:bg-cyan-200 transition"
                           >
-                            📦 Ver Workflow V7 Continuidad
+                            📦 Workflow Continuidad V7
                           </button>
                           <button
-                            onClick={() => handleCopy(INITIAL_TOOLS[4]?.rawMarkdown || '', 'PEVC V5.md')}
-                            className="px-3.5 py-2 bg-white dark:bg-neutral-800 font-display font-bold text-xs rounded border-2 border-[#121214] shadow-brutal-sm hover:bg-neutral-100 transition"
+                            onClick={() => setCurrentSection('vibe-guide')}
+                            className="px-3.5 py-2 bg-orange-100 dark:bg-orange-950/40 text-brand-orangeDark dark:text-brand-orange font-display font-bold text-xs rounded border-2 border-[#121214] shadow-brutal-sm hover:bg-orange-200 transition"
                           >
-                            Descargar PEVC_V5.md
+                            💡 Jerga & Markdowns
+                          </button>
+                          <button
+                            onClick={() => setIsAddToolModalOpen(true)}
+                            className="px-3.5 py-2 bg-[#FFD166] text-[#121214] font-display font-black text-xs rounded border-2 border-[#121214] shadow-brutal-sm hover:bg-yellow-400 transition"
+                          >
+                            ➕ Subir con IA (Link/Archivo)
                           </button>
                         </div>
                       </div>
@@ -770,6 +813,14 @@ export const App: React.FC = () => {
                 </section>
               )}
 
+              {/* SECTION: VIBE GUIDE (JERGA Y MARKDOWNS) */}
+              {currentSection === 'vibe-guide' && (
+                <VibeGuideSection
+                  onOpenVault={() => setCurrentSection('vault')}
+                  onCopy={handleCopy}
+                />
+              )}
+
               {/* SECTION: COMBOS */}
               {currentSection === 'combos' && (
                 <section className="p-6 bg-white dark:bg-[#15161A] border-[3px] border-[#121214] rounded-lg shadow-brutal-lg space-y-6">
@@ -925,6 +976,15 @@ export const App: React.FC = () => {
                 </button>
                 <button
                   onClick={() => {
+                    setCurrentSection('vibe-guide');
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full text-left p-2 rounded bg-orange-100 dark:bg-orange-950/40 text-brand-orangeDark dark:text-brand-orange font-bold"
+                >
+                  💡 Jerga & Markdowns Antigravity
+                </button>
+                <button
+                  onClick={() => {
                     setCurrentSection('combos');
                     setIsMobileMenuOpen(false);
                   }}
@@ -1003,6 +1063,14 @@ export const App: React.FC = () => {
           showToast('Combo vaciado');
         }}
         onCopy={handleCopy}
+      />
+
+      {/* Add Tool Modal with AI Synthesizer */}
+      <AddToolModal
+        isOpen={isAddToolModalOpen}
+        onClose={() => setIsAddToolModalOpen(false)}
+        onAddTool={handleAddTool}
+        onShowToast={showToast}
       />
 
       {/* Toast Notification */}

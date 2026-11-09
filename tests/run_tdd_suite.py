@@ -70,6 +70,23 @@ def test_suite():
             page.locator('button:has-text("← Volver al Baúl")').first.click()
             page.wait_for_timeout(400)
 
+            # 5. Test Vibe Guide & Antigravity Markdowns Section
+            page.locator('button:has-text("Jerga & Markdowns")').first.click()
+            page.wait_for_timeout(600)
+            assert page.locator('text=Diccionario Criollo de Vibe Coding').count() > 0, "Diccionario Criollo visible"
+            page.locator('button:has-text("Markdowns en Antigravity")').click()
+            page.wait_for_timeout(400)
+            assert page.locator('text=PROTOCOLO DE DESARROLLO: FEATURE EXPRESS').count() > 0, "Ejemplo completo de Markdown visible"
+            page.locator('button:has-text("← Volver al Baúl")').first.click()
+            page.wait_for_timeout(400)
+
+            # 6. Test Add Tool Modal with AI
+            page.locator('button:has-text("Subir con IA")').first.click()
+            page.wait_for_timeout(500)
+            assert page.locator('text=Subir Herramienta al Baúl con IA').count() > 0, "Modal de Subir Herramienta abierto"
+            page.locator('button:has-text("✕")').first.click()
+            page.wait_for_timeout(300)
+
             print("✅ TODOS LOS TESTS TDD PASARON EN VERDE")
             browser.close()
     finally:
