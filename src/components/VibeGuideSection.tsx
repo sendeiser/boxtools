@@ -9,7 +9,7 @@ export const VibeGuideSection: React.FC<VibeGuideSectionProps> = ({
   onOpenVault,
   onCopy,
 }) => {
-  const [activeTab, setActiveTab] = useState<'jerga' | 'antigravity-md'>('jerga');
+  const [activeTab, setActiveTab] = useState<'jerga' | 'antigravity-md' | 'diseno-suite'>('jerga');
   const [copiedExample, setCopiedExample] = useState(false);
 
   const FULL_MARKDOWN_EXAMPLE = `# PROTOCOLO DE DESARROLLO: FEATURE EXPRESS (.md)
@@ -89,6 +89,18 @@ Tienes ESTRICTAMENTE PROHIBIDO modificar la arquitectura existente o instalar li
         >
           <span>📘</span>
           <span>2. Cómo Usar Markdowns en Antigravity (Tutorial + Ejemplo)</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('diseno-suite')}
+          className={`flex items-center gap-2 px-4 py-2 font-display font-black text-xs rounded border-2 border-[#121214] shadow-brutal-sm transition ${
+            activeTab === 'diseno-suite'
+              ? 'bg-brand-orange text-white'
+              : 'bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100'
+          }`}
+        >
+          <span>🎨</span>
+          <span>3. Estrategia UI/UX: Frontend Design vs UI/UX Pro Max vs Mezcla</span>
         </button>
       </div>
 
@@ -316,6 +328,130 @@ Tienes ESTRICTAMENTE PROHIBIDO modificar la arquitectura existente o instalar li
                 <li>Escribe en el chat: <code>@[protocolo_feature_express.md] activa este markdown y agrega un botón de logout</code>.</li>
                 <li>Observa cómo Antigravity se detiene en la Fase 1 para pedirte confirmación antes de tocar una sola línea de código.</li>
               </ol>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 3: ESTRATEGIA DE DISEÑO UI/UX */}
+      {activeTab === 'diseno-suite' && (
+        <div className="space-y-6">
+          <div className="p-4 bg-purple-50 dark:bg-purple-950/20 border-2 border-purple-600 rounded shadow-brutal-sm">
+            <h3 className="font-display font-black text-base text-purple-950 dark:text-purple-200">
+              🎨 ¿Frontend Design, UI/UX Pro Max o la Mezcla de las Dos?
+            </h3>
+            <p className="text-xs text-neutral-700 dark:text-neutral-300 mt-1 leading-relaxed">
+              En la <strong>Fase 2 de PEVC V5</strong> el diseño no se improvisa con Tailwind genérico. Tienes a tu disposición dos herramientas formidables con enfoques complementarios. Puedes usar una, la otra, o la <strong>estrategia híbrida recomendada</strong> que combina la inteligencia de nicho con la arquitectura formal de especificaciones.
+            </p>
+          </div>
+
+          {/* Tabla Comparativa */}
+          <div className="border-2 border-black rounded-lg overflow-hidden shadow-brutal-sm">
+            <div className="bg-[#121214] text-white p-3 font-mono text-xs font-bold flex items-center justify-between">
+              <span>COMPARATIVA: FRONTEND DESIGN vs UI/UX PRO MAX</span>
+              <span className="text-brand-yellow text-[10px]">PEVC V5 MATRIX</span>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs text-left">
+                <thead className="bg-neutral-100 dark:bg-neutral-800 border-b border-neutral-300 font-mono text-[11px]">
+                  <tr>
+                    <th className="p-3">Dimensión</th>
+                    <th className="p-3 text-cyan-800 dark:text-cyan-300 font-bold">1. frontend-design (Anthropic)</th>
+                    <th className="p-3 text-brand-orange font-bold">2. ui-ux-pro-max (Obra)</th>
+                    <th className="p-3 text-purple-800 dark:text-purple-300 font-bold bg-purple-50 dark:bg-purple-950/30">⭐ 3. La Mezcla (Dúo Dinámico)</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-neutral-200 dark:divide-neutral-700 font-sans text-[11px]">
+                  <tr>
+                    <td className="p-3 font-bold bg-neutral-50 dark:bg-neutral-900 font-mono">Enfoque Primario</td>
+                    <td className="p-3">Arquitectura formal del sistema de diseño y layout.</td>
+                    <td className="p-3">Inteligencia heurística de nicho y búsqueda de tokens.</td>
+                    <td className="p-3 bg-purple-50/50 dark:bg-purple-950/20 font-semibold text-purple-900 dark:text-purple-200">
+                      Investigación profunda de nicho ➔ Arquitectura y Prompt Stitch.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="p-3 font-bold bg-neutral-50 dark:bg-neutral-900 font-mono">Catálogo & Base</td>
+                    <td className="p-3">Guías de estilo para componentes, jerarquías y redacción para Stitch.</td>
+                    <td className="p-3">79 estilos visuales, 192 paletas de producto y 74 font pairings.</td>
+                    <td className="p-3 bg-purple-50/50 dark:bg-purple-950/20 font-semibold text-purple-900 dark:text-purple-200">
+                      Toda la base de datos de 192 paletas formalizada en la spec.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="p-3 font-bold bg-neutral-50 dark:bg-neutral-900 font-mono">Conexión con Stitch</td>
+                    <td className="p-3 font-semibold text-emerald-700 dark:text-emerald-400">
+                      Directa: redacta el Prompt Maestro estructurado para Stitch MCP.
+                    </td>
+                    <td className="p-3">Provee valores de color exactos, reglas y pairings para el prompt.</td>
+                    <td className="p-3 bg-purple-50/50 dark:bg-purple-950/20 font-semibold text-purple-900 dark:text-purple-200">
+                      Prompt Maestro de Stitch hiperpreciso con justificación de nicho.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="p-3 font-bold bg-neutral-50 dark:bg-neutral-900 font-mono">Auditoría UX / WCAG</td>
+                    <td className="p-3">Estructura y diseño responsive base.</td>
+                    <td className="p-3">119 reglas heurísticas (contraste 4.5:1, targets táctiles 44px).</td>
+                    <td className="p-3 bg-purple-50/50 dark:bg-purple-950/20 font-semibold text-purple-900 dark:text-purple-200">
+                      Auditoría heurística con UI/UX Pro Max + Verificación con Impeccable.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="p-3 font-bold bg-neutral-50 dark:bg-neutral-900 font-mono">Instalación</td>
+                    <td className="p-3 font-mono text-[10px]">
+                      npx skills add https://github.com/anthropics/skills --skill frontend-design
+                    </td>
+                    <td className="p-3 font-mono text-[10px]">
+                      npx skills add ui-ux-pro-max
+                    </td>
+                    <td className="p-3 bg-purple-50/50 dark:bg-purple-950/20 font-mono text-[10px] font-bold">
+                      Instalar ambas en Fase 0
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* El Flujo Paso a Paso de la Mezcla */}
+          <div className="p-5 border-2 border-black rounded-lg bg-neutral-50 dark:bg-[#1A1C22] space-y-4">
+            <h4 className="font-display font-black text-sm uppercase tracking-wide text-brand-orange flex items-center gap-2">
+              <span>🚀</span>
+              <span>El Protocolo de la Mezcla Híbrida en 4 Pasos (Fase 2 Oficial)</span>
+            </h4>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs">
+              <div className="p-3 bg-white dark:bg-[#15161A] border-2 border-black rounded shadow-brutal-xs space-y-1.5">
+                <span className="font-mono text-[10px] font-bold text-brand-orange">PASO 1 // INVESTIGACIÓN</span>
+                <p className="font-bold text-sm">ui-ux-pro-max CLI</p>
+                <p className="text-[11px] text-neutral-600 dark:text-neutral-400">
+                  Ejecutas la búsqueda en la terminal para obtener la paleta psicológica (60-30-10) y el pairing tipográfico de tu nicho.
+                </p>
+              </div>
+
+              <div className="p-3 bg-white dark:bg-[#15161A] border-2 border-black rounded shadow-brutal-xs space-y-1.5">
+                <span className="font-mono text-[10px] font-bold text-cyan-600">PASO 2 // ARQUITECTURA</span>
+                <p className="font-bold text-sm">frontend-design</p>
+                <p className="text-[11px] text-neutral-600 dark:text-neutral-400">
+                  Tomas los colores y fuentes del Paso 1 y estructuras la jerarquía de componentes, layouts y redactas el Prompt Maestro para Stitch.
+                </p>
+              </div>
+
+              <div className="p-3 bg-white dark:bg-[#15161A] border-2 border-black rounded shadow-brutal-xs space-y-1.5">
+                <span className="font-mono text-[10px] font-bold text-purple-600">PASO 3 // CANVAS VISUAL</span>
+                <p className="font-bold text-sm">Google Stitch MCP</p>
+                <p className="text-[11px] text-neutral-600 dark:text-neutral-400">
+                  El servidor MCP de Stitch recibe el Prompt Maestro y genera los mockups interactivos y el código HTML/Tailwind en alta resolución.
+                </p>
+              </div>
+
+              <div className="p-3 bg-white dark:bg-[#15161A] border-2 border-black rounded shadow-brutal-xs space-y-1.5">
+                <span className="font-mono text-[10px] font-bold text-emerald-600">PASO 4 // PULIDO 10/10</span>
+                <p className="font-bold text-sm">Playwright + Impeccable</p>
+                <p className="text-[11px] text-neutral-600 dark:text-neutral-400">
+                  Capturas en 1440px, 768px y 375px; Impeccable audita la imagen y el CSS hasta eliminar toda imperfección antes de programar la lógica.
+                </p>
+              </div>
             </div>
           </div>
         </div>

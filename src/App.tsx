@@ -719,11 +719,114 @@ export const App: React.FC = () => {
                         </p>
                       </div>
 
-                      <div className="p-4 border-2 border-black rounded shadow-brutal-sm bg-neutral-50 dark:bg-[#1A1C22]">
-                        <h3 className="font-display font-black text-sm">Fase 2: Frontend Design ➔ Stitch ➔ Impeccable</h3>
-                        <p className="text-xs text-neutral-600 dark:text-neutral-300 mt-1">
-                          Diseño en alta resolución, capturas en 1440px/768px/375px y corrección visual con Impeccable antes de programar.
-                        </p>
+                      <div className="md:col-span-2 p-5 border-[3px] border-[#121214] dark:border-neutral-700 rounded-lg shadow-brutal bg-[#FFFDF7] dark:bg-[#1A1C22] space-y-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-neutral-200 dark:border-neutral-800 pb-3">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xl">🎨</span>
+                            <div>
+                              <h3 className="font-display font-black text-base text-[#121214] dark:text-white">
+                                Fase 2: Diseño UI/UX — Frontend Design, UI/UX Pro Max o Mezcla de las Dos
+                              </h3>
+                              <p className="text-xs text-neutral-600 dark:text-neutral-400">
+                                Las 2 opciones oficiales de diseño y su integración armónica hacia Google Stitch MCP e Impeccable.
+                              </p>
+                            </div>
+                          </div>
+                          <span className="self-start sm:self-auto bg-purple-100 text-purple-950 border border-purple-800 font-mono text-[10px] font-bold px-2 py-0.5 rounded">
+                            VIBE UI SUITE
+                          </span>
+                        </div>
+
+                        {/* 3 Pillars of Design: Opción A, Opción B, Opción C */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+                          {/* Opción 1: frontend-design */}
+                          <div className="p-3.5 border-2 border-[#121214] dark:border-neutral-700 rounded bg-white dark:bg-[#15161A] flex flex-col justify-between space-y-3">
+                            <div>
+                              <div className="flex items-center justify-between mb-1.5">
+                                <span className="font-mono text-[10px] font-extrabold text-cyan-700 dark:text-cyan-400 uppercase">
+                                  // OPCIÓN 1: ARQUITECTURA
+                                </span>
+                                <span className="text-base">📐</span>
+                              </div>
+                              <h4 className="font-display font-black text-sm">frontend-design</h4>
+                              <p className="text-[11px] text-neutral-600 dark:text-neutral-300 mt-1 leading-snug">
+                                Ideal para diseñar la estructura formal del sistema: pliego de tokens, escalas tipográficas proporcionales, espaciados y redacción del Prompt Maestro hiperdetallado para Stitch.
+                              </p>
+                            </div>
+                            <button
+                              onClick={() => {
+                                const found = tools.find((t) => t.slug === 'frontend-design');
+                                if (found) setActiveDetailTool(found);
+                              }}
+                              className="w-full text-center py-1.5 px-2 bg-cyan-100 hover:bg-cyan-200 text-cyan-950 font-mono text-[10px] font-bold border-2 border-black rounded shadow-brutal-xs transition"
+                            >
+                              Ver Ficha frontend-design →
+                            </button>
+                          </div>
+
+                          {/* Opción 2: ui-ux-pro-max */}
+                          <div className="p-3.5 border-2 border-[#121214] dark:border-neutral-700 rounded bg-white dark:bg-[#15161A] flex flex-col justify-between space-y-3">
+                            <div>
+                              <div className="flex items-center justify-between mb-1.5">
+                                <span className="font-mono text-[10px] font-extrabold text-brand-orange uppercase">
+                                  // OPCIÓN 2: INTELIGENCIA
+                                </span>
+                                <span className="text-base">✨</span>
+                              </div>
+                              <h4 className="font-display font-black text-sm">ui-ux-pro-max</h4>
+                              <p className="text-[11px] text-neutral-600 dark:text-neutral-300 mt-1 leading-snug">
+                                Motor de búsqueda por CLI Python con 192 paletas de producto fundamentadas, 79 estilos visuales (bento, neo-brutal, minimal) y 119 reglas de accesibilidad WCAG.
+                              </p>
+                            </div>
+                            <button
+                              onClick={() => {
+                                const found = tools.find((t) => t.slug === 'ui-ux-pro-max');
+                                if (found) setActiveDetailTool(found);
+                              }}
+                              className="w-full text-center py-1.5 px-2 bg-orange-100 hover:bg-orange-200 text-orange-950 font-mono text-[10px] font-bold border-2 border-black rounded shadow-brutal-xs transition"
+                            >
+                              Ver Ficha ui-ux-pro-max →
+                            </button>
+                          </div>
+
+                          {/* Opción 3: La Mezcla de las Dos (Híbrido) */}
+                          <div className="p-3.5 border-2 border-brand-orange rounded bg-[#FFF7EE] dark:bg-[#251A14] flex flex-col justify-between space-y-3 relative overflow-hidden">
+                            <div className="absolute -right-6 top-3 rotate-45 bg-brand-orange text-white text-[8px] font-mono font-bold px-6 py-0.5">
+                              TOP
+                            </div>
+                            <div>
+                              <div className="flex items-center justify-between mb-1.5">
+                                <span className="font-mono text-[10px] font-extrabold text-purple-700 dark:text-purple-400 uppercase">
+                                  // LA MEZCLA (RECOMENDADA)
+                                </span>
+                                <span className="text-base">⚡🎨</span>
+                              </div>
+                              <h4 className="font-display font-black text-sm">Dúo Dinámico UI/UX</h4>
+                              <p className="text-[11px] text-neutral-700 dark:text-neutral-300 mt-1 leading-snug">
+                                La combinación suprema: 1) <strong>ui-ux-pro-max</strong> investiga el nicho y paleta cromática; 2) <strong>frontend-design</strong> estructura la guía de componentes y prompt maestro de Stitch.
+                              </p>
+                            </div>
+                            <button
+                              onClick={() => {
+                                const found = tools.find((t) => t.slug === 'diseno-hibrido-vibe');
+                                if (found) setActiveDetailTool(found);
+                              }}
+                              className="w-full text-center py-1.5 px-2 bg-brand-orange hover:bg-brand-orangeDark text-white font-mono text-[10px] font-bold border-2 border-black rounded shadow-brutal-xs transition"
+                            >
+                              Ver Flujo Híbrido Completo →
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Next Steps in Phase 2 */}
+                        <div className="p-3 bg-neutral-100 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded text-[11px] text-neutral-700 dark:text-neutral-300 flex items-center justify-between flex-wrap gap-2">
+                          <span className="font-mono font-bold">
+                            ➔ Siguiente en Fase 2: Inyectar a <strong>Google Stitch MCP</strong> y auditar con <strong>Playwright + Impeccable (1440px / 768px / 375px)</strong>.
+                          </span>
+                          <span className="bg-[#121214] text-white text-[9px] font-mono px-2 py-0.5 rounded font-bold">
+                            CERO PROGRAMAR SIN APROBACIÓN VISUAL
+                          </span>
+                        </div>
                       </div>
 
                       <div className="p-4 border-2 border-black rounded shadow-brutal-sm bg-neutral-50 dark:bg-[#1A1C22]">

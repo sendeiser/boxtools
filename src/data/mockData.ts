@@ -320,6 +320,158 @@ python .agents/skills/ui-ux-pro-max/scripts/search.py "editorial modern" --domai
     compatibilityTags: ['Antigravity', 'OpenCode', 'Cursor', 'Claude Code'],
   },
   {
+    id: 't-frontend-design',
+    slug: 'frontend-design',
+    codeId: 'SKILL-004',
+    title: 'frontend-design (Arquitectura & Stitch Spec)',
+    tagline: 'Especificación formal de Design Systems: tokens semánticos, anatomía de componentes, layouts y generación de Prompt Maestro para Google Stitch.',
+    emoji: '📐',
+    category: 'skill',
+    categoryLabel: '⚡ SKILL AGÉNTICA',
+    phase: 'fase2',
+    phaseLabel: 'FASE 2 // VIBE UI',
+    status: 'published',
+    isFeatured: true,
+    criolloAnalogy: 'Es como el arquitecto proyectista que dibuja los planos de replanteo con cotas milimétricas: antes de elegir la pintura o los adornos, te define dónde va cada viga, la distribución de pantallas, las proporciones de los contenedores y te deja el pliego de especificaciones listo para que los albañiles (Stitch) no inventen nada.',
+    criolloWithout: [
+      'Escribir prompts vagos o improvisados a Stitch y terminar con pantallas desarticuladas sin coherencia de espaciados ni tipografía.',
+      'Empezar a programar CSS sin una arquitectura de componentes clara, terminando con estilos duplicados y clases desorganizadas.',
+    ],
+    criolloWith: [
+      'Guía de estilos completa generada antes de tocar una sola línea de código: paleta hexadecimal exacta, escalas tipográficas y espaciados coherentes.',
+      'Generación automática del Prompt Maestro hiperdetallado listo para alimentar a Google Stitch MCP.',
+    ],
+    semaforoGreen: [
+      'En la Fase 2 de PEVC V5 para formalizar el pliego de diseño y los tokens del proyecto.',
+      'Al redactar el prompt maestro de pantalla para Stitch MCP.',
+      'Para documentar la arquitectura de componentes y layout en 01-arquitectura-y-spec.md.',
+    ],
+    semaforoRed: [
+      'Para backend, endpoints API o queries a Supabase.',
+      'Para debugging lógico de algoritmos en Python o Node.',
+    ],
+    riskLevel: 'low',
+    mermaidCode: `flowchart LR
+    A[📄 Spec de Requisitos] --> B[📐 frontend-design Skill]
+    B --> C[🎨 Design Tokens & Layouts]
+    C --> D[📝 Stitch Master Prompt]
+    D --> E[🔌 Stitch MCP Canvas]`,
+    svgConfig: {
+      title: 'Arquitectura de Diseño frontend-design',
+      badge: 'ESPECIFICACIÓN FORMAL UI',
+      steps: [
+        { icon: '📄', label: 'Requisitos', sublabel: 'Inputs de producto', tone: 'orange' },
+        { icon: '📐', label: 'Tokens & Layout', sublabel: 'frontend-design', tone: 'cyan' },
+        { icon: '📝', label: 'Stitch Master Prompt', sublabel: 'Prompt maestro UI', tone: 'emerald' },
+      ],
+      summaryNote: 'Convierte requerimientos abstractos en una especificación geométrica y de componentes exacta para Stitch.',
+    },
+    mediaGallery: [
+      {
+        id: 'm-fed-1',
+        url: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=1200&q=80',
+        caption: 'Arquitectura de layouts, design tokens y especificación formal de pantallas',
+        isAiGenerated: false,
+      },
+    ],
+    cliQuickCommand: 'npx skills add https://github.com/anthropics/skills --skill frontend-design',
+    installCommands: {
+      antigravity: 'npx skills add https://github.com/anthropics/skills --skill frontend-design',
+      opencode: 'npx skills add https://github.com/anthropics/skills --skill frontend-design',
+      cursor: 'npx skills add https://github.com/anthropics/skills --skill frontend-design',
+      claudeCode: 'npx skills add https://github.com/anthropics/skills --skill frontend-design',
+    },
+    rawMarkdown: `# frontend-design - Design System Architecture
+Skill oficial para estructurar sistemas de diseño, jerarquías de componentes y prompts maestros para Google Stitch.
+
+## Responsabilidades clave:
+1. Definir paleta de color semántica (Background, Surface, Border, Primary, Accent).
+2. Escala tipográfica armónica (Display, H1, H2, Body, Caption) y line-heights.
+3. Especificación de espaciados base (4px, 8px, 16px, 24px, 32px).
+4. Redacción del Prompt Maestro hiperdetallado para Google Stitch MCP.
+`,
+    repoUrl: 'https://github.com/anthropics/skills',
+    compatibilityTags: ['Antigravity', 'OpenCode', 'Cursor', 'Claude Code'],
+  },
+  {
+    id: 't-diseno-hibrido-vibe',
+    slug: 'diseno-hibrido-vibe',
+    codeId: 'SKILL-014',
+    title: 'Dúo Dinámico UI/UX (Frontend Design + UI/UX Pro Max)',
+    tagline: 'La mezcla perfecta: usa UI/UX Pro Max para investigación de nicho, heurísticas y paletas; usa Frontend Design para armar la arquitectura del sistema y el prompt de Stitch.',
+    emoji: '⚡🎨',
+    category: 'skill',
+    categoryLabel: '⚡ SKILL AGÉNTICA',
+    phase: 'fase2',
+    phaseLabel: 'FASE 2 // VIBE UI',
+    status: 'published',
+    isFeatured: true,
+    criolloAnalogy: 'Es como juntar al Director Creativo con el Arquitecto Proyectista: el primero investiga qué estética conecta con la gente de tu rubro, te trae las 3 mejores combinaciones de color y tipografía de su catálogo de 192 paletas, y el segundo las traduce en planos de ingeniería milimétricos y pliegos técnicos para que Stitch maquete la pantalla sin una sola imperfección.',
+    criolloWithout: [
+      'Elegir una sola herramienta y quedarte a mitad de camino: o mucho concepto estético sin especificación técnica, o mucha especificación técnica con colores aburridos y genéricos.',
+    ],
+    criolloWith: [
+      'Flujo armónico en 2 tiempos: 1) Búsqueda heurística por CLI con UI/UX Pro Max para extraer paleta y tipografía del nicho; 2) Estructuración formal con Frontend Design para redactar el Prompt Maestro de Stitch.',
+      'Cero dudas de diseño: el agente cuenta con la base de datos visual más rica y el protocolo de entrega más estricto.',
+    ],
+    semaforoGreen: [
+      'En la Fase 2 de PEVC V5 cuando buscas el estándar de diseño más alto y profesional posible.',
+      'Al iniciar productos SaaS, fintech, dashboards o landings de alto impacto visual.',
+    ],
+    semaforoRed: [
+      'Para lógica de backend, migraciones SQL o tareas de infraestructura DevOps.',
+    ],
+    riskLevel: 'low',
+    mermaidCode: `flowchart LR
+    A[🎯 Nicho de Producto] --> B[🔍 UI/UX Pro Max CLI]
+    B -->|Paleta + Tipografía + Heurística| C[📐 Frontend Design Architecture]
+    C -->|Design Tokens + Component Spec| D[📝 Prompt Maestro Stitch]
+    D --> E[🔌 Stitch MCP Canvas]
+    E --> F[👁️ Impeccable + Playwright Audit]`,
+    svgConfig: {
+      title: 'Tubería Híbrida de Diseño Supremo',
+      badge: 'MEZCLA DE LAS DOS // DÚO DINÁMICO',
+      steps: [
+        { icon: '✨', label: '1. UI/UX Pro Max', sublabel: 'Nicho, paleta & reglas', tone: 'orange' },
+        { icon: '📐', label: '2. Frontend Design', sublabel: 'Arquitectura & Spec', tone: 'cyan' },
+        { icon: '🚀', label: '3. Stitch + Impeccable', sublabel: 'Pantalla 10/10 lista', tone: 'emerald' },
+      ],
+      summaryNote: 'Combina la inteligencia de nicho y paletas de UI/UX Pro Max con el rigor arquitectónico de Frontend Design.',
+    },
+    mediaGallery: [
+      {
+        id: 'm-duo-1',
+        url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80',
+        caption: 'Integración armónica: Inteligencia heurística + Arquitectura formal de componentes',
+        isAiGenerated: false,
+      },
+    ],
+    cliQuickCommand: 'npx skills add ui-ux-pro-max && npx skills add https://github.com/anthropics/skills --skill frontend-design',
+    installCommands: {
+      antigravity: 'npx skills add ui-ux-pro-max && npx skills add https://github.com/anthropics/skills --skill frontend-design',
+      opencode: 'npx skills add ui-ux-pro-max && npx skills add https://github.com/anthropics/skills --skill frontend-design',
+      cursor: 'npx skills add ui-ux-pro-max && npx skills add https://github.com/anthropics/skills --skill frontend-design',
+      claudeCode: 'npx skills add ui-ux-pro-max && npx skills add https://github.com/anthropics/skills --skill frontend-design',
+    },
+    rawMarkdown: `# Dúo Dinámico UI/UX: Frontend Design + UI/UX Pro Max
+Metodología de diseño integrada para la Fase 2 de PEVC V5.
+
+## Flujo de Trabajo en 4 Pasos:
+1. **Investigación y Selección Estética (\`ui-ux-pro-max\`):**
+   - Ejecuta \`python .agents/skills/ui-ux-pro-max/scripts/search.py "<nicho>" --design-system\`
+   - Extrae la paleta cromática (60-30-10) y el pairing tipográfico con justificación psicológica.
+2. **Estructura y Especificación (\`frontend-design\`):**
+   - Formaliza los tokens en un pliego de diseño y define la jerarquía de componentes y layouts responsive.
+   - Redacta el Prompt Maestro hiperdetallado para Google Stitch.
+3. **Generación Visual (\`stitch-mcp\`):**
+   - Inyecta el Prompt Maestro al servidor MCP de Stitch para materializar el canvas visual.
+4. **Auditoría Multimodal (\`impeccable\` + \`playwright\`):**
+   - Captura en 1440px, 768px y 375px; audita y pule cada botón, espaciado y tipografía hasta alcanzar un 10/10.
+`,
+    repoUrl: 'https://github.com/boxtools/design-duo',
+    compatibilityTags: ['Antigravity', 'OpenCode', 'Cursor', 'Claude Code'],
+  },
+  {
     id: 't-supabase-cloud',
     slug: 'supabase-cloud',
     codeId: 'MCP-002',
@@ -653,8 +805,18 @@ export const INITIAL_COMBOS: readonly ComboPreset[] = [
     subtitle: 'El arsenal definitivo para arrancar y finalizar una web moderna con IA.',
     badgeColor: 'orange',
     criolloSummary: 'El combo completo con papas y gaseosa: tenés capataz, maquetador de lujo, auditor implacable, base de datos en la nube sin Docker y ojos mecánicos para probar todo.',
-    toolSlugs: ['superpowers', 'ui-ux-pro-max', 'stitch-mcp', 'impeccable', 'supabase-cloud', 'playwright-mcp'],
-    workflowNote: 'Cubre de la Fase 0 a la Fase 4 sin huecos.',
+    toolSlugs: ['superpowers', 'frontend-design', 'ui-ux-pro-max', 'stitch-mcp', 'impeccable', 'supabase-cloud', 'playwright-mcp'],
+    workflowNote: 'Cubre de la Fase 0 a la Fase 4 sin huecos con el Dúo Dinámico de diseño.',
+  },
+  {
+    id: 'c-design-arsenal',
+    slug: 'arsenal-diseno-vibe',
+    title: 'Arsenal de Diseño UI/UX (Frontend Design + UI/UX Pro Max)',
+    subtitle: 'Las 2 opciones de diseño unificadas con Stitch e Impeccable: arquitectura formal o búsqueda inteligente.',
+    badgeColor: 'purple',
+    criolloSummary: 'El cuarteto de oro del diseño: tenés la opción de usar frontend-design para armar los planos y el prompt de Stitch, ui-ux-pro-max para buscar paletas y heurísticas de nicho, o la mezcla de las dos para no dejar ningún cabo suelto.',
+    toolSlugs: ['frontend-design', 'ui-ux-pro-max', 'diseno-hibrido-vibe', 'stitch-mcp', 'impeccable'],
+    workflowNote: 'La solución completa para la Fase 2: frontend-design + ui-ux-pro-max o la mezcla de las dos.',
   },
   {
     id: 'c-design-trinity',
@@ -663,7 +825,7 @@ export const INITIAL_COMBOS: readonly ComboPreset[] = [
     subtitle: 'De la idea al diseño de alta costura con maquetación asistida y auditoría multimodal.',
     badgeColor: 'purple',
     criolloSummary: 'El dream team estético: UI/UX Pro Max te define la paleta y reglas para no inventar fruta, Stitch te genera la pantalla en minutos e Impeccable te audita hasta el último pixel para que quede perfecto.',
-    toolSlugs: ['ui-ux-pro-max', 'stitch-mcp', 'impeccable'],
+    toolSlugs: ['ui-ux-pro-max', 'frontend-design', 'stitch-mcp', 'impeccable'],
     workflowNote: 'El combo definitivo para la Fase 2 de PEVC V5 (Vibe UI & Design System).',
   },
   {

@@ -63,6 +63,21 @@ def test_suite():
             page.locator('button:has-text("✕")').first.click()
             page.wait_for_timeout(400)
 
+            # 2d. Test frontend-design & diseno-hibrido-vibe cards
+            page.locator('[data-testid="tool-card-frontend-design"] button:has-text("Ver Ficha + Gráficos")').scroll_into_view_if_needed()
+            page.locator('[data-testid="tool-card-frontend-design"] button:has-text("Ver Ficha + Gráficos")').click()
+            page.wait_for_timeout(800)
+            assert page.locator('text=SKILL-004').count() > 0, "Modal de frontend-design abierto con SKILL-004"
+            page.locator('button:has-text("✕")').first.click()
+            page.wait_for_timeout(400)
+
+            page.locator('[data-testid="tool-card-diseno-hibrido-vibe"] button:has-text("Ver Ficha + Gráficos")').scroll_into_view_if_needed()
+            page.locator('[data-testid="tool-card-diseno-hibrido-vibe"] button:has-text("Ver Ficha + Gráficos")').click()
+            page.wait_for_timeout(800)
+            assert page.locator('text=SKILL-014').count() > 0, "Modal de diseno-hibrido-vibe abierto con SKILL-014"
+            page.locator('button:has-text("✕")').first.click()
+            page.wait_for_timeout(400)
+
             # 3. Test Combo Drawer
             page.click('text="Mi Combo"')
             page.wait_for_timeout(400)
@@ -85,6 +100,10 @@ def test_suite():
             page.locator('button:has-text("Markdowns en Antigravity")').click()
             page.wait_for_timeout(400)
             assert page.locator('text=PROTOCOLO DE DESARROLLO: FEATURE EXPRESS').count() > 0, "Ejemplo completo de Markdown visible"
+            
+            page.locator('button:has-text("Estrategia UI/UX")').click()
+            page.wait_for_timeout(400)
+            assert page.locator('text=¿Frontend Design, UI/UX Pro Max o la Mezcla de las Dos?').count() > 0, "Tab 3 de Estrategia de Diseño visible"
             page.locator('button:has-text("← Volver al Baúl")').first.click()
             page.wait_for_timeout(400)
 
