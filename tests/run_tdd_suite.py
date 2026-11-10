@@ -115,6 +115,53 @@ def test_suite():
             page.locator('button:has-text("✕")').first.click()
             page.wait_for_timeout(300)
 
+            # 7. Test Retractable Sidebar & Collapsible Components
+            # 7a. Sidebar Retraction & Expansion
+            sidebar = page.locator('aside[data-testid="main-sidebar"]')
+            assert "w-[280px]" in sidebar.get_attribute("class") or "", "Sidebar inicial expandido (280px)"
+            page.locator('button:has-text("RETRAER")').first.click()
+            page.wait_for_timeout(400)
+            assert "w-[76px]" in sidebar.get_attribute("class") or "", "Sidebar retraído a modo slim (76px)"
+            page.locator('button:has-text("EXPANDIR")').first.click()
+            page.wait_for_timeout(400)
+            assert "w-[280px]" in sidebar.get_attribute("class") or "", "Sidebar re-expandido (280px)"
+
+            # 7b. Hero Banner Collapse
+            assert page.locator('text=PIPELINE DE LAS 5 FASES PEVC').count() > 0, "Hero banner expandido inicialmente"
+            page.locator('button:has-text("Contraer Banner")').first.click()
+            page.wait_for_timeout(300)
+            assert page.locator('text=PIPELINE DE LAS 5 FASES PEVC').count() == 0, "Hero banner contraído"
+            page.locator('button:has-text("Expandir Banner")').first.click()
+            page.wait_for_timeout(300)
+            assert page.locator('text=PIPELINE DE LAS 5 FASES PEVC').count() > 0, "Hero banner re-expandido"
+
+            # 7c. PEVC V5 Collapsible Phases
+            page.locator('button:has-text("PEVC V5 (Creación)")').first.click()
+            page.wait_for_timeout(500)
+            assert page.locator('text=Dúo Dinámico UI/UX').count() > 0, "Fase 2 de PEVC expandida"
+            page.locator('button:has-text("Contraer Suite")').first.click()
+            page.wait_for_timeout(300)
+            assert page.locator('text=Dúo Dinámico UI/UX').count() == 0, "Fase 2 suite contraída"
+            page.locator('button:has-text("Expandir Suite")').first.click()
+            page.wait_for_timeout(300)
+            assert page.locator('text=Dúo Dinámico UI/UX').count() > 0, "Fase 2 suite re-expandida"
+            page.locator('button:has-text("← Volver al Baúl")').first.click()
+            page.wait_for_timeout(400)
+
+            # 7d. Detail Modal Collapsible Sections (Mermaid & Matrix)
+            page.locator('[data-testid="tool-card-superpowers"] button:has-text("Ver Ficha + Gráficos")').scroll_into_view_if_needed()
+            page.locator('[data-testid="tool-card-superpowers"] button:has-text("Ver Ficha + Gráficos")').click()
+            page.wait_for_timeout(800)
+            assert page.locator('button:has-text("Ocultar Diagrama")').count() > 0, "Boton ocultar diagrama visible"
+            page.locator('button:has-text("Ocultar Diagrama")').click()
+            page.wait_for_timeout(300)
+            assert page.locator('button:has-text("Ver Diagrama")').count() > 0, "Diagrama contraído"
+            page.locator('button:has-text("Ver Diagrama")').click()
+            page.wait_for_timeout(300)
+            assert page.locator('button:has-text("Ocultar Diagrama")').count() > 0, "Diagrama re-expandido"
+            page.locator('button:has-text("✕")').first.click()
+            page.wait_for_timeout(300)
+
             print("✅ TODOS LOS TESTS TDD PASARON EN VERDE")
             browser.close()
     finally:

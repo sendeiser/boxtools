@@ -42,6 +42,90 @@ export const App: React.FC = () => {
     'impeccable',
   ]);
 
+  // Retractable Sidebar & Collapsible Components State
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('boxtools_sidebar_collapsed') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const toggleSidebar = () => {
+    setIsSidebarCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('boxtools_sidebar_collapsed', String(next));
+      } catch {}
+      return next;
+    });
+  };
+
+  const [openNavGroups, setOpenNavGroups] = useState({
+    vistas: true,
+    categorias: true,
+    fases: true,
+  });
+
+  const toggleNavGroup = (key: 'vistas' | 'categorias' | 'fases') => {
+    setOpenNavGroups((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const [isHeroCollapsed, setIsHeroCollapsed] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('boxtools_hero_collapsed') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const toggleHero = () => {
+    setIsHeroCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('boxtools_hero_collapsed', String(next));
+      } catch {}
+      return next;
+    });
+  };
+
+  const [openPevcFases, setOpenPevcFases] = useState({
+    f0: true,
+    f1: true,
+    f2: true,
+    f3: true,
+  });
+
+  const togglePevcPhase = (key: 'f0' | 'f1' | 'f2' | 'f3') => {
+    setOpenPevcFases((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const toggleAllPevcFases = (expand: boolean) => {
+    setOpenPevcFases({
+      f0: expand,
+      f1: expand,
+      f2: expand,
+      f3: expand,
+    });
+  };
+
+  // Keyboard Shortcuts (Ctrl+B / Cmd+B for sidebar, Ctrl+K for search)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
+        e.preventDefault();
+        toggleSidebar();
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        const searchInput = document.getElementById('search-input-desktop') || document.getElementById('search-input-mobile');
+        searchInput?.focus();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   // Cloud Connection Status
   const [isCloudConnected, setIsCloudConnected] = useState<boolean | null>(null);
 
@@ -170,247 +254,399 @@ export const App: React.FC = () => {
           {/* ========================================= */}
           {/* 1. LEFT FIXED SIDEBAR ("Índice del Manual") */}
           {/* ========================================= */}
-          <aside className="w-[280px] shrink-0 h-full border-r-[3px] border-[#121214] dark:border-neutral-800 bg-white dark:bg-[#15161A] flex flex-col justify-between z-30 select-none shadow-[2px_0_0_#121214] hidden md:flex">
+          <aside
+            className={`${
+              isSidebarCollapsed ? 'w-[76px]' : 'w-[280px]'
+            } shrink-0 h-full border-r-[3px] border-[#121214] dark:border-neutral-800 bg-white dark:bg-[#15161A] flex flex-col justify-between z-30 select-none shadow-[2px_0_0_#121214] hidden md:flex transition-all duration-300 ease-in-out`}
+            data-testid="main-sidebar"
+          >
             {/* Top Brand Header */}
-            <div className="p-4 border-b-[3px] border-[#121214] dark:border-neutral-800 bg-[#FFFBF7] dark:bg-[#1A1C22]">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-9 h-9 bg-brand-orange border-2 border-black shadow-brutal-sm flex items-center justify-center font-display font-black text-white text-lg rotate-[-2deg]">
-                    BX
+            {isSidebarCollapsed ? (
+              <div className="p-3 border-b-[3px] border-[#121214] dark:border-neutral-800 bg-[#FFFBF7] dark:bg-[#1A1C22] flex flex-col items-center">
+                <div
+                  onClick={toggleSidebar}
+                  className="w-10 h-10 bg-brand-orange border-2 border-black shadow-brutal-xs flex items-center justify-center font-display font-black text-white text-base rotate-[-2deg] cursor-pointer hover:rotate-0 transition"
+                  title="Expandir menú lateral (Ctrl+B)"
+                >
+                  BX
+                </div>
+                <button
+                  onClick={toggleSidebar}
+                  className="mt-2 w-8 h-7 rounded border-2 border-[#121214] bg-[#FFD166] text-black font-mono font-bold text-xs flex items-center justify-center shadow-brutal-xs hover:bg-yellow-400 transition"
+                  title="Expandir menú lateral (Ctrl+B)"
+                >
+                  ▶
+                </button>
+                <div className="mt-2" title={isCloudConnected ? 'Supabase Conectado' : 'Modo Local'}>
+                  <span
+                    className={`inline-block w-2.5 h-2.5 rounded-full ${
+                      isCloudConnected ? 'bg-emerald-500 animate-pulse' : 'bg-brand-orange'
+                    }`}
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="p-4 border-b-[3px] border-[#121214] dark:border-neutral-800 bg-[#FFFBF7] dark:bg-[#1A1C22]">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-9 h-9 bg-brand-orange border-2 border-black shadow-brutal-sm flex items-center justify-center font-display font-black text-white text-lg rotate-[-2deg]">
+                      BX
+                    </div>
+                    <div>
+                      <span className="font-display font-black tracking-tight text-base leading-none block">
+                        BOXTOOLS
+                      </span>
+                      <span className="font-mono text-[10px] tracking-widest text-brand-orange font-bold">
+                        AI VAULT // V5.2
+                      </span>
+                    </div>
                   </div>
-                  <div>
-                    <span className="font-display font-black tracking-tight text-base leading-none block">
-                      BOXTOOLS
-                    </span>
-                    <span className="font-mono text-[10px] tracking-widest text-brand-orange font-bold">
-                      AI VAULT // V5.2
-                    </span>
-                  </div>
-                </div>
-                <span className={`inline-flex items-center gap-1 text-[9px] font-mono font-bold border-2 border-[#121214] px-1.5 py-0.5 shadow-brutal-sm ${
-                  isCloudConnected
-                    ? 'bg-[#E6F4EA] text-[#137333] dark:bg-emerald-950 dark:text-emerald-300'
-                    : 'bg-[#FFF3E8] text-brand-orange dark:bg-amber-950 dark:text-amber-300'
-                }`}>
-                  <span className={`w-1.5 h-1.5 rounded-full ${isCloudConnected ? 'bg-emerald-500 animate-pulse' : 'bg-brand-orange'}`}></span>
-                  {isCloudConnected ? 'SUPABASE' : 'LOCAL'}
-                </span>
-              </div>
-
-              {/* PEVC V5 Ready Badge */}
-              <div
-                onClick={() => setCurrentSection('pevc')}
-                className="mt-2 bg-[#FFD166] text-[#121214] border-2 border-[#121214] p-2 shadow-brutal-sm flex items-center justify-between cursor-pointer hover:bg-yellow-400 transition"
-              >
-                <div className="flex items-center gap-1.5 font-display font-bold text-xs">
-                  <span>⚡</span>
-                  <span>PEVC V5 READY</span>
-                </div>
-                <span className="font-mono text-[9px] bg-[#121214] text-white px-1.5 py-0.5 rounded font-bold uppercase">
-                  5 Fases
-                </span>
-              </div>
-            </div>
-
-            {/* Navigation Groups */}
-            <div className="flex-1 overflow-y-auto p-3 space-y-4 text-xs font-medium">
-              {/* Group: Vistas Principales */}
-              <div>
-                <p className="font-mono font-extrabold text-[10px] tracking-wider text-neutral-400 uppercase px-2 mb-1.5">
-                  // Vistas Principales
-                </p>
-                <nav className="space-y-1">
-                  <button
-                    onClick={() => setCurrentSection('vault')}
-                    className={`w-full flex items-center justify-between px-2.5 py-2 rounded border-2 border-[#121214] font-bold shadow-brutal-sm transition ${
-                      currentSection === 'vault'
-                        ? 'bg-brand-orange text-white'
-                        : 'bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200'
-                    }`}
-                  >
-                    <span className="flex items-center gap-2">
-                      <span>🗃️</span> Explorador del Baúl
-                    </span>
-                    <span className="bg-black/20 text-[10px] px-1.5 py-0.5 rounded font-mono">
-                      {tools.length}
-                    </span>
-                  </button>
-
-                  <button
-                    onClick={() => setCurrentSection('pevc')}
-                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded border transition ${
-                      currentSection === 'pevc'
-                        ? 'border-[#121214] bg-neutral-100 dark:bg-neutral-800 font-bold'
-                        : 'border-transparent hover:bg-neutral-100 dark:hover:bg-neutral-800'
-                    }`}
-                  >
-                    <span className="flex items-center gap-2">
-                      <span>📘</span> PEVC V5 (Creación)
-                    </span>
-                    <span className="font-mono text-[9px] text-brand-orange font-bold">5 Fases</span>
-                  </button>
-
-                  <button
-                    onClick={() => setCurrentSection('repomix-v7')}
-                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded border transition ${
-                      currentSection === 'repomix-v7'
-                        ? 'border-[#121214] bg-cyan-100 dark:bg-cyan-950/50 font-bold text-cyan-900 dark:text-cyan-200'
-                        : 'border-transparent hover:bg-neutral-100 dark:hover:bg-neutral-800'
-                    }`}
-                  >
-                    <span className="flex items-center gap-2">
-                      <span>📦</span> Continuidad V7
-                    </span>
-                    <span className="font-mono text-[9px] bg-cyan-200 text-cyan-950 px-1 rounded font-bold">Repomix</span>
-                  </button>
-
-                  <button
-                    onClick={() => setCurrentSection('vibe-guide')}
-                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded border transition ${
-                      currentSection === 'vibe-guide'
-                        ? 'border-[#121214] bg-[#FFD166] text-[#121214] font-bold shadow-brutal-xs'
-                        : 'border-transparent hover:bg-neutral-100 dark:hover:bg-neutral-800'
-                    }`}
-                  >
-                    <span className="flex items-center gap-2">
-                      <span>💡</span> Jerga & Markdowns
-                    </span>
-                    <span className="font-mono text-[9px] bg-orange-100 text-orange-950 px-1 rounded font-bold">Guía</span>
-                  </button>
-
-                  <button
-                    onClick={() => setCurrentSection('combos')}
-                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded border transition ${
-                      currentSection === 'combos'
-                        ? 'border-[#121214] bg-neutral-100 dark:bg-neutral-800 font-bold'
-                        : 'border-transparent hover:bg-neutral-100 dark:hover:bg-neutral-800'
-                    }`}
-                  >
-                    <span className="flex items-center gap-2">
-                      <span>🎒</span> Combos & Recetas
-                    </span>
-                    <span className="bg-purple-100 text-purple-900 font-mono text-[9px] px-1 rounded font-bold">
-                      {INITIAL_COMBOS.length}
-                    </span>
-                  </button>
-
-                  <button
-                    onClick={() => setCurrentSection('onboarding')}
-                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded border transition ${
-                      currentSection === 'onboarding'
-                        ? 'border-[#121214] bg-neutral-100 dark:bg-neutral-800 font-bold'
-                        : 'border-transparent hover:bg-neutral-100 dark:hover:bg-neutral-800'
-                    }`}
-                  >
-                    <span className="flex items-center gap-2">
-                      <span>🧭</span> Ruta de Onboarding
-                    </span>
-                    <span className="bg-emerald-100 text-emerald-800 font-mono text-[9px] px-1 rounded font-bold">
-                      15 min
-                    </span>
-                  </button>
-                </nav>
-              </div>
-
-              {/* Group: Categorías */}
-              <div>
-                <p className="font-mono font-extrabold text-[10px] tracking-wider text-neutral-400 uppercase px-2 mb-1.5">
-                  // Categorías Baúl
-                </p>
-                <div className="space-y-1 font-mono text-[11px]">
-                  <button
-                    onClick={() => setSelectedCategory('all')}
-                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded border transition ${
-                      selectedCategory === 'all'
-                        ? 'bg-[#121214] text-white font-bold'
-                        : 'hover:bg-neutral-100 dark:hover:bg-neutral-800'
-                    }`}
-                  >
-                    <span>Todos los Activos</span>
-                    <span>{tools.length}</span>
-                  </button>
-                  <button
-                    onClick={() => setSelectedCategory('skill')}
-                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded border transition ${
-                      selectedCategory === 'skill'
-                        ? 'bg-brand-orange text-white font-bold'
-                        : 'hover:bg-neutral-100 dark:hover:bg-neutral-800'
-                    }`}
-                  >
-                    <span>⚡ Skills Agénticas</span>
-                    <span>{tools.filter((t) => t.category === 'skill').length}</span>
-                  </button>
-                  <button
-                    onClick={() => setSelectedCategory('mcp')}
-                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded border transition ${
-                      selectedCategory === 'mcp'
-                        ? 'bg-brand-orange text-white font-bold'
-                        : 'hover:bg-neutral-100 dark:hover:bg-neutral-800'
-                    }`}
-                  >
-                    <span>🔌 Servidores MCP</span>
-                    <span>{tools.filter((t) => t.category === 'mcp').length}</span>
-                  </button>
-                  <button
-                    onClick={() => setSelectedCategory('markdown')}
-                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded border transition ${
-                      selectedCategory === 'markdown'
-                        ? 'bg-brand-orange text-white font-bold'
-                        : 'hover:bg-neutral-100 dark:hover:bg-neutral-800'
-                    }`}
-                  >
-                    <span>📝 Workflows .md</span>
-                    <span>{tools.filter((t) => t.category === 'markdown').length}</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Group: Fases PEVC V5 */}
-              <div>
-                <p className="font-mono font-extrabold text-[10px] tracking-wider text-neutral-400 uppercase px-2 mb-1.5">
-                  // Ciclo de Vida PEVC V5
-                </p>
-                <div className="space-y-1 font-mono text-[10px]">
-                  {[
-                    { slug: 'fase0', label: 'Fase 0: Contexto & Arq' },
-                    { slug: 'fase1', label: 'Fase 1: Especificación Spec' },
-                    { slug: 'fase2', label: 'Fase 2: Vibe UI (Stitch/Imp)' },
-                    { slug: 'fase3', label: 'Fase 3: DB Cloud & TDD' },
-                    { slug: 'fase4', label: 'Fase 4: QA E2E & Release' },
-                  ].map((phase) => (
-                    <button
-                      key={phase.slug}
-                      onClick={() =>
-                        setSelectedPhase(selectedPhase === phase.slug ? 'all' : (phase.slug as PhaseSlug))
-                      }
-                      className={`w-full text-left px-2.5 py-1.5 rounded border transition flex items-center justify-between ${
-                        selectedPhase === phase.slug
-                          ? 'border-brand-orange bg-orange-50 dark:bg-orange-950/40 font-bold text-brand-orange'
-                          : 'border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                  <div className="flex items-center gap-1.5">
+                    <span
+                      className={`inline-flex items-center gap-1 text-[9px] font-mono font-bold border-2 border-[#121214] px-1.5 py-0.5 shadow-brutal-sm ${
+                        isCloudConnected
+                          ? 'bg-[#E6F4EA] text-[#137333] dark:bg-emerald-950 dark:text-emerald-300'
+                          : 'bg-[#FFF3E8] text-brand-orange dark:bg-amber-950 dark:text-amber-300'
                       }`}
                     >
-                      <span>{phase.label}</span>
-                      <span>
-                        {tools.filter((t) => t.phase === phase.slug).length}
+                      <span
+                        className={`w-1.5 h-1.5 rounded-full ${
+                          isCloudConnected ? 'bg-emerald-500 animate-pulse' : 'bg-brand-orange'
+                        }`}
+                      ></span>
+                      {isCloudConnected ? 'SUPABASE' : 'LOCAL'}
+                    </span>
+                    <button
+                      onClick={toggleSidebar}
+                      className="w-7 h-7 rounded border-2 border-[#121214] bg-white dark:bg-neutral-800 hover:bg-[#FFD166] text-black dark:text-white flex items-center justify-center font-mono font-bold text-xs shadow-brutal-xs transition"
+                      title="Contraer menú lateral (Ctrl+B)"
+                    >
+                      ◀
+                    </button>
+                  </div>
+                </div>
+
+                {/* PEVC V5 Ready Badge */}
+                <div
+                  onClick={() => setCurrentSection('pevc')}
+                  className="mt-2 bg-[#FFD166] text-[#121214] border-2 border-[#121214] p-2 shadow-brutal-sm flex items-center justify-between cursor-pointer hover:bg-yellow-400 transition"
+                >
+                  <div className="flex items-center gap-1.5 font-display font-bold text-xs">
+                    <span>⚡</span>
+                    <span>PEVC V5 READY</span>
+                  </div>
+                  <span className="font-mono text-[9px] bg-[#121214] text-white px-1.5 py-0.5 rounded font-bold uppercase">
+                    5 Fases
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Navigation Groups */}
+            {isSidebarCollapsed ? (
+              <div className="flex-1 overflow-y-auto p-2 space-y-3 flex flex-col items-center">
+                {/* Compact Nav Icons */}
+                {[
+                  { id: 'vault', label: 'Explorador del Baúl', icon: '🗃️', count: tools.length },
+                  { id: 'pevc', label: 'PEVC V5 (Creación)', icon: '📘', badge: '5F' },
+                  { id: 'repomix-v7', label: 'Continuidad V7', icon: '📦', badge: 'V7' },
+                  { id: 'vibe-guide', label: 'Jerga & Markdowns', icon: '💡', badge: 'Guía' },
+                  { id: 'combos', label: 'Combos & Recetas', icon: '🎒', count: INITIAL_COMBOS.length },
+                  { id: 'onboarding', label: 'Ruta Onboarding', icon: '🧭', badge: '15m' },
+                ].map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => setCurrentSection(item.id as any)}
+                    className={`w-11 h-11 rounded-lg border-2 border-[#121214] flex items-center justify-center text-lg relative shadow-brutal-xs transition ${
+                      currentSection === item.id
+                        ? 'bg-brand-orange text-white ring-2 ring-brand-orange/40'
+                        : 'bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 hover:bg-[#FFD166] hover:text-black'
+                    }`}
+                    title={`${item.label} ${item.count !== undefined ? `(${item.count})` : ''}`}
+                  >
+                    <span>{item.icon}</span>
+                    {item.count !== undefined && (
+                      <span className="absolute -top-1.5 -right-1.5 bg-[#121214] text-white text-[8px] font-mono font-bold px-1 py-0.2 rounded-full border border-white">
+                        {item.count}
                       </span>
+                    )}
+                  </button>
+                ))}
+
+                <div className="w-8 border-b-2 border-neutral-300 dark:border-neutral-700 my-1" />
+
+                {/* Compact Categories */}
+                <div className="space-y-1.5 flex flex-col items-center" title="Categorías">
+                  {[
+                    { slug: 'all', icon: '🗂️', label: 'Todos los Activos' },
+                    { slug: 'skill', icon: '⚡', label: 'Skills Agénticas' },
+                    { slug: 'mcp', icon: '🔌', label: 'Servidores MCP' },
+                    { slug: 'markdown', icon: '📝', label: 'Workflows .md' },
+                  ].map((cat) => (
+                    <button
+                      key={cat.slug}
+                      onClick={() => setSelectedCategory(cat.slug as any)}
+                      className={`w-9 h-9 rounded border-2 border-[#121214] flex items-center justify-center text-sm shadow-brutal-xs transition ${
+                        selectedCategory === cat.slug
+                          ? 'bg-brand-orange text-white'
+                          : 'bg-neutral-100 dark:bg-neutral-800 hover:bg-[#FFD166] hover:text-black'
+                      }`}
+                      title={`Filtrar por: ${cat.label}`}
+                    >
+                      <span>{cat.icon}</span>
+                    </button>
+                  ))}
+                </div>
+
+                <div className="w-8 border-b-2 border-neutral-300 dark:border-neutral-700 my-1" />
+
+                {/* Compact Phases */}
+                <div className="space-y-1 flex flex-col items-center" title="Filtrar por Fase PEVC">
+                  {['fase0', 'fase1', 'fase2', 'fase3', 'fase4'].map((ph, idx) => (
+                    <button
+                      key={ph}
+                      onClick={() => setSelectedPhase(selectedPhase === ph ? 'all' : (ph as PhaseSlug))}
+                      className={`w-9 h-6 rounded border font-mono text-[9px] font-black shadow-brutal-xs transition flex items-center justify-center ${
+                        selectedPhase === ph
+                          ? 'bg-brand-orange text-white border-black'
+                          : 'border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 hover:border-black'
+                      }`}
+                      title={`Fase ${idx} PEVC`}
+                    >
+                      F{idx}
                     </button>
                   ))}
                 </div>
               </div>
-            </div>
+            ) : (
+              <div className="flex-1 overflow-y-auto p-3 space-y-4 text-xs font-medium">
+                {/* Group: Vistas Principales */}
+                <div>
+                  <button
+                    onClick={() => toggleNavGroup('vistas')}
+                    className="w-full flex items-center justify-between text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 px-2 mb-1.5 font-mono font-extrabold text-[10px] tracking-wider uppercase transition"
+                  >
+                    <span>// Vistas Principales</span>
+                    <span className="text-xs">{openNavGroups.vistas ? '▾' : '▸'}</span>
+                  </button>
+                  {openNavGroups.vistas && (
+                    <nav className="space-y-1 animate-in fade-in duration-150">
+                      <button
+                        onClick={() => setCurrentSection('vault')}
+                        className={`w-full flex items-center justify-between px-2.5 py-2 rounded border-2 border-[#121214] font-bold shadow-brutal-sm transition ${
+                          currentSection === 'vault'
+                            ? 'bg-brand-orange text-white'
+                            : 'bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200'
+                        }`}
+                      >
+                        <span className="flex items-center gap-2">
+                          <span>🗃️</span> Explorador del Baúl
+                        </span>
+                        <span className="bg-black/20 text-[10px] px-1.5 py-0.5 rounded font-mono">
+                          {tools.length}
+                        </span>
+                      </button>
+
+                      <button
+                        onClick={() => setCurrentSection('pevc')}
+                        className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded border transition ${
+                          currentSection === 'pevc'
+                            ? 'border-[#121214] bg-neutral-100 dark:bg-neutral-800 font-bold'
+                            : 'border-transparent hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                        }`}
+                      >
+                        <span className="flex items-center gap-2">
+                          <span>📘</span> PEVC V5 (Creación)
+                        </span>
+                        <span className="font-mono text-[9px] text-brand-orange font-bold">5 Fases</span>
+                      </button>
+
+                      <button
+                        onClick={() => setCurrentSection('repomix-v7')}
+                        className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded border transition ${
+                          currentSection === 'repomix-v7'
+                            ? 'border-[#121214] bg-cyan-100 dark:bg-cyan-950/50 font-bold text-cyan-900 dark:text-cyan-200'
+                            : 'border-transparent hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                        }`}
+                      >
+                        <span className="flex items-center gap-2">
+                          <span>📦</span> Continuidad V7
+                        </span>
+                        <span className="font-mono text-[9px] bg-cyan-200 text-cyan-950 px-1 rounded font-bold">Repomix</span>
+                      </button>
+
+                      <button
+                        onClick={() => setCurrentSection('vibe-guide')}
+                        className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded border transition ${
+                          currentSection === 'vibe-guide'
+                            ? 'border-[#121214] bg-[#FFD166] text-[#121214] font-bold shadow-brutal-xs'
+                            : 'border-transparent hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                        }`}
+                      >
+                        <span className="flex items-center gap-2">
+                          <span>💡</span> Jerga & Markdowns
+                        </span>
+                        <span className="font-mono text-[9px] bg-orange-100 text-orange-950 px-1 rounded font-bold">Guía</span>
+                      </button>
+
+                      <button
+                        onClick={() => setCurrentSection('combos')}
+                        className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded border transition ${
+                          currentSection === 'combos'
+                            ? 'border-[#121214] bg-neutral-100 dark:bg-neutral-800 font-bold'
+                            : 'border-transparent hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                        }`}
+                      >
+                        <span className="flex items-center gap-2">
+                          <span>🎒</span> Combos & Recetas
+                        </span>
+                        <span className="bg-purple-100 text-purple-900 font-mono text-[9px] px-1 rounded font-bold">
+                          {INITIAL_COMBOS.length}
+                        </span>
+                      </button>
+
+                      <button
+                        onClick={() => setCurrentSection('onboarding')}
+                        className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded border transition ${
+                          currentSection === 'onboarding'
+                            ? 'border-[#121214] bg-neutral-100 dark:bg-neutral-800 font-bold'
+                            : 'border-transparent hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                        }`}
+                      >
+                        <span className="flex items-center gap-2">
+                          <span>🧭</span> Ruta de Onboarding
+                        </span>
+                        <span className="bg-emerald-100 text-emerald-800 font-mono text-[9px] px-1 rounded font-bold">
+                          15 min
+                        </span>
+                      </button>
+                    </nav>
+                  )}
+                </div>
+
+                {/* Group: Categorías */}
+                <div>
+                  <button
+                    onClick={() => toggleNavGroup('categorias')}
+                    className="w-full flex items-center justify-between text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 px-2 mb-1.5 font-mono font-extrabold text-[10px] tracking-wider uppercase transition"
+                  >
+                    <span>// Categorías Baúl</span>
+                    <span className="text-xs">{openNavGroups.categorias ? '▾' : '▸'}</span>
+                  </button>
+                  {openNavGroups.categorias && (
+                    <div className="space-y-1 font-mono text-[11px] animate-in fade-in duration-150">
+                      <button
+                        onClick={() => setSelectedCategory('all')}
+                        className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded border transition ${
+                          selectedCategory === 'all'
+                            ? 'bg-[#121214] text-white font-bold'
+                            : 'hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                        }`}
+                      >
+                        <span>Todos los Activos</span>
+                        <span>{tools.length}</span>
+                      </button>
+                      <button
+                        onClick={() => setSelectedCategory('skill')}
+                        className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded border transition ${
+                          selectedCategory === 'skill'
+                            ? 'bg-brand-orange text-white font-bold'
+                            : 'hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                        }`}
+                      >
+                        <span>⚡ Skills Agénticas</span>
+                        <span>{tools.filter((t) => t.category === 'skill').length}</span>
+                      </button>
+                      <button
+                        onClick={() => setSelectedCategory('mcp')}
+                        className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded border transition ${
+                          selectedCategory === 'mcp'
+                            ? 'bg-brand-orange text-white font-bold'
+                            : 'hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                        }`}
+                      >
+                        <span>🔌 Servidores MCP</span>
+                        <span>{tools.filter((t) => t.category === 'mcp').length}</span>
+                      </button>
+                      <button
+                        onClick={() => setSelectedCategory('markdown')}
+                        className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded border transition ${
+                          selectedCategory === 'markdown'
+                            ? 'bg-brand-orange text-white font-bold'
+                            : 'hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                        }`}
+                      >
+                        <span>📝 Workflows .md</span>
+                        <span>{tools.filter((t) => t.category === 'markdown').length}</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Group: Fases PEVC V5 */}
+                <div>
+                  <button
+                    onClick={() => toggleNavGroup('fases')}
+                    className="w-full flex items-center justify-between text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 px-2 mb-1.5 font-mono font-extrabold text-[10px] tracking-wider uppercase transition"
+                  >
+                    <span>// Ciclo de Vida PEVC V5</span>
+                    <span className="text-xs">{openNavGroups.fases ? '▾' : '▸'}</span>
+                  </button>
+                  {openNavGroups.fases && (
+                    <div className="space-y-1 font-mono text-[10px] animate-in fade-in duration-150">
+                      {[
+                        { slug: 'fase0', label: 'Fase 0: Contexto & Arq' },
+                        { slug: 'fase1', label: 'Fase 1: Especificación Spec' },
+                        { slug: 'fase2', label: 'Fase 2: Vibe UI (Stitch/Imp)' },
+                        { slug: 'fase3', label: 'Fase 3: DB Cloud & TDD' },
+                        { slug: 'fase4', label: 'Fase 4: QA E2E & Release' },
+                      ].map((phase) => (
+                        <button
+                          key={phase.slug}
+                          onClick={() =>
+                            setSelectedPhase(selectedPhase === phase.slug ? 'all' : (phase.slug as PhaseSlug))
+                          }
+                          className={`w-full text-left px-2.5 py-1.5 rounded border transition flex items-center justify-between ${
+                            selectedPhase === phase.slug
+                              ? 'border-brand-orange bg-orange-50 dark:bg-orange-950/40 font-bold text-brand-orange'
+                              : 'border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                          }`}
+                        >
+                          <span>{phase.label}</span>
+                          <span>
+                            {tools.filter((t) => t.phase === phase.slug).length}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Sidebar Bottom Footer: Admin Panel Shortcut */}
             <div className="p-3 border-t-[3px] border-[#121214] dark:border-neutral-800 bg-neutral-50 dark:bg-[#121316]">
-              <button
-                onClick={() => setCurrentSection('admin')}
-                className="w-full flex items-center justify-between p-2.5 rounded border-2 border-[#121214] bg-white dark:bg-[#1E1F24] hover:bg-neutral-100 text-xs font-bold shadow-brutal-sm transition"
-              >
-                <div className="flex items-center gap-2">
+              {isSidebarCollapsed ? (
+                <button
+                  onClick={() => setCurrentSection('admin')}
+                  className="w-11 h-11 mx-auto rounded border-2 border-[#121214] bg-white dark:bg-[#1E1F24] hover:bg-[#FFD166] text-sm font-bold shadow-brutal-xs flex items-center justify-center relative transition"
+                  title="Panel Admin & Motor IA"
+                >
                   <span>⚙️</span>
-                  <span className="font-display">Panel Admin & Motor IA</span>
-                </div>
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              </button>
+                  <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse border border-white dark:border-black"></span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => setCurrentSection('admin')}
+                  className="w-full flex items-center justify-between p-2.5 rounded border-2 border-[#121214] bg-white dark:bg-[#1E1F24] hover:bg-neutral-100 text-xs font-bold shadow-brutal-sm transition"
+                >
+                  <div className="flex items-center gap-2">
+                    <span>⚙️</span>
+                    <span className="font-display">Panel Admin & Motor IA</span>
+                  </div>
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                </button>
+              )}
             </div>
           </aside>
 
@@ -420,7 +656,7 @@ export const App: React.FC = () => {
           <div className="flex-1 flex flex-col h-full overflow-hidden">
             {/* Top Navigation Bar: Responsive 2-Row on Mobile, 1-Row on Desktop */}
             <header className="border-b-[3px] border-[#121214] dark:border-neutral-800 bg-white dark:bg-[#15161A] px-3 md:px-6 py-2.5 md:py-0 md:h-[68px] flex flex-col md:flex-row md:items-center justify-between gap-2.5 md:gap-3 z-20 shrink-0">
-              {/* Row 1 on Mobile: Logo + Menu Drawer + Mi Combo + Theme */}
+              {/* Row 1 on Mobile: Logo + Menu Drawer + Sidebar Toggle + Mi Combo + Theme */}
               <div className="flex items-center justify-between gap-2 w-full md:w-auto">
                 <div className="flex items-center gap-2">
                   {/* Mobile Drawer Trigger */}
@@ -431,6 +667,17 @@ export const App: React.FC = () => {
                   >
                     ☰
                   </button>
+
+                  {/* Desktop Retract/Expand Toggle Button */}
+                  <button
+                    onClick={toggleSidebar}
+                    className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded border-2 border-[#121214] bg-white dark:bg-[#1E1F24] hover:bg-[#FFD166] text-black dark:text-white hover:text-black font-display font-black text-xs shadow-brutal-sm transition"
+                    title={isSidebarCollapsed ? "Expandir barra lateral (Ctrl+B)" : "Retraer barra lateral (Ctrl+B)"}
+                  >
+                    <span>{isSidebarCollapsed ? '▶' : '◀'}</span>
+                    <span className="text-[10px] font-mono tracking-tight">{isSidebarCollapsed ? 'EXPANDIR' : 'RETRAER'}</span>
+                  </button>
+
                   <div className="flex items-center gap-1.5 md:hidden">
                     <div className="w-7 h-7 bg-brand-orange border-2 border-black shadow-brutal-sm flex items-center justify-center font-display font-black text-white text-xs">
                       BX
@@ -444,6 +691,7 @@ export const App: React.FC = () => {
                 {/* Search Box on Desktop */}
                 <div className="hidden md:flex flex-1 max-w-md relative">
                   <input
+                    id="search-input-desktop"
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
@@ -556,99 +804,139 @@ export const App: React.FC = () => {
             <main className="flex-1 overflow-y-auto p-4 md:p-8 space-y-8 grid-dots">
               {currentSection === 'vault' && (
                 <>
-                  {/* Hero Banner PEVC V5 */}
-                  <section className="border-[3px] border-[#121214] dark:border-neutral-800 rounded-lg bg-white dark:bg-[#15161A] shadow-brutal-lg overflow-hidden">
-                    <div className="bg-[#121214] text-white px-5 py-2.5 flex items-center justify-between border-b-2 border-black">
-                      <span className="font-mono text-xs font-black text-brand-orange uppercase">
-                        MANUAL OFICIAL PEVC V5 // FRAMEWORK DE INGENIERÍA IA
-                      </span>
-                      <span className="font-mono text-xs text-brand-yellow font-bold hidden sm:inline">
-                        ⚡ 100% Cero Alucinaciones
-                      </span>
+                  {/* Hero Banner PEVC V5 (Collapsible) */}
+                  <section className="border-[3px] border-[#121214] dark:border-neutral-800 rounded-lg bg-white dark:bg-[#15161A] shadow-brutal-lg overflow-hidden transition-all duration-200">
+                    <div className="bg-[#121214] text-white px-4 md:px-5 py-2.5 flex items-center justify-between border-b-2 border-black gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-xs font-black text-brand-orange uppercase">
+                          MANUAL OFICIAL PEVC V5 // FRAMEWORK DE INGENIERÍA IA
+                        </span>
+                        <span className="font-mono text-xs text-brand-yellow font-bold hidden sm:inline">
+                          ⚡ 100% Cero Alucinaciones
+                        </span>
+                      </div>
+                      <button
+                        onClick={toggleHero}
+                        className="px-2.5 py-1 rounded border-2 border-neutral-700 bg-neutral-900 hover:bg-[#FFD166] text-white hover:text-black font-mono text-[11px] font-bold flex items-center gap-1.5 transition shadow-brutal-xs"
+                        title={isHeroCollapsed ? "Expandir banner explicativo" : "Contraer banner para ver más herramientas"}
+                      >
+                        <span>{isHeroCollapsed ? '▾' : '▴'}</span>
+                        <span>{isHeroCollapsed ? 'Expandir Banner' : 'Contraer Banner'}</span>
+                      </button>
                     </div>
 
-                    <div className="p-6 flex flex-col xl:flex-row gap-6 items-start justify-between">
-                      <div className="xl:max-w-[45%] space-y-3">
-                        <span className="inline-block px-2.5 py-1 bg-orange-100 text-brand-orangeDark border border-brand-orange font-mono text-[11px] font-bold rounded">
-                          🏆 PROTOCOLO ESTÁNDAR DEL EQUIPO
-                        </span>
-                        <h1 className="font-display font-extrabold text-2xl lg:text-3xl tracking-tight leading-tight">
-                          PEVC V5: <span className="text-brand-orange underline decoration-wavy">Vibe Coding Profesional</span>
-                        </h1>
-                        <p className="text-xs md:text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed">
-                          {viewMode === 'criollo'
-                            ? 'No le tires código a ciegas a la IA. La metodología PEVC es como construir una casa: primero planos con el arquitecto (Contexto), compras los materiales exactos (Spec), pegas ladrillos en tandas chicas (Vibe Coding), revisas grietas con la plomada (QA), y recién entregas la llave (Deploy).'
-                            : 'Pipeline determinista por fases con contratos semánticos: context_anchor.md -> specs_spec.md -> incremental_diffs -> jest/playwright_audit -> atomic_squash_merge.'}
-                        </p>
+                    {!isHeroCollapsed ? (
+                      <div className="p-6 flex flex-col xl:flex-row gap-6 items-start justify-between animate-in fade-in duration-200">
+                        <div className="xl:max-w-[45%] space-y-3">
+                          <span className="inline-block px-2.5 py-1 bg-orange-100 text-brand-orangeDark border border-brand-orange font-mono text-[11px] font-bold rounded">
+                            🏆 PROTOCOLO ESTÁNDAR DEL EQUIPO
+                          </span>
+                          <h1 className="font-display font-extrabold text-2xl lg:text-3xl tracking-tight leading-tight">
+                            PEVC V5: <span className="text-brand-orange underline decoration-wavy">Vibe Coding Profesional</span>
+                          </h1>
+                          <p className="text-xs md:text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed">
+                            {viewMode === 'criollo'
+                              ? 'No le tires código a ciegas a la IA. La metodología PEVC es como construir una casa: primero planos con el arquitecto (Contexto), compras los materiales exactos (Spec), pegas ladrillos en tandas chicas (Vibe Coding), revisas grietas con la plomada (QA), y recién entregas la llave (Deploy).'
+                              : 'Pipeline determinista por fases con contratos semánticos: context_anchor.md -> specs_spec.md -> incremental_diffs -> jest/playwright_audit -> atomic_squash_merge.'}
+                          </p>
 
-                        <div className="pt-2 flex flex-wrap gap-2.5">
+                          <div className="pt-2 flex flex-wrap gap-2.5">
+                            <button
+                              onClick={() => setCurrentSection('pevc')}
+                              className="px-4 py-2 bg-brand-orange text-white font-display font-bold text-xs rounded border-2 border-[#121214] shadow-brutal-sm hover:bg-orange-600 transition"
+                            >
+                              Abrir PEVC V5 (Creación)
+                            </button>
+                            <button
+                              onClick={() => setCurrentSection('repomix-v7')}
+                              className="px-3.5 py-2 bg-cyan-100 dark:bg-cyan-950/40 text-cyan-950 dark:text-cyan-200 font-display font-bold text-xs rounded border-2 border-[#121214] shadow-brutal-sm hover:bg-cyan-200 transition"
+                            >
+                              📦 Workflow Continuidad V7
+                            </button>
+                            <button
+                              onClick={() => setCurrentSection('vibe-guide')}
+                              className="px-3.5 py-2 bg-orange-100 dark:bg-orange-950/40 text-brand-orangeDark dark:text-brand-orange font-display font-bold text-xs rounded border-2 border-[#121214] shadow-brutal-sm hover:bg-orange-200 transition"
+                            >
+                              💡 Jerga & Markdowns
+                            </button>
+                            <button
+                              onClick={() => setIsAddToolModalOpen(true)}
+                              className="px-3.5 py-2 bg-[#FFD166] text-[#121214] font-display font-black text-xs rounded border-2 border-[#121214] shadow-brutal-sm hover:bg-yellow-400 transition"
+                            >
+                              ➕ Subir con IA (Link/Archivo)
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* 5-Phase Interactive Pipeline Roadmap */}
+                        <div className="xl:flex-1 w-full bg-[#FAF9F5] dark:bg-[#111215] border-2 border-[#121214] dark:border-neutral-700 p-4 rounded-lg shadow-brutal-sm">
+                          <div className="flex items-center justify-between mb-3 border-b border-neutral-300 dark:border-neutral-800 pb-2">
+                            <span className="font-mono text-xs font-bold flex items-center gap-2">
+                              <span className="w-2.5 h-2.5 rounded-full bg-brand-orange"></span>
+                              PIPELINE DE LAS 5 FASES PEVC
+                            </span>
+                            <span className="font-mono text-[10px] text-neutral-500 uppercase">
+                              Flujo Obligatorio
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-5 gap-2 font-mono text-[10px]">
+                            {[
+                              { f: 'F0', name: 'Arquitectura', icon: '🗺️', desc: 'Mirar el mapa antes de cavar' },
+                              { f: 'F1', name: 'Especificación', icon: '📐', desc: 'Pedir la hamburguesa sin cebolla' },
+                              { f: 'F2', name: 'Vibe UI & Code', icon: '🎨', desc: 'Stitch + Impeccable' },
+                              { f: 'F3', name: 'DB & QA E2E', icon: '🧪', desc: 'Supabase Cloud + Playwright' },
+                              { f: 'F4', name: 'Git & Release', icon: '🚀', desc: 'Clean PR y merge a main' },
+                            ].map((step, idx) => (
+                              <div
+                                key={step.f}
+                                onClick={() => setSelectedPhase(step.f.toLowerCase() as PhaseSlug)}
+                                className="p-2.5 bg-white dark:bg-[#1A1C22] border-2 border-[#121214] rounded shadow-brutal-sm cursor-pointer hover:border-brand-orange transition"
+                              >
+                                <div className="flex justify-between font-bold">
+                                  <span>{step.f}</span>
+                                  <span>{step.icon}</span>
+                                </div>
+                                <div className="font-display font-black text-xs text-[#121214] dark:text-white mt-1">
+                                  {step.name}
+                                </div>
+                                <p className="text-[9px] text-neutral-500 mt-1 line-clamp-2">
+                                  {step.desc}
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="p-3.5 bg-[#FFFBF7] dark:bg-[#1A1C22] flex flex-wrap items-center justify-between gap-3 text-xs animate-in fade-in duration-150">
+                        <div className="flex items-center gap-2.5 flex-wrap">
+                          <span className="px-2 py-0.5 bg-orange-100 text-brand-orangeDark border border-brand-orange font-mono text-[10px] font-bold rounded">
+                            🏆 PROTOCOLO ESTÁNDAR
+                          </span>
+                          <span className="font-display font-extrabold text-xs md:text-sm text-neutral-800 dark:text-neutral-200">
+                            PEVC V5: <span className="text-brand-orange">Vibe Coding Profesional</span> (5 Fases)
+                          </span>
+                          <span className="text-neutral-500 text-xs hidden lg:inline font-mono">
+                            — Contexto ➔ Spec ➔ Vibe UI (Stitch/Imp) ➔ Supabase TDD ➔ Deploy
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
                           <button
                             onClick={() => setCurrentSection('pevc')}
-                            className="px-4 py-2 bg-brand-orange text-white font-display font-bold text-xs rounded border-2 border-[#121214] shadow-brutal-sm hover:bg-orange-600 transition"
+                            className="px-3 py-1 bg-brand-orange text-white font-display font-bold text-xs rounded border-2 border-[#121214] shadow-brutal-xs hover:bg-orange-600 transition"
                           >
-                            Abrir PEVC V5 (Creación)
+                            Abrir Metodología →
                           </button>
                           <button
-                            onClick={() => setCurrentSection('repomix-v7')}
-                            className="px-3.5 py-2 bg-cyan-100 dark:bg-cyan-950/40 text-cyan-950 dark:text-cyan-200 font-display font-bold text-xs rounded border-2 border-[#121214] shadow-brutal-sm hover:bg-cyan-200 transition"
+                            onClick={toggleHero}
+                            className="text-neutral-600 dark:text-neutral-300 hover:text-brand-orange font-mono text-xs font-bold underline"
                           >
-                            📦 Workflow Continuidad V7
-                          </button>
-                          <button
-                            onClick={() => setCurrentSection('vibe-guide')}
-                            className="px-3.5 py-2 bg-orange-100 dark:bg-orange-950/40 text-brand-orangeDark dark:text-brand-orange font-display font-bold text-xs rounded border-2 border-[#121214] shadow-brutal-sm hover:bg-orange-200 transition"
-                          >
-                            💡 Jerga & Markdowns
-                          </button>
-                          <button
-                            onClick={() => setIsAddToolModalOpen(true)}
-                            className="px-3.5 py-2 bg-[#FFD166] text-[#121214] font-display font-black text-xs rounded border-2 border-[#121214] shadow-brutal-sm hover:bg-yellow-400 transition"
-                          >
-                            ➕ Subir con IA (Link/Archivo)
+                            Expandir Banner ▾
                           </button>
                         </div>
                       </div>
-
-                      {/* 5-Phase Interactive Pipeline Roadmap */}
-                      <div className="xl:flex-1 w-full bg-[#FAF9F5] dark:bg-[#111215] border-2 border-[#121214] dark:border-neutral-700 p-4 rounded-lg shadow-brutal-sm">
-                        <div className="flex items-center justify-between mb-3 border-b border-neutral-300 dark:border-neutral-800 pb-2">
-                          <span className="font-mono text-xs font-bold flex items-center gap-2">
-                            <span className="w-2.5 h-2.5 rounded-full bg-brand-orange"></span>
-                            PIPELINE DE LAS 5 FASES PEVC
-                          </span>
-                          <span className="font-mono text-[10px] text-neutral-500 uppercase">
-                            Flujo Obligatorio
-                          </span>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-5 gap-2 font-mono text-[10px]">
-                          {[
-                            { f: 'F0', name: 'Arquitectura', icon: '🗺️', desc: 'Mirar el mapa antes de cavar' },
-                            { f: 'F1', name: 'Especificación', icon: '📐', desc: 'Pedir la hamburguesa sin cebolla' },
-                            { f: 'F2', name: 'Vibe UI & Code', icon: '🎨', desc: 'Stitch + Impeccable' },
-                            { f: 'F3', name: 'DB & QA E2E', icon: '🧪', desc: 'Supabase Cloud + Playwright' },
-                            { f: 'F4', name: 'Git & Release', icon: '🚀', desc: 'Clean PR y merge a main' },
-                          ].map((step, idx) => (
-                            <div
-                              key={step.f}
-                              onClick={() => setSelectedPhase(step.f.toLowerCase() as PhaseSlug)}
-                              className="p-2.5 bg-white dark:bg-[#1A1C22] border-2 border-[#121214] rounded shadow-brutal-sm cursor-pointer hover:border-brand-orange transition"
-                            >
-                              <div className="flex justify-between font-bold">
-                                <span>{step.f}</span>
-                                <span>{step.icon}</span>
-                              </div>
-                              <div className="font-display font-black text-xs text-[#121214] dark:text-white mt-1">
-                                {step.name}
-                              </div>
-                              <p className="text-[9px] text-neutral-500 mt-1 line-clamp-2">
-                                {step.desc}
-                              </p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
+                    )}
                   </section>
 
                   {/* Filter Status Bar */}
@@ -710,19 +998,37 @@ export const App: React.FC = () => {
               {/* SECTION: WORKFLOW PEVC V5 */}
               {currentSection === 'pevc' && (
                 <section className="p-6 bg-white dark:bg-[#15161A] border-[3px] border-[#121214] rounded-lg shadow-brutal-lg space-y-6">
-                  <div className="flex items-center justify-between border-b-2 border-black pb-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b-2 border-black pb-3 gap-3">
                     <div>
                       <span className="text-xs font-mono font-bold text-brand-orange uppercase">
                         // Metodología Maestra
                       </span>
                       <h2 className="font-display font-black text-2xl">PEVC V5: Vibe Coding Profesional</h2>
                     </div>
-                    <button
-                      onClick={() => setCurrentSection('vault')}
-                      className="px-3 py-1.5 bg-[#FFD166] border-2 border-black font-bold text-xs rounded shadow-brutal-sm"
-                    >
-                      ← Volver al Baúl
-                    </button>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <div className="flex items-center gap-1 font-mono text-[11px]">
+                        <button
+                          onClick={() => toggleAllPevcFases(true)}
+                          className="px-2.5 py-1 border border-black rounded bg-neutral-100 dark:bg-neutral-800 hover:bg-[#FFD166] text-black dark:text-white hover:text-black font-bold transition shadow-brutal-xs"
+                          title="Expandir todas las fases"
+                        >
+                          ▾ Expandir Todo
+                        </button>
+                        <button
+                          onClick={() => toggleAllPevcFases(false)}
+                          className="px-2.5 py-1 border border-black rounded bg-neutral-100 dark:bg-neutral-800 hover:bg-[#FFD166] text-black dark:text-white hover:text-black font-bold transition shadow-brutal-xs"
+                          title="Contraer todas las fases"
+                        >
+                          ▴ Contraer Todo
+                        </button>
+                      </div>
+                      <button
+                        onClick={() => setCurrentSection('vault')}
+                        className="px-3 py-1.5 bg-[#FFD166] border-2 border-black font-bold text-xs rounded shadow-brutal-sm hover:bg-yellow-400 transition"
+                      >
+                        ← Volver al Baúl
+                      </button>
+                    </div>
                   </div>
 
                   <div className="prose dark:prose-invert max-w-none text-xs md:text-sm leading-relaxed space-y-4 font-sans">
@@ -731,135 +1037,187 @@ export const App: React.FC = () => {
                     </p>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="p-4 border-2 border-black rounded shadow-brutal-sm bg-neutral-50 dark:bg-[#1A1C22]">
-                        <h3 className="font-display font-black text-sm">Fase 0: Instalación de las 11 Skills & MCPs</h3>
-                        <p className="text-xs text-neutral-600 dark:text-neutral-300 mt-1">
-                          Verificación obligatoria de herramientas: Superpowers, ECC, Stitch MCP, Supabase Cloud (cero Docker) y Playwright.
-                        </p>
+                      {/* Fase 0 */}
+                      <div className="border-2 border-black rounded shadow-brutal-sm bg-neutral-50 dark:bg-[#1A1C22] overflow-hidden transition">
+                        <div
+                          onClick={() => togglePevcPhase('f0')}
+                          className="p-3 bg-neutral-100 dark:bg-[#20222A] border-b border-black flex items-center justify-between cursor-pointer select-none"
+                        >
+                          <h3 className="font-display font-black text-sm m-0">Fase 0: Instalación de las Skills & MCPs</h3>
+                          <button className="text-xs font-mono font-bold text-neutral-500 hover:text-black dark:hover:text-white">
+                            {openPevcFases.f0 ? '▴ Contraer' : '▾ Expandir'}
+                          </button>
+                        </div>
+                        {openPevcFases.f0 && (
+                          <div className="p-4 animate-in fade-in duration-150">
+                            <p className="text-xs text-neutral-600 dark:text-neutral-300 m-0">
+                              Verificación obligatoria de herramientas: Superpowers, ECC, Stitch MCP, Supabase Cloud (cero Docker), Playwright, Frontend Design y UI/UX Pro Max.
+                            </p>
+                          </div>
+                        )}
                       </div>
 
-                      <div className="p-4 border-2 border-black rounded shadow-brutal-sm bg-neutral-50 dark:bg-[#1A1C22]">
-                        <h3 className="font-display font-black text-sm">Fase 1: Entrevista Exhaustiva Brainstorming</h3>
-                        <p className="text-xs text-neutral-600 dark:text-neutral-300 mt-1">
-                          Interrogatorio socrático para erradicar cualquier hueco lógico, definir la pila y crear 01-arquitectura-y-spec.md.
-                        </p>
+                      {/* Fase 1 */}
+                      <div className="border-2 border-black rounded shadow-brutal-sm bg-neutral-50 dark:bg-[#1A1C22] overflow-hidden transition">
+                        <div
+                          onClick={() => togglePevcPhase('f1')}
+                          className="p-3 bg-neutral-100 dark:bg-[#20222A] border-b border-black flex items-center justify-between cursor-pointer select-none"
+                        >
+                          <h3 className="font-display font-black text-sm m-0">Fase 1: Entrevista Exhaustiva Brainstorming</h3>
+                          <button className="text-xs font-mono font-bold text-neutral-500 hover:text-black dark:hover:text-white">
+                            {openPevcFases.f1 ? '▴ Contraer' : '▾ Expandir'}
+                          </button>
+                        </div>
+                        {openPevcFases.f1 && (
+                          <div className="p-4 animate-in fade-in duration-150">
+                            <p className="text-xs text-neutral-600 dark:text-neutral-300 m-0">
+                              Interrogatorio socrático para erradicar cualquier hueco lógico, definir la pila, elegir la estrategia UI/UX y crear 01-arquitectura-y-spec.md.
+                            </p>
+                          </div>
+                        )}
                       </div>
 
-                      <div className="md:col-span-2 p-5 border-[3px] border-[#121214] dark:border-neutral-700 rounded-lg shadow-brutal bg-[#FFFDF7] dark:bg-[#1A1C22] space-y-4">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-neutral-200 dark:border-neutral-800 pb-3">
+                      {/* Fase 2: Suite Vibe UI */}
+                      <div className="md:col-span-2 border-[3px] border-[#121214] dark:border-neutral-700 rounded-lg shadow-brutal bg-[#FFFDF7] dark:bg-[#1A1C22] overflow-hidden transition">
+                        <div
+                          onClick={() => togglePevcPhase('f2')}
+                          className="p-4 bg-purple-50/70 dark:bg-purple-950/30 border-b-2 border-neutral-200 dark:border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 cursor-pointer select-none"
+                        >
                           <div className="flex items-center gap-2">
                             <span className="text-xl">🎨</span>
                             <div>
-                              <h3 className="font-display font-black text-base text-[#121214] dark:text-white">
+                              <h3 className="font-display font-black text-base text-[#121214] dark:text-white m-0">
                                 Fase 2: Diseño UI/UX — Frontend Design, UI/UX Pro Max o Mezcla de las Dos
                               </h3>
-                              <p className="text-xs text-neutral-600 dark:text-neutral-400">
+                              <p className="text-xs text-neutral-600 dark:text-neutral-400 m-0">
                                 Las 2 opciones oficiales de diseño y su integración armónica hacia Google Stitch MCP e Impeccable.
                               </p>
                             </div>
                           </div>
-                          <span className="self-start sm:self-auto bg-purple-100 text-purple-950 border border-purple-800 font-mono text-[10px] font-bold px-2 py-0.5 rounded">
-                            VIBE UI SUITE
-                          </span>
-                        </div>
-
-                        {/* 3 Pillars of Design: Opción A, Opción B, Opción C */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
-                          {/* Opción 1: frontend-design */}
-                          <div className="p-3.5 border-2 border-[#121214] dark:border-neutral-700 rounded bg-white dark:bg-[#15161A] flex flex-col justify-between space-y-3">
-                            <div>
-                              <div className="flex items-center justify-between mb-1.5">
-                                <span className="font-mono text-[10px] font-extrabold text-cyan-700 dark:text-cyan-400 uppercase">
-                                  // OPCIÓN 1: ARQUITECTURA
-                                </span>
-                                <span className="text-base">📐</span>
-                              </div>
-                              <h4 className="font-display font-black text-sm">frontend-design</h4>
-                              <p className="text-[11px] text-neutral-600 dark:text-neutral-300 mt-1 leading-snug">
-                                Ideal para diseñar la estructura formal del sistema: pliego de tokens, escalas tipográficas proporcionales, espaciados y redacción del Prompt Maestro hiperdetallado para Stitch.
-                              </p>
-                            </div>
-                            <button
-                              onClick={() => {
-                                const found = tools.find((t) => t.slug === 'frontend-design');
-                                if (found) setActiveDetailTool(found);
-                              }}
-                              className="w-full text-center py-1.5 px-2 bg-cyan-100 hover:bg-cyan-200 text-cyan-950 font-mono text-[10px] font-bold border-2 border-black rounded shadow-brutal-xs transition"
-                            >
-                              Ver Ficha frontend-design →
-                            </button>
-                          </div>
-
-                          {/* Opción 2: ui-ux-pro-max */}
-                          <div className="p-3.5 border-2 border-[#121214] dark:border-neutral-700 rounded bg-white dark:bg-[#15161A] flex flex-col justify-between space-y-3">
-                            <div>
-                              <div className="flex items-center justify-between mb-1.5">
-                                <span className="font-mono text-[10px] font-extrabold text-brand-orange uppercase">
-                                  // OPCIÓN 2: INTELIGENCIA
-                                </span>
-                                <span className="text-base">✨</span>
-                              </div>
-                              <h4 className="font-display font-black text-sm">ui-ux-pro-max</h4>
-                              <p className="text-[11px] text-neutral-600 dark:text-neutral-300 mt-1 leading-snug">
-                                Motor de búsqueda por CLI Python con 192 paletas de producto fundamentadas, 79 estilos visuales (bento, neo-brutal, minimal) y 119 reglas de accesibilidad WCAG.
-                              </p>
-                            </div>
-                            <button
-                              onClick={() => {
-                                const found = tools.find((t) => t.slug === 'ui-ux-pro-max');
-                                if (found) setActiveDetailTool(found);
-                              }}
-                              className="w-full text-center py-1.5 px-2 bg-orange-100 hover:bg-orange-200 text-orange-950 font-mono text-[10px] font-bold border-2 border-black rounded shadow-brutal-xs transition"
-                            >
-                              Ver Ficha ui-ux-pro-max →
-                            </button>
-                          </div>
-
-                          {/* Opción 3: La Mezcla de las Dos (Híbrido) */}
-                          <div className="p-3.5 border-2 border-brand-orange rounded bg-[#FFF7EE] dark:bg-[#251A14] flex flex-col justify-between space-y-3 relative overflow-hidden">
-                            <div className="absolute -right-6 top-3 rotate-45 bg-brand-orange text-white text-[8px] font-mono font-bold px-6 py-0.5">
-                              TOP
-                            </div>
-                            <div>
-                              <div className="flex items-center justify-between mb-1.5">
-                                <span className="font-mono text-[10px] font-extrabold text-purple-700 dark:text-purple-400 uppercase">
-                                  // LA MEZCLA (RECOMENDADA)
-                                </span>
-                                <span className="text-base">⚡🎨</span>
-                              </div>
-                              <h4 className="font-display font-black text-sm">Dúo Dinámico UI/UX</h4>
-                              <p className="text-[11px] text-neutral-700 dark:text-neutral-300 mt-1 leading-snug">
-                                La combinación suprema: 1) <strong>ui-ux-pro-max</strong> investiga el nicho y paleta cromática; 2) <strong>frontend-design</strong> estructura la guía de componentes y prompt maestro de Stitch.
-                              </p>
-                            </div>
-                            <button
-                              onClick={() => {
-                                const found = tools.find((t) => t.slug === 'diseno-hibrido-vibe');
-                                if (found) setActiveDetailTool(found);
-                              }}
-                              className="w-full text-center py-1.5 px-2 bg-brand-orange hover:bg-brand-orangeDark text-white font-mono text-[10px] font-bold border-2 border-black rounded shadow-brutal-xs transition"
-                            >
-                              Ver Flujo Híbrido Completo →
+                          <div className="flex items-center gap-2 self-start sm:self-auto">
+                            <span className="bg-purple-100 text-purple-950 border border-purple-800 font-mono text-[10px] font-bold px-2 py-0.5 rounded">
+                              VIBE UI SUITE
+                            </span>
+                            <button className="text-xs font-mono font-bold text-purple-800 dark:text-purple-300 underline">
+                              {openPevcFases.f2 ? '▴ Contraer Suite' : '▾ Expandir Suite'}
                             </button>
                           </div>
                         </div>
 
-                        {/* Next Steps in Phase 2 */}
-                        <div className="p-3 bg-neutral-100 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded text-[11px] text-neutral-700 dark:text-neutral-300 flex items-center justify-between flex-wrap gap-2">
-                          <span className="font-mono font-bold">
-                            ➔ Siguiente en Fase 2: Inyectar a <strong>Google Stitch MCP</strong> y auditar con <strong>Playwright + Impeccable (1440px / 768px / 375px)</strong>.
-                          </span>
-                          <span className="bg-[#121214] text-white text-[9px] font-mono px-2 py-0.5 rounded font-bold">
-                            CERO PROGRAMAR SIN APROBACIÓN VISUAL
-                          </span>
-                        </div>
+                        {openPevcFases.f2 && (
+                          <div className="p-5 space-y-4 animate-in fade-in duration-200">
+                            {/* 3 Pillars of Design: Opción A, Opción B, Opción C */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+                              {/* Opción 1: frontend-design */}
+                              <div className="p-3.5 border-2 border-[#121214] dark:border-neutral-700 rounded bg-white dark:bg-[#15161A] flex flex-col justify-between space-y-3">
+                                <div>
+                                  <div className="flex items-center justify-between mb-1.5">
+                                    <span className="font-mono text-[10px] font-extrabold text-cyan-700 dark:text-cyan-400 uppercase">
+                                      // OPCIÓN 1: ARQUITECTURA
+                                    </span>
+                                    <span className="text-base">📐</span>
+                                  </div>
+                                  <h4 className="font-display font-black text-sm m-0">frontend-design</h4>
+                                  <p className="text-[11px] text-neutral-600 dark:text-neutral-300 mt-1 leading-snug">
+                                    Ideal para diseñar la estructura formal del sistema: pliego de tokens, escalas tipográficas proporcionales, espaciados y redacción del Prompt Maestro hiperdetallado para Stitch.
+                                  </p>
+                                </div>
+                                <button
+                                  onClick={() => {
+                                    const found = tools.find((t) => t.slug === 'frontend-design');
+                                    if (found) setActiveDetailTool(found);
+                                  }}
+                                  className="w-full text-center py-1.5 px-2 bg-cyan-100 hover:bg-cyan-200 text-cyan-950 font-mono text-[10px] font-bold border-2 border-black rounded shadow-brutal-xs transition"
+                                >
+                                  Ver Ficha frontend-design →
+                                </button>
+                              </div>
+
+                              {/* Opción 2: ui-ux-pro-max */}
+                              <div className="p-3.5 border-2 border-[#121214] dark:border-neutral-700 rounded bg-white dark:bg-[#15161A] flex flex-col justify-between space-y-3">
+                                <div>
+                                  <div className="flex items-center justify-between mb-1.5">
+                                    <span className="font-mono text-[10px] font-extrabold text-brand-orange uppercase">
+                                      // OPCIÓN 2: INTELIGENCIA
+                                    </span>
+                                    <span className="text-base">✨</span>
+                                  </div>
+                                  <h4 className="font-display font-black text-sm m-0">ui-ux-pro-max</h4>
+                                  <p className="text-[11px] text-neutral-600 dark:text-neutral-300 mt-1 leading-snug">
+                                    Motor de búsqueda por CLI Python con 192 paletas de producto fundamentadas, 79 estilos visuales (bento, neo-brutal, minimal) y 119 reglas de accesibilidad WCAG.
+                                  </p>
+                                </div>
+                                <button
+                                  onClick={() => {
+                                    const found = tools.find((t) => t.slug === 'ui-ux-pro-max');
+                                    if (found) setActiveDetailTool(found);
+                                  }}
+                                  className="w-full text-center py-1.5 px-2 bg-orange-100 hover:bg-orange-200 text-orange-950 font-mono text-[10px] font-bold border-2 border-black rounded shadow-brutal-xs transition"
+                                >
+                                  Ver Ficha ui-ux-pro-max →
+                                </button>
+                              </div>
+
+                              {/* Opción 3: La Mezcla de las Dos (Híbrido) */}
+                              <div className="p-3.5 border-2 border-brand-orange rounded bg-[#FFF7EE] dark:bg-[#251A14] flex flex-col justify-between space-y-3 relative overflow-hidden">
+                                <div className="absolute -right-6 top-3 rotate-45 bg-brand-orange text-white text-[8px] font-mono font-bold px-6 py-0.5">
+                                  TOP
+                                </div>
+                                <div>
+                                  <div className="flex items-center justify-between mb-1.5">
+                                    <span className="font-mono text-[10px] font-extrabold text-purple-700 dark:text-purple-400 uppercase">
+                                      // LA MEZCLA (RECOMENDADA)
+                                    </span>
+                                    <span className="text-base">⚡🎨</span>
+                                  </div>
+                                  <h4 className="font-display font-black text-sm m-0">Dúo Dinámico UI/UX</h4>
+                                  <p className="text-[11px] text-neutral-700 dark:text-neutral-300 mt-1 leading-snug">
+                                    La combinación suprema: 1) <strong>ui-ux-pro-max</strong> investiga el nicho y paleta cromática; 2) <strong>frontend-design</strong> estructura la guía de componentes y prompt maestro de Stitch.
+                                  </p>
+                                </div>
+                                <button
+                                  onClick={() => {
+                                    const found = tools.find((t) => t.slug === 'diseno-hibrido-vibe');
+                                    if (found) setActiveDetailTool(found);
+                                  }}
+                                  className="w-full text-center py-1.5 px-2 bg-brand-orange hover:bg-brand-orangeDark text-white font-mono text-[10px] font-bold border-2 border-black rounded shadow-brutal-xs transition"
+                                >
+                                  Ver Flujo Híbrido Completo →
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* Next Steps in Phase 2 */}
+                            <div className="p-3 bg-neutral-100 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded text-[11px] text-neutral-700 dark:text-neutral-300 flex items-center justify-between flex-wrap gap-2">
+                              <span className="font-mono font-bold">
+                                ➔ Siguiente en Fase 2: Inyectar a <strong>Google Stitch MCP</strong> y auditar con <strong>Playwright + Impeccable (1440px / 768px / 375px)</strong>.
+                              </span>
+                              <span className="bg-[#121214] text-white text-[9px] font-mono px-2 py-0.5 rounded font-bold">
+                                CERO PROGRAMAR SIN APROBACIÓN VISUAL
+                              </span>
+                            </div>
+                          </div>
+                        )}
                       </div>
 
-                      <div className="p-4 border-2 border-black rounded shadow-brutal-sm bg-neutral-50 dark:bg-[#1A1C22]">
-                        <h3 className="font-display font-black text-sm">Fase 3: Supabase Cloud & Semáforo TDD</h3>
-                        <p className="text-xs text-neutral-600 dark:text-neutral-300 mt-1">
-                          Conexión a base de datos Postgres sin Docker y desarrollo guiado por pruebas (Rojo ➔ Verde ➔ Azul).
-                        </p>
+                      {/* Fase 3 */}
+                      <div className="border-2 border-black rounded shadow-brutal-sm bg-neutral-50 dark:bg-[#1A1C22] overflow-hidden transition">
+                        <div
+                          onClick={() => togglePevcPhase('f3')}
+                          className="p-3 bg-neutral-100 dark:bg-[#20222A] border-b border-black flex items-center justify-between cursor-pointer select-none"
+                        >
+                          <h3 className="font-display font-black text-sm m-0">Fase 3: Supabase Cloud & Semáforo TDD</h3>
+                          <button className="text-xs font-mono font-bold text-neutral-500 hover:text-black dark:hover:text-white">
+                            {openPevcFases.f3 ? '▴ Contraer' : '▾ Expandir'}
+                          </button>
+                        </div>
+                        {openPevcFases.f3 && (
+                          <div className="p-4 animate-in fade-in duration-150">
+                            <p className="text-xs text-neutral-600 dark:text-neutral-300 m-0">
+                              Conexión a base de datos Postgres sin Docker y desarrollo guiado por pruebas (Rojo ➔ Verde ➔ Azul).
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </div>
 

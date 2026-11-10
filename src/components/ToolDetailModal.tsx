@@ -30,6 +30,13 @@ export const ToolDetailModal: React.FC<ToolDetailModalProps> = ({
   const [markdownView, setMarkdownView] = useState<'formatted' | 'raw'>('formatted');
   const [selectedCliTab, setSelectedCliTab] = useState<'antigravity' | 'opencode' | 'cursor' | 'claudeCode'>('antigravity');
 
+  // Collapsible Sections State in Modal
+  const [isMermaidOpen, setIsMermaidOpen] = useState(true);
+  const [isGalleryOpen, setIsGalleryOpen] = useState(true);
+  const [isMatrixOpen, setIsMatrixOpen] = useState(true);
+  const [isSemaforoOpen, setIsSemaforoOpen] = useState(true);
+  const [isMarkdownOpen, setIsMarkdownOpen] = useState(true);
+
   const downloadMarkdownFile = () => {
     const blob = new Blob([tool.rawMarkdown], { type: 'text/markdown;charset=utf-8' });
     const url = URL.createObjectURL(blob);
@@ -172,94 +179,139 @@ export const ToolDetailModal: React.FC<ToolDetailModalProps> = ({
               <SvgInfographic config={tool.svgConfig} />
 
               {/* Mermaid Flowchart */}
-              <div className="space-y-2">
-                <span className="font-mono text-xs font-bold text-neutral-500 uppercase tracking-wider block">
-                  // Diagrama de Flujo por Código (Mermaid.js)
-                </span>
-                <div className="min-h-[140px] flex items-center justify-center">
-                  <MermaidViewer code={tool.mermaidCode} className="w-full" />
+              <div className="border-2 border-[#121214] dark:border-neutral-700 rounded-lg overflow-hidden shadow-brutal-sm bg-neutral-50 dark:bg-[#1A1C22]">
+                <div
+                  onClick={() => setIsMermaidOpen(!isMermaidOpen)}
+                  className="p-3 bg-neutral-100 dark:bg-[#20222A] border-b border-[#121214] dark:border-neutral-700 flex items-center justify-between cursor-pointer select-none"
+                >
+                  <span className="font-mono text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider block">
+                    📊 Diagrama de Flujo por Código (Mermaid.js)
+                  </span>
+                  <button className="text-xs font-mono font-bold text-neutral-500 hover:text-black dark:hover:text-white px-2 py-0.5 rounded bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600">
+                    {isMermaidOpen ? '▴ Ocultar Diagrama' : '▾ Ver Diagrama'}
+                  </button>
                 </div>
+                {isMermaidOpen && (
+                  <div className="p-4 min-h-[140px] flex items-center justify-center animate-in fade-in duration-150">
+                    <MermaidViewer code={tool.mermaidCode} className="w-full" />
+                  </div>
+                )}
               </div>
 
               {/* Image Gallery */}
               {tool.mediaGallery.length > 0 && (
-                <div className="space-y-2">
-                  <span className="font-mono text-xs font-bold text-neutral-500 uppercase tracking-wider block">
-                    // Galería Visual (Click para Pantalla Completa)
-                  </span>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {tool.mediaGallery.map((m) => (
-                      <div
-                        key={m.id}
-                        onClick={() => onOpenLightbox(m.url, m.caption)}
-                        className="group cursor-pointer border-2 border-[#121214] rounded-lg overflow-hidden shadow-brutal-sm hover:shadow-brutal transition"
-                      >
-                        <img
-                          src={m.url}
-                          alt={m.caption}
-                          className="w-full h-44 object-cover group-hover:scale-105 transition duration-200"
-                        />
-                        <div className="p-2.5 bg-white dark:bg-neutral-800 text-xs font-mono font-bold text-neutral-700 dark:text-neutral-300">
-                          {m.caption}
-                        </div>
-                      </div>
-                    ))}
+                <div className="border-2 border-[#121214] dark:border-neutral-700 rounded-lg overflow-hidden shadow-brutal-sm bg-white dark:bg-[#1A1C22]">
+                  <div
+                    onClick={() => setIsGalleryOpen(!isGalleryOpen)}
+                    className="p-3 bg-neutral-100 dark:bg-[#20222A] border-b border-[#121214] dark:border-neutral-700 flex items-center justify-between cursor-pointer select-none"
+                  >
+                    <span className="font-mono text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider block">
+                      🖼️ Galería Visual ({tool.mediaGallery.length} capturas)
+                    </span>
+                    <button className="text-xs font-mono font-bold text-neutral-500 hover:text-black dark:hover:text-white px-2 py-0.5 rounded bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600">
+                      {isGalleryOpen ? '▴ Ocultar Galería' : '▾ Ver Galería'}
+                    </button>
                   </div>
+                  {isGalleryOpen && (
+                    <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4 animate-in fade-in duration-150">
+                      {tool.mediaGallery.map((m) => (
+                        <div
+                          key={m.id}
+                          onClick={() => onOpenLightbox(m.url, m.caption)}
+                          className="group cursor-pointer border-2 border-[#121214] rounded-lg overflow-hidden shadow-brutal-sm hover:shadow-brutal transition"
+                        >
+                          <img
+                            src={m.url}
+                            alt={m.caption}
+                            className="w-full h-44 object-cover group-hover:scale-105 transition duration-200"
+                          />
+                          <div className="p-2.5 bg-white dark:bg-neutral-800 text-xs font-mono font-bold text-neutral-700 dark:text-neutral-300">
+                            {m.caption}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 
               {/* Before vs After Matrix */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-4 bg-red-50 dark:bg-red-950/30 border-2 border-red-500 rounded-lg shadow-brutal-sm space-y-2">
-                  <span className="font-display font-black text-xs text-red-700 dark:text-red-400 uppercase flex items-center gap-1.5">
-                    ❌ Sin esta herramienta (Dolor 💀):
+              <div className="border-2 border-[#121214] dark:border-neutral-700 rounded-lg overflow-hidden shadow-brutal-sm bg-white dark:bg-[#1A1C22]">
+                <div
+                  onClick={() => setIsMatrixOpen(!isMatrixOpen)}
+                  className="p-3 bg-neutral-100 dark:bg-[#20222A] border-b border-[#121214] dark:border-neutral-700 flex items-center justify-between cursor-pointer select-none"
+                >
+                  <span className="font-mono text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider block">
+                    ⚖️ Análisis de Impacto (Con vs Sin Herramienta)
                   </span>
-                  <ul className="list-disc list-inside space-y-1 text-xs text-neutral-700 dark:text-neutral-300">
-                    {tool.criolloWithout.map((w, i) => (
-                      <li key={i}>{w}</li>
-                    ))}
-                  </ul>
+                  <button className="text-xs font-mono font-bold text-neutral-500 hover:text-black dark:hover:text-white px-2 py-0.5 rounded bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600">
+                    {isMatrixOpen ? '▴ Ocultar Matriz' : '▾ Ver Matriz'}
+                  </button>
                 </div>
+                {isMatrixOpen && (
+                  <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in duration-150">
+                    <div className="p-4 bg-red-50 dark:bg-red-950/30 border-2 border-red-500 rounded-lg shadow-brutal-sm space-y-2">
+                      <span className="font-display font-black text-xs text-red-700 dark:text-red-400 uppercase flex items-center gap-1.5">
+                        ❌ Sin esta herramienta (Dolor 💀):
+                      </span>
+                      <ul className="list-disc list-inside space-y-1 text-xs text-neutral-700 dark:text-neutral-300">
+                        {tool.criolloWithout.map((w, i) => (
+                          <li key={i}>{w}</li>
+                        ))}
+                      </ul>
+                    </div>
 
-                <div className="p-4 bg-emerald-50 dark:bg-emerald-950/30 border-2 border-emerald-500 rounded-lg shadow-brutal-sm space-y-2">
-                  <span className="font-display font-black text-xs text-emerald-700 dark:text-emerald-400 uppercase flex items-center gap-1.5">
-                    ✅ Con esta herramienta (Solución 🚀):
-                  </span>
-                  <ul className="list-disc list-inside space-y-1 text-xs text-neutral-700 dark:text-neutral-300">
-                    {tool.criolloWith.map((w, i) => (
-                      <li key={i}>{w}</li>
-                    ))}
-                  </ul>
-                </div>
+                    <div className="p-4 bg-emerald-50 dark:bg-emerald-950/30 border-2 border-emerald-500 rounded-lg shadow-brutal-sm space-y-2">
+                      <span className="font-display font-black text-xs text-emerald-700 dark:text-emerald-400 uppercase flex items-center gap-1.5">
+                        ✅ Con esta herramienta (Solución 🚀):
+                      </span>
+                      <ul className="list-disc list-inside space-y-1 text-xs text-neutral-700 dark:text-neutral-300">
+                        {tool.criolloWith.map((w, i) => (
+                          <li key={i}>{w}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Team Traffic Light */}
-              <div className="p-4 bg-white dark:bg-[#1A1C22] border-2 border-[#121214] dark:border-neutral-700 rounded-lg shadow-brutal-sm space-y-3">
-                <span className="font-display font-black text-xs uppercase tracking-wider block">
-                  🚦 Semáforo Práctico para el Equipo
-                </span>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                  <div className="p-3 bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-500 rounded space-y-1">
-                    <span className="font-mono font-bold text-emerald-800 dark:text-emerald-400 block">
-                      🟢 Cuándo usarla sí o sí:
-                    </span>
-                    {tool.semaforoGreen.map((s, idx) => (
-                      <p key={idx} className="text-neutral-700 dark:text-neutral-300">
-                        • {s}
-                      </p>
-                    ))}
-                  </div>
-                  <div className="p-3 bg-rose-50/60 dark:bg-rose-950/20 border border-rose-500 rounded space-y-1">
-                    <span className="font-mono font-bold text-rose-800 dark:text-rose-400 block">
-                      🔴 Cuándo NO usarla / Errores comunes:
-                    </span>
-                    {tool.semaforoRed.map((s, idx) => (
-                      <p key={idx} className="text-neutral-700 dark:text-neutral-300">
-                        • {s}
-                      </p>
-                    ))}
-                  </div>
+              <div className="border-2 border-[#121214] dark:border-neutral-700 rounded-lg overflow-hidden shadow-brutal-sm bg-white dark:bg-[#1A1C22]">
+                <div
+                  onClick={() => setIsSemaforoOpen(!isSemaforoOpen)}
+                  className="p-3 bg-neutral-100 dark:bg-[#20222A] border-b border-[#121214] dark:border-neutral-700 flex items-center justify-between cursor-pointer select-none"
+                >
+                  <span className="font-display font-black text-xs uppercase tracking-wider block">
+                    🚦 Semáforo Práctico para el Equipo
+                  </span>
+                  <button className="text-xs font-mono font-bold text-neutral-500 hover:text-black dark:hover:text-white px-2 py-0.5 rounded bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600">
+                    {isSemaforoOpen ? '▴ Ocultar Semáforo' : '▾ Ver Semáforo'}
+                  </button>
                 </div>
+                {isSemaforoOpen && (
+                  <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs animate-in fade-in duration-150">
+                    <div className="p-3 bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-500 rounded space-y-1">
+                      <span className="font-mono font-bold text-emerald-800 dark:text-emerald-400 block">
+                        🟢 Cuándo usarla sí o sí:
+                      </span>
+                      {tool.semaforoGreen.map((s, idx) => (
+                        <p key={idx} className="text-neutral-700 dark:text-neutral-300">
+                          • {s}
+                        </p>
+                      ))}
+                    </div>
+                    <div className="p-3 bg-rose-50/60 dark:bg-rose-950/20 border border-rose-500 rounded space-y-1">
+                      <span className="font-mono font-bold text-rose-800 dark:text-rose-400 block">
+                        🔴 Cuándo NO usarla / Errores comunes:
+                      </span>
+                      {tool.semaforoRed.map((s, idx) => (
+                        <p key={idx} className="text-neutral-700 dark:text-neutral-300">
+                          • {s}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </>
           ) : (
@@ -326,52 +378,66 @@ export const ToolDetailModal: React.FC<ToolDetailModalProps> = ({
               )}
 
               {/* Dual Markdown Viewer */}
-              <div className="p-4 bg-white dark:bg-[#1A1C22] border-2 border-[#121214] dark:border-neutral-700 rounded-lg shadow-brutal-sm space-y-3">
-                <div className="flex items-center justify-between border-b border-neutral-200 dark:border-neutral-800 pb-2">
+              <div className="border-2 border-[#121214] dark:border-neutral-700 rounded-lg overflow-hidden shadow-brutal-sm bg-white dark:bg-[#1A1C22]">
+                <div className="p-3 bg-neutral-100 dark:bg-[#20222A] border-b border-[#121214] dark:border-neutral-700 flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <span className="font-display font-black text-xs uppercase tracking-wider">
                       📝 Visor de Documentación Markdown
                     </span>
-                    <div className="flex bg-neutral-200 dark:bg-neutral-800 p-0.5 rounded font-mono text-[10px]">
-                      <button
-                        onClick={() => setMarkdownView('formatted')}
-                        className={`px-2 py-0.5 rounded font-bold ${
-                          markdownView === 'formatted'
-                            ? 'bg-white dark:bg-black text-black dark:text-white shadow-xs'
-                            : 'text-neutral-500'
-                        }`}
-                      >
-                        Formateado
-                      </button>
-                      <button
-                        onClick={() => setMarkdownView('raw')}
-                        className={`px-2 py-0.5 rounded font-bold ${
-                          markdownView === 'raw'
-                            ? 'bg-white dark:bg-black text-black dark:text-white shadow-xs'
-                            : 'text-neutral-500'
-                        }`}
-                      >
-                        Raw .md
-                      </button>
-                    </div>
+                    {isMarkdownOpen && (
+                      <div className="flex bg-neutral-200 dark:bg-neutral-800 p-0.5 rounded font-mono text-[10px]">
+                        <button
+                          onClick={() => setMarkdownView('formatted')}
+                          className={`px-2 py-0.5 rounded font-bold ${
+                            markdownView === 'formatted'
+                              ? 'bg-white dark:bg-black text-black dark:text-white shadow-xs'
+                              : 'text-neutral-500'
+                          }`}
+                        >
+                          Formateado
+                        </button>
+                        <button
+                          onClick={() => setMarkdownView('raw')}
+                          className={`px-2 py-0.5 rounded font-bold ${
+                            markdownView === 'raw'
+                              ? 'bg-white dark:bg-black text-black dark:text-white shadow-xs'
+                              : 'text-neutral-500'
+                          }`}
+                        >
+                          Raw .md
+                        </button>
+                      </div>
+                    )}
                   </div>
 
-                  <button
-                    onClick={() => onCopy(tool.rawMarkdown, 'Markdown Completo')}
-                    className="px-2.5 py-1 bg-[#121214] hover:bg-brand-orange text-white font-mono text-xs font-bold rounded transition"
-                  >
-                    Copiar Markdown
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => onCopy(tool.rawMarkdown, 'Markdown Completo')}
+                      className="px-2.5 py-1 bg-[#121214] hover:bg-brand-orange text-white font-mono text-xs font-bold rounded transition"
+                    >
+                      Copiar Markdown
+                    </button>
+                    <button
+                      onClick={() => setIsMarkdownOpen(!isMarkdownOpen)}
+                      className="text-xs font-mono font-bold text-neutral-500 hover:text-black dark:hover:text-white px-2 py-0.5 rounded bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600"
+                    >
+                      {isMarkdownOpen ? '▴ Ocultar' : '▾ Ver'}
+                    </button>
+                  </div>
                 </div>
 
-                {markdownView === 'formatted' ? (
-                  <div className="p-4 bg-neutral-50 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded text-xs font-sans leading-relaxed space-y-2 whitespace-pre-wrap">
-                    {tool.rawMarkdown}
+                {isMarkdownOpen && (
+                  <div className="p-4 animate-in fade-in duration-150">
+                    {markdownView === 'formatted' ? (
+                      <div className="p-4 bg-neutral-50 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded text-xs font-sans leading-relaxed space-y-2 whitespace-pre-wrap">
+                        {tool.rawMarkdown}
+                      </div>
+                    ) : (
+                      <pre className="p-4 bg-[#121214] text-neutral-300 border border-neutral-700 rounded font-mono text-xs overflow-x-auto whitespace-pre-wrap">
+                        <code>{tool.rawMarkdown}</code>
+                      </pre>
+                    )}
                   </div>
-                ) : (
-                  <pre className="p-4 bg-[#121214] text-neutral-300 border border-neutral-700 rounded font-mono text-xs overflow-x-auto whitespace-pre-wrap">
-                    <code>{tool.rawMarkdown}</code>
-                  </pre>
                 )}
               </div>
             </>
