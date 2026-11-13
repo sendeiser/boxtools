@@ -19,6 +19,27 @@ import { VibeGuideSection } from './components/VibeGuideSection';
 import { AddToolModal } from './components/AddToolModal';
 import { PublicationsHubSection } from './components/PublicationsHubSection';
 
+const VALID_SECTIONS: readonly ActiveSection[] = [
+  'vault',
+  'publications',
+  'pevc',
+  'repomix-v7',
+  'vibe-guide',
+  'combos',
+  'onboarding',
+  'admin',
+];
+
+function getInitialSectionFromHash(): ActiveSection {
+  try {
+    const hash = window.location.hash.replace(/^#\/?/, '').trim() as ActiveSection;
+    if (VALID_SECTIONS.includes(hash)) return hash;
+  } catch {
+    /* ignore */
+  }
+  return 'vault';
+}
+
 export const App: React.FC = () => {
   // Global View States
   const [tools, setTools] = useState<readonly ToolItem[]>(INITIAL_TOOLS);
@@ -28,8 +49,34 @@ export const App: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // App Sections
-  const [currentSection, setCurrentSection] = useState<ActiveSection>('vault');
+  // App Sections (sincronizado con URL hash para conservar vista al recargar)
+  const [currentSection, setCurrentSectionState] = useState<ActiveSection>(() =>
+    getInitialSectionFromHash()
+  );
+
+  const setCurrentSection = (section: ActiveSection) => {
+    setCurrentSectionState(section);
+    try {
+      const nextHash = section === 'vault' ? '' : `#${section}`;
+      if (window.location.hash !== nextHash) {
+        if (nextHash) {
+          window.history.replaceState(null, '', nextHash);
+        } else {
+          window.history.replaceState(null, '', window.location.pathname + window.location.search);
+        }
+      }
+    } catch {
+      /* ignore */
+    }
+  };
+
+  useEffect(() => {
+    const onHashChange = () => {
+      setCurrentSectionState(getInitialSectionFromHash());
+    };
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
 
   // Interactive Modals & Drawers
   const [activeDetailTool, setActiveDetailTool] = useState<ToolItem | null>(null);

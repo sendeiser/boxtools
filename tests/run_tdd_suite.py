@@ -4,8 +4,14 @@ import os
 from playwright.sync_api import sync_playwright
 
 def test_suite():
+    out_dir = os.environ.get("BOXTOOLS_OUT_DIR", "").strip()
+    server_cmd = (
+        ["npx", "vite", "preview", "--outDir", out_dir, "--port", "4173"]
+        if out_dir
+        else ["npm", "run", "preview", "--", "--port", "4173"]
+    )
     proc = subprocess.Popen(
-        ["npm", "run", "preview", "--", "--port", "4173"],
+        server_cmd,
         cwd=r"d:\boxtools",
         shell=True,
         stdout=subprocess.PIPE,
@@ -161,6 +167,59 @@ def test_suite():
             assert page.locator('button:has-text("Ocultar Diagrama")').count() > 0, "Diagrama re-expandido"
             page.locator('button:has-text("✕")').first.click()
             page.wait_for_timeout(300)
+
+            # 8. Test Publications & Links Hub Persistence Across Page Reload + Cloud Sync
+            page.locator('[data-testid="nav-publications-btn"]').first.click()
+            page.wait_for_selector('[data-testid="pub-cloud-status"]:has-text("Nube Supabase OK")', timeout=15000)
+            assert "#publications" in page.url, f"La URL debería incluir #publications: {page.url}"
+
+            # 8a. Crear apartado personalizado
+            page.locator('[data-testid="open-create-section-modal-btn"]').click()
+            page.wait_for_selector('[data-testid="sec-form-name-input"]', timeout=5000)
+            page.fill('[data-testid="sec-form-name-input"]', "Apartado E2E Persist")
+            page.fill('[data-testid="sec-form-desc-input"]', "Apartado temporal de verificación E2E")
+            page.locator('[data-testid="save-section-submit-btn"]').click()
+            page.wait_for_selector('button:has-text("Apartado E2E Persist")', timeout=10000)
+            page.wait_for_selector('[data-testid="pub-cloud-status"]:has-text("Nube Supabase OK")', timeout=15000)
+
+            # Seleccionar el apartado nuevo antes de crear la publicación
+            page.locator('button:has-text("Apartado E2E Persist")').first.click()
+            page.wait_for_timeout(300)
+
+            # 8b. Crear publicación manual (validando footer sticky accesible)
+            page.locator('[data-testid="open-manual-publication-modal-btn"]').click()
+            page.wait_for_selector('[data-testid="pub-form-title-input"]', timeout=5000)
+            assert page.locator('[data-testid="save-publication-submit-btn"]').is_visible(), "Botón Publicar sticky visible"
+            page.fill('[data-testid="pub-form-title-input"]', "Publicación E2E Persistente")
+            page.fill('[data-testid="pub-form-url-input"]', "https://github.com/example/e2e-persist")
+            page.locator('[data-testid="save-publication-submit-btn"]').click()
+            page.wait_for_selector('article:has-text("Publicación E2E Persistente")', timeout=10000)
+            page.wait_for_selector('[data-testid="pub-cloud-status"]:has-text("Nube Supabase OK")', timeout=15000)
+
+            # 8c. Recargar la página (F5) y validar que sigue en #publications con ambos registros
+            page.reload()
+            page.wait_for_load_state("domcontentloaded")
+            page.wait_for_selector('[data-testid="pub-cloud-status"]:has-text("Nube Supabase OK")', timeout=15000)
+            assert "#publications" in page.url, f"La URL perdió #publications tras recargar: {page.url}"
+            assert page.locator('button:has-text("Apartado E2E Persist")').count() > 0, "Apartado custom desapareció al recargar"
+            assert page.locator('article:has-text("Publicación E2E Persistente")').count() > 0, "Publicación guardada desapareció al recargar"
+
+            # 8d. Limpiar publicación y apartado de prueba desde la UI y revalidar tras recarga
+            page.locator('article:has-text("Publicación E2E Persistente") button[title="Eliminar publicación"]').first.click()
+            page.wait_for_selector('article:has-text("Publicación E2E Persistente")', state="detached", timeout=10000)
+            page.wait_for_selector('[data-testid="pub-cloud-status"]:has-text("Nube Supabase OK")', timeout=15000)
+
+            page.locator('button:has-text("Apartado E2E Persist")').first.click()
+            page.wait_for_selector('button[title="Eliminar apartado"]', timeout=5000)
+            page.locator('button[title="Eliminar apartado"]').first.click()
+            page.wait_for_selector('button:has-text("Apartado E2E Persist")', state="detached", timeout=10000)
+            page.wait_for_selector('[data-testid="pub-cloud-status"]:has-text("Nube Supabase OK")', timeout=15000)
+
+            page.reload()
+            page.wait_for_load_state("domcontentloaded")
+            page.wait_for_selector('[data-testid="pub-cloud-status"]:has-text("Nube Supabase OK")', timeout=15000)
+            assert page.locator('button:has-text("Apartado E2E Persist")').count() == 0, "Apartado eliminado reapareció"
+            assert page.locator('article:has-text("Publicación E2E Persistente")').count() == 0, "Publicación eliminada reapareció"
 
             print("✅ TODOS LOS TESTS TDD PASARON EN VERDE")
             browser.close()

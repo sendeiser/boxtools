@@ -10,16 +10,17 @@ import {
 } from '../types/boxtools';
 import {
   getPublicationSections,
-  savePublicationSection,
-  deletePublicationSection,
+  persistPublicationSection,
+  removePublicationSection,
   getPublications,
-  savePublication,
-  deletePublication,
+  persistPublication,
+  removePublication,
+  fetchPublicationsDataFromCloud,
   analyzeLinkAndGeneratePublication,
   extractYoutubeId,
   extractLoomId,
 } from '../lib/publicationService';
-import { getAiConfig } from '../lib/aiService';
+import { getAiConfig, fetchAiConfigFromDatabase } from '../lib/aiService';
 import { AiSettingsModal } from './AiSettingsModal';
 
 export interface PublicationsHubSectionProps {
@@ -124,9 +125,27 @@ export const PublicationsHubSection: React.FC<PublicationsHubSectionProps> = ({
 }) => {
   const [sections, setSections] = useState<PublicationSection[]>(() => getPublicationSections());
   const [publications, setPublications] = useState<PublicationItem[]>(() => getPublications());
+  const [cloudSyncState, setCloudSyncState] = useState<'syncing' | 'synced' | 'local'>('syncing');
+  const [isSavingPub, setIsSavingPub] = useState(false);
+  const [isSavingSection, setIsSavingSection] = useState(false);
 
-  // Filters
-  const [activeSectionId, setActiveSectionId] = useState<string>('all');
+  // Filters (conservar apartado seleccionado entre recargas)
+  const [activeSectionId, setActiveSectionIdState] = useState<string>(() => {
+    try {
+      return localStorage.getItem('boxtools_pub_active_section_v1') || 'all';
+    } catch {
+      return 'all';
+    }
+  });
+  const setActiveSectionId = (secId: string) => {
+    setActiveSectionIdState(secId);
+    try {
+      localStorage.setItem('boxtools_pub_active_section_v1', secId);
+    } catch {
+      /* ignore */
+    }
+  };
+
   const [activeTypeFilter, setActiveTypeFilter] = useState<PublicationResourceType | 'all' | 'favorites'>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -139,7 +158,14 @@ export const PublicationsHubSection: React.FC<PublicationsHubSectionProps> = ({
   const [playingVideoIds, setPlayingVideoIds] = useState<Record<string, boolean>>({});
   const [expandedStepIds, setExpandedStepIds] = useState<Record<string, boolean>>({});
   const [detailPub, setDetailPub] = useState<PublicationItem | null>(null);
-  const [completedStepsMap, setCompletedStepsMap] = useState<Record<string, boolean>>({});
+  const [completedStepsMap, setCompletedStepsMap] = useState<Record<string, boolean>>(() => {
+    try {
+      const raw = localStorage.getItem('boxtools_pub_steps_v1');
+      return raw ? JSON.parse(raw) : {};
+    } catch {
+      return {};
+    }
+  });
 
   // Create / Edit Publication Modal state
   const [isPubModalOpen, setIsPubModalOpen] = useState(false);
@@ -186,6 +212,36 @@ export const PublicationsHubSection: React.FC<PublicationsHubSectionProps> = ({
   // AI Settings Modal
   const [showAiSettingsModal, setShowAiSettingsModal] = useState(false);
   const [aiConfig, setAiConfig] = useState<AiSettingsConfig>(() => getAiConfig());
+
+  // Sincronización inicial con Supabase Cloud al montar
+  useEffect(() => {
+    let active = true;
+    fetchPublicationsDataFromCloud().then((res) => {
+      if (!active) return;
+      setSections(res.sections);
+      setPublications(res.publications);
+      setCloudSyncState(res.cloudSynced ? 'synced' : 'local');
+      setActiveSectionIdState((prev) => {
+        if (prev !== 'all' && !res.sections.some((s) => s.id === prev)) {
+          try {
+            localStorage.setItem('boxtools_pub_active_section_v1', 'all');
+          } catch {
+            /* ignore */
+          }
+          return 'all';
+        }
+        return prev;
+      });
+    });
+
+    fetchAiConfigFromDatabase().then((cfg) => {
+      if (active) setAiConfig(cfg);
+    });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
     setAiConfig(getAiConfig());
@@ -374,9 +430,10 @@ export const PublicationsHubSection: React.FC<PublicationsHubSectionProps> = ({
     }
   };
 
-  // Save Publication (Create or Update)
-  const handleSavePublication = (e: React.FormEvent) => {
+  // Save Publication (Create or Update -> LocalStorage + Supabase Cloud)
+  const handleSavePublication = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSavingPub) return;
     const title = formTitle.trim();
     if (!title) {
       onShowToast('⚠️ El título de la publicación es obligatorio');
@@ -408,10 +465,11 @@ export const PublicationsHubSection: React.FC<PublicationsHubSectionProps> = ({
 
     const existing = editingPubId ? publications.find((p) => p.id === editingPubId) : undefined;
     const starsNum = formGithubStars.trim() ? parseInt(formGithubStars.trim(), 10) : undefined;
+    const uniqueSuffix = `${Date.now().toString().slice(-4)}${Math.floor(Math.random() * 90 + 10)}`;
 
     const newItem: PublicationItem = {
-      id: existing ? existing.id : `pub-${Date.now()}`,
-      slug: existing ? existing.slug : `${slugBase}-${Math.floor(Math.random() * 900 + 100)}`,
+      id: existing ? existing.id : `pub-${Date.now()}-${Math.floor(Math.random() * 900 + 100)}`,
+      slug: existing ? existing.slug : `${slugBase}-${uniqueSuffix}`,
       title,
       summary:
         formSummary.trim() ||
@@ -443,40 +501,78 @@ export const PublicationsHubSection: React.FC<PublicationsHubSectionProps> = ({
       createdAt: existing ? existing.createdAt : new Date().toISOString(),
     };
 
-    const updated = savePublication(newItem);
-    setPublications(updated);
+    // Asegurar visibilidad inmediata tras guardar (limpiar filtros que oculten la nueva card)
+    if (activeSectionId !== 'all' && activeSectionId !== newItem.sectionId) {
+      setActiveSectionId(newItem.sectionId);
+    }
+    if (activeTypeFilter !== 'all' && activeTypeFilter !== newItem.resourceType) {
+      setActiveTypeFilter('all');
+    }
+    if (searchQuery.trim()) {
+      setSearchQuery('');
+    }
+
+    setIsSavingPub(true);
+    setCloudSyncState('syncing');
+    const result = await persistPublication(newItem, sections);
+    setIsSavingPub(false);
+
+    setPublications(result.publications);
+    setCloudSyncState(result.supabaseSuccess ? 'synced' : 'local');
     setIsPubModalOpen(false);
     if (detailPub && detailPub.id === newItem.id) {
       setDetailPub(newItem);
     }
+
+    const secNameLabel = sections.find((s) => s.id === newItem.sectionId)?.name || 'Hub';
     onShowToast(
-      existing
-        ? `✓ Publicación actualizada: "${newItem.title}"`
-        : `🎉 Publicación creada en "${sections.find((s) => s.id === newItem.sectionId)?.name || 'Hub'}"`
+      result.supabaseSuccess
+        ? existing
+          ? `☁️ Publicación actualizada en la nube: "${newItem.title}"`
+          : `☁️ Publicación guardada en Supabase ("${secNameLabel}")`
+        : existing
+        ? `✓ Actualizada localmente: "${newItem.title}"`
+        : `🎉 Publicación guardada localmente en "${secNameLabel}"`
     );
   };
 
-  const handleDeletePublication = (pub: PublicationItem) => {
-    const updated = deletePublication(pub.id);
-    setPublications(updated);
+  const handleDeletePublication = async (pub: PublicationItem) => {
     if (detailPub?.id === pub.id) setDetailPub(null);
-    onShowToast(`🗑️ Publicación eliminada: "${pub.title}"`);
+    setCloudSyncState('syncing');
+    const result = await removePublication(pub.id);
+    setPublications(result.publications);
+    setCloudSyncState(result.supabaseSuccess ? 'synced' : 'local');
+    onShowToast(
+      result.supabaseSuccess
+        ? `🗑️ Publicación eliminada de la nube: "${pub.title}"`
+        : `🗑️ Publicación eliminada localmente: "${pub.title}"`
+    );
+  };
+
+  const handlePublicationFlagUpdate = async (updatedItem: PublicationItem, toastMsg: string) => {
+    setPublications((prev) => prev.map((p) => (p.id === updatedItem.id ? updatedItem : p)));
+    if (detailPub?.id === updatedItem.id) setDetailPub(updatedItem);
+    setCloudSyncState('syncing');
+    const result = await persistPublication(updatedItem, sections);
+    setPublications(result.publications);
+    setCloudSyncState(result.supabaseSuccess ? 'synced' : 'local');
+    onShowToast(toastMsg);
   };
 
   const handleTogglePin = (pub: PublicationItem) => {
     const updatedItem: PublicationItem = { ...pub, isPinned: !pub.isPinned };
-    const updated = savePublication(updatedItem);
-    setPublications(updated);
-    if (detailPub?.id === pub.id) setDetailPub(updatedItem);
-    onShowToast(updatedItem.isPinned ? '📌 Fijada arriba del muro' : '📌 Desfijada');
+    void handlePublicationFlagUpdate(
+      updatedItem,
+      updatedItem.isPinned ? '📌 Fijada arriba del muro' : '📌 Desfijada'
+    );
   };
 
   const handleToggleFavorite = (pub: PublicationItem) => {
     const updatedItem: PublicationItem = { ...pub, isFavorite: !pub.isFavorite };
-    const updated = savePublication(updatedItem);
-    setPublications(updated);
-    if (detailPub?.id === pub.id) setDetailPub(updatedItem);
-    onShowToast(updatedItem.isFavorite ? '⭐ Guardada en Favoritos' : 'Removida de Favoritos');
+    void handlePublicationFlagUpdate(
+      updatedItem,
+      updatedItem.isFavorite ? '⭐ Guardada en Favoritos' : 'Removida de Favoritos'
+    );
   };
 
   // Apartado (Section) CRUD
@@ -498,8 +594,9 @@ export const PublicationsHubSection: React.FC<PublicationsHubSectionProps> = ({
     setIsSectionModalOpen(true);
   };
 
-  const handleSaveSection = (e: React.FormEvent) => {
+  const handleSaveSection = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSavingSection) return;
     const cleanName = secName.trim();
     if (!cleanName) {
       onShowToast('⚠️ Escribí un nombre para el apartado');
@@ -507,7 +604,7 @@ export const PublicationsHubSection: React.FC<PublicationsHubSectionProps> = ({
     }
 
     const existing = editingSectionId ? sections.find((s) => s.id === editingSectionId) : undefined;
-    const slug =
+    const slugBase =
       cleanName
         .toLowerCase()
         .normalize('NFD')
@@ -515,9 +612,12 @@ export const PublicationsHubSection: React.FC<PublicationsHubSectionProps> = ({
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-|-$/g, '') || `apartado-${Date.now()}`;
 
+    const slugTaken = sections.some((s) => s.slug === slugBase && s.id !== existing?.id);
+    const uniqueSlug = slugTaken ? `${slugBase}-${Date.now().toString().slice(-4)}` : slugBase;
+
     const newSec: PublicationSection = {
-      id: existing ? existing.id : `sec-${slug}-${Date.now().toString().slice(-4)}`,
-      slug,
+      id: existing ? existing.id : `sec-${slugBase}-${Date.now().toString().slice(-4)}`,
+      slug: existing ? existing.slug : uniqueSlug,
       name: cleanName,
       emoji: secEmoji.trim() || '📁',
       description:
@@ -527,26 +627,45 @@ export const PublicationsHubSection: React.FC<PublicationsHubSectionProps> = ({
       createdAt: existing ? existing.createdAt : new Date().toISOString(),
     };
 
-    const updated = savePublicationSection(newSec);
-    setSections(updated);
+    setIsSavingSection(true);
+    setCloudSyncState('syncing');
+    const result = await persistPublicationSection(newSec);
+    setIsSavingSection(false);
+
+    setSections(result.sections);
+    setCloudSyncState(result.supabaseSuccess ? 'synced' : 'local');
     setActiveSectionId(newSec.id);
+    if (isPubModalOpen) {
+      setFormSectionId(newSec.id);
+    }
     setIsSectionModalOpen(false);
     onShowToast(
-      existing
-        ? `✓ Apartado "${newSec.name}" actualizado`
+      result.supabaseSuccess
+        ? existing
+          ? `☁️ Apartado "${newSec.name}" actualizado en la nube`
+          : `☁️ Apartado guardado en Supabase: "${newSec.emoji} ${newSec.name}"`
+        : existing
+        ? `✓ Apartado "${newSec.name}" actualizado localmente`
         : `🗂️ Nuevo apartado creado: "${newSec.emoji} ${newSec.name}"`
     );
   };
 
-  const handleDeleteSection = (sec: PublicationSection) => {
+  const handleDeleteSection = async (sec: PublicationSection) => {
     if (sec.isSystem) {
       onShowToast('⚠️ Los apartados base del sistema no se pueden borrar, pero podés editarlos.');
       return;
     }
-    const updated = deletePublicationSection(sec.id);
-    setSections(updated);
+    setCloudSyncState('syncing');
+    const result = await removePublicationSection(sec.id);
+    setSections(result.sections);
+    setPublications(result.publications);
+    setCloudSyncState(result.supabaseSuccess ? 'synced' : 'local');
     if (activeSectionId === sec.id) setActiveSectionId('all');
-    onShowToast(`🗑️ Apartado "${sec.name}" eliminado`);
+    onShowToast(
+      result.supabaseSuccess
+        ? `🗑️ Apartado "${sec.name}" eliminado de la nube`
+        : `🗑️ Apartado "${sec.name}" eliminado localmente`
+    );
   };
 
   // Filtered and sorted publications (pinned first, then newest)
@@ -591,7 +710,34 @@ export const PublicationsHubSection: React.FC<PublicationsHubSectionProps> = ({
               HUB DE PUBLICACIONES & RECURSOS // LINKS, GITHUB, VIDEOS & TUTORIALES
             </span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span
+              data-testid="pub-cloud-status"
+              className={`font-mono text-[10px] px-2 py-1 rounded border font-bold flex items-center gap-1.5 ${
+                cloudSyncState === 'synced'
+                  ? 'border-emerald-500/60 bg-emerald-950/60 text-emerald-300'
+                  : cloudSyncState === 'syncing'
+                  ? 'border-amber-400/60 bg-amber-950/60 text-amber-200'
+                  : 'border-neutral-600 bg-neutral-900 text-neutral-300'
+              }`}
+            >
+              <span
+                className={`w-1.5 h-1.5 rounded-full ${
+                  cloudSyncState === 'synced'
+                    ? 'bg-emerald-400'
+                    : cloudSyncState === 'syncing'
+                    ? 'bg-amber-400 animate-ping'
+                    : 'bg-neutral-400'
+                }`}
+              />
+              <span>
+                {cloudSyncState === 'synced'
+                  ? 'Nube Supabase OK'
+                  : cloudSyncState === 'syncing'
+                  ? 'Sincronizando...'
+                  : 'Modo Local'}
+              </span>
+            </span>
             <button
               type="button"
               onClick={() => setShowAiSettingsModal(true)}
@@ -1393,10 +1539,18 @@ export const PublicationsHubSection: React.FC<PublicationsHubSectionProps> = ({
                             type="checkbox"
                             checked={checked}
                             onChange={() =>
-                              setCompletedStepsMap((prev) => ({
-                                ...prev,
-                                [stepKey]: !prev[stepKey],
-                              }))
+                              setCompletedStepsMap((prev) => {
+                                const next = {
+                                  ...prev,
+                                  [stepKey]: !prev[stepKey],
+                                };
+                                try {
+                                  localStorage.setItem('boxtools_pub_steps_v1', JSON.stringify(next));
+                                } catch {
+                                  // Ignore storage quota errors
+                                }
+                                return next;
+                              })
                             }
                             className="mt-0.5"
                           />
@@ -1467,7 +1621,8 @@ export const PublicationsHubSection: React.FC<PublicationsHubSectionProps> = ({
               </button>
             </header>
 
-            <form onSubmit={handleSavePublication} className="p-4 md:p-6 overflow-y-auto space-y-5 flex-1">
+            <form onSubmit={handleSavePublication} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+              <div className="p-4 md:p-6 overflow-y-auto space-y-5 flex-1">
               {/* Mode Switch Tabs inside Modal */}
               <div className="grid grid-cols-2 gap-3">
                 <button
@@ -1558,7 +1713,7 @@ export const PublicationsHubSection: React.FC<PublicationsHubSectionProps> = ({
 
               {aiGenerationNotice && (
                 <div
-                  className={`p-3 rounded border-2 font-mono text-xs ${
+                  className={`p-3 rounded border-2 font-mono text-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 ${
                     aiGenerationNotice.type === 'success'
                       ? 'bg-emerald-50 text-emerald-950 border-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200'
                       : aiGenerationNotice.type === 'warning'
@@ -1566,7 +1721,16 @@ export const PublicationsHubSection: React.FC<PublicationsHubSectionProps> = ({
                       : 'bg-cyan-50 text-cyan-950 border-cyan-700 dark:bg-cyan-950/40 dark:text-cyan-200'
                   }`}
                 >
-                  {aiGenerationNotice.text}
+                  <span>{aiGenerationNotice.text}</span>
+                  {aiGenerationNotice.type === 'success' && (
+                    <button
+                      type="submit"
+                      disabled={isSavingPub}
+                      className="shrink-0 px-3 py-1.5 rounded border-2 border-black bg-[#121214] hover:bg-brand-orange disabled:opacity-60 text-white font-display font-black text-[11px] shadow-brutal-xs transition"
+                    >
+                      {isSavingPub ? '⏳ Guardando...' : '🚀 Publicar Ahora'}
+                    </button>
+                  )}
                 </div>
               )}
 
@@ -1846,21 +2010,29 @@ export const PublicationsHubSection: React.FC<PublicationsHubSectionProps> = ({
                 </div>
               </div>
 
-              {/* Modal Footer */}
-              <div className="pt-4 border-t-2 border-black flex items-center justify-end gap-3">
+              </div>
+
+              {/* Sticky Modal Footer */}
+              <div className="px-4 md:px-6 py-3.5 border-t-2 border-black bg-[#FAF9F5] dark:bg-[#1A1C22] flex items-center justify-end gap-3 shrink-0">
                 <button
                   type="button"
                   onClick={() => setIsPubModalOpen(false)}
-                  className="px-4 py-2 rounded border-2 border-black bg-white dark:bg-neutral-800 font-display font-bold text-xs"
+                  disabled={isSavingPub}
+                  className="px-4 py-2 rounded border-2 border-black bg-white dark:bg-neutral-800 disabled:opacity-60 font-display font-bold text-xs"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded border-2 border-black bg-[#121214] hover:bg-brand-orange text-white font-display font-black text-xs shadow-brutal-sm transition"
+                  disabled={isSavingPub}
+                  className="px-5 py-2 rounded border-2 border-black bg-[#121214] hover:bg-brand-orange disabled:opacity-60 text-white font-display font-black text-xs shadow-brutal-sm transition"
                   data-testid="save-publication-submit-btn"
                 >
-                  {editingPubId ? '💾 Guardar Cambios' : '🚀 Publicar en el Muro'}
+                  {isSavingPub
+                    ? '⏳ Guardando en Nube...'
+                    : editingPubId
+                    ? '💾 Guardar Cambios'
+                    : '🚀 Publicar en el Muro'}
                 </button>
               </div>
             </form>
@@ -1968,16 +2140,22 @@ export const PublicationsHubSection: React.FC<PublicationsHubSectionProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsSectionModalOpen(false)}
-                  className="px-4 py-2 rounded border-2 border-black bg-white dark:bg-neutral-800 font-display font-bold text-xs"
+                  disabled={isSavingSection}
+                  className="px-4 py-2 rounded border-2 border-black bg-white dark:bg-neutral-800 disabled:opacity-60 font-display font-bold text-xs"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded border-2 border-black bg-brand-orange text-white font-display font-black text-xs shadow-brutal-sm"
+                  disabled={isSavingSection}
+                  className="px-4 py-2 rounded border-2 border-black bg-brand-orange disabled:opacity-60 text-white font-display font-black text-xs shadow-brutal-sm"
                   data-testid="save-section-submit-btn"
                 >
-                  {editingSectionId ? 'Guardar Apartado' : '✓ Crear Apartado'}
+                  {isSavingSection
+                    ? '⏳ Guardando...'
+                    : editingSectionId
+                    ? 'Guardar Apartado'
+                    : '✓ Crear Apartado'}
                 </button>
               </div>
             </form>

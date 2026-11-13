@@ -3,12 +3,19 @@ import {
   PublicationSection,
   PublicationResourceType,
   PublicationDifficulty,
+  SectionTone,
   AiSettingsConfig,
 } from '../types/boxtools';
 import { getAiConfig } from './aiService';
+import { supabase } from './supabase';
 
 const STORAGE_SECTIONS_KEY = 'boxtools_publication_sections_v1';
 const STORAGE_ITEMS_KEY = 'boxtools_publications_v1';
+const PENDING_SEC_UPSERTS_KEY = 'boxtools_pending_sec_upserts_v1';
+const PENDING_SEC_DELETES_KEY = 'boxtools_pending_sec_deletes_v1';
+const PENDING_PUB_UPSERTS_KEY = 'boxtools_pending_pub_upserts_v1';
+const PENDING_PUB_DELETES_KEY = 'boxtools_pending_pub_deletes_v1';
+const MIGRATED_CLOUD_KEY = 'boxtools_pubs_cloud_migrated_v1';
 
 export const DEFAULT_PUBLICATION_SECTIONS: PublicationSection[] = [
   {
@@ -208,6 +215,161 @@ export const INITIAL_PUBLICATIONS: PublicationItem[] = [
 ];
 
 // ============================================================================
+// HELPERS DE SINCRONIZACIÓN LOCAL + SUPABASE CLOUD
+// ============================================================================
+
+function readIdQueue(key: string): string[] {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.filter((x): x is string => typeof x === 'string') : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeIdQueue(key: string, ids: string[]): void {
+  try {
+    localStorage.setItem(key, JSON.stringify(Array.from(new Set(ids))));
+  } catch {
+    /* ignore storage errors */
+  }
+}
+
+function enqueueId(key: string, id: string): void {
+  const curr = readIdQueue(key);
+  if (!curr.includes(id)) {
+    writeIdQueue(key, [...curr, id]);
+  }
+}
+
+function dequeueId(key: string, id: string): void {
+  const curr = readIdQueue(key);
+  if (curr.includes(id)) {
+    writeIdQueue(key, curr.filter((x) => x !== id));
+  }
+}
+
+function ensureSystemSections(list: PublicationSection[]): PublicationSection[] {
+  const existingIds = new Set(list.map((s) => s.id));
+  const merged = [...list];
+  for (const def of DEFAULT_PUBLICATION_SECTIONS) {
+    if (def.isSystem && !existingIds.has(def.id)) {
+      merged.push(def);
+    }
+  }
+  return merged;
+}
+
+function mapRowToPublicationSection(row: any): PublicationSection {
+  return {
+    id: String(row.id),
+    slug: String(row.slug || row.id),
+    name: String(row.name || 'Apartado'),
+    emoji: String(row.emoji || '📁'),
+    description: String(row.description || ''),
+    tone: (row.tone as SectionTone) || 'orange',
+    isSystem: Boolean(row.is_system),
+    createdAt: String(row.created_at || new Date().toISOString()),
+  };
+}
+
+function mapPublicationSectionToRow(section: PublicationSection) {
+  return {
+    id: section.id,
+    slug: section.slug,
+    name: section.name,
+    emoji: section.emoji,
+    description: section.description,
+    tone: section.tone,
+    is_system: Boolean(section.isSystem),
+    created_at: section.createdAt,
+    updated_at: new Date().toISOString(),
+  };
+}
+
+function mapRowToPublication(row: any): PublicationItem {
+  return {
+    id: String(row.id),
+    slug: String(row.slug || row.id),
+    title: String(row.title || 'Publicación'),
+    summary: String(row.summary || ''),
+    criolloTakeaway: String(row.criollo_takeaway || ''),
+    technicalNotes: String(row.technical_notes || ''),
+    url: String(row.url || ''),
+    resourceType: (row.resource_type as PublicationResourceType) || 'link',
+    sectionId: String(row.section_id || 'sec-links'),
+    emoji: String(row.emoji || '📌'),
+    authorOrChannel: String(row.author_or_channel || 'Equipo BoxTools'),
+    thumbnailUrl: row.thumbnail_url || undefined,
+    videoEmbedUrl: row.video_embed_url || undefined,
+    githubStars: typeof row.github_stars === 'number' ? row.github_stars : undefined,
+    githubLanguage: row.github_language || undefined,
+    keyPoints: Array.isArray(row.key_points) ? row.key_points.map(String) : [],
+    tutorialSteps: Array.isArray(row.tutorial_steps) ? row.tutorial_steps.map(String) : [],
+    tags: Array.isArray(row.tags) ? row.tags.map(String) : [],
+    difficulty: (row.difficulty as PublicationDifficulty) || 'intermedio',
+    estimatedTime: String(row.estimated_time || '10 min'),
+    isPinned: Boolean(row.is_pinned),
+    isFavorite: Boolean(row.is_favorite),
+    createdByAi: Boolean(row.created_by_ai),
+    createdAt: String(row.created_at || new Date().toISOString()),
+  };
+}
+
+function mapPublicationToRow(item: PublicationItem) {
+  return {
+    id: item.id,
+    slug: item.slug,
+    title: item.title,
+    summary: item.summary,
+    criollo_takeaway: item.criolloTakeaway,
+    technical_notes: item.technicalNotes,
+    url: item.url,
+    resource_type: item.resourceType,
+    section_id: item.sectionId,
+    emoji: item.emoji,
+    author_or_channel: item.authorOrChannel,
+    thumbnail_url: item.thumbnailUrl || null,
+    video_embed_url: item.videoEmbedUrl || null,
+    github_stars:
+      typeof item.githubStars === 'number' && !isNaN(item.githubStars) ? item.githubStars : null,
+    github_language: item.githubLanguage || null,
+    key_points: [...item.keyPoints],
+    tutorial_steps: [...item.tutorialSteps],
+    tags: [...item.tags],
+    difficulty: item.difficulty,
+    estimated_time: item.estimatedTime,
+    is_pinned: Boolean(item.isPinned),
+    is_favorite: Boolean(item.isFavorite),
+    created_by_ai: Boolean(item.createdByAi),
+    created_at: item.createdAt,
+    updated_at: new Date().toISOString(),
+  };
+}
+
+async function upsertWithUniqueSlugRetry(
+  table: 'publication_sections' | 'publications',
+  row: Record<string, any>
+): Promise<{ error: any }> {
+  const firstAttempt = await (supabase as any).from(table).upsert(row, { onConflict: 'id' });
+  if (!firstAttempt.error) return { error: null };
+
+  // Si colisiona únicamente el slug UNIQUE, sufijar aleatoriamente y reintentar
+  const msg = String(firstAttempt.error?.message || '').toLowerCase();
+  if (firstAttempt.error?.code === '23505' && msg.includes('slug')) {
+    const retryRow = { ...row, slug: `${row.slug}-${Math.floor(Math.random() * 9000 + 1000)}` };
+    const secondAttempt = await (supabase as any)
+      .from(table)
+      .upsert(retryRow, { onConflict: 'id' });
+    return { error: secondAttempt.error || null };
+  }
+
+  return { error: firstAttempt.error };
+}
+
+// ============================================================================
 // GESTIÓN DE APARTADOS (SECCIONES PERSONALIZADAS)
 // ============================================================================
 
@@ -220,16 +382,7 @@ export function getPublicationSections(): PublicationSection[] {
     }
     const parsed = JSON.parse(raw) as PublicationSection[];
     if (!Array.isArray(parsed) || parsed.length === 0) return DEFAULT_PUBLICATION_SECTIONS;
-
-    // Asegurar que los apartados base estén presentes si no fueron borrados explícitamente
-    const existingIds = new Set(parsed.map((s) => s.id));
-    const merged = [...parsed];
-    for (const def of DEFAULT_PUBLICATION_SECTIONS) {
-      if (def.isSystem && !existingIds.has(def.id)) {
-        merged.push(def);
-      }
-    }
-    return merged;
+    return ensureSystemSections(parsed);
   } catch (err) {
     console.warn('Error leyendo apartados de publicaciones:', err);
     return DEFAULT_PUBLICATION_SECTIONS;
@@ -244,10 +397,34 @@ export function savePublicationSection(section: PublicationSection): Publication
     : [...current, section];
   try {
     localStorage.setItem(STORAGE_SECTIONS_KEY, JSON.stringify(updated));
+    enqueueId(PENDING_SEC_UPSERTS_KEY, section.id);
+    dequeueId(PENDING_SEC_DELETES_KEY, section.id);
   } catch (err) {
-    console.error('Error guardando apartado:', err);
+    console.error('Error guardando apartado en localStorage:', err);
   }
   return updated;
+}
+
+export async function persistPublicationSection(
+  section: PublicationSection
+): Promise<{ sections: PublicationSection[]; supabaseSuccess: boolean; error?: string }> {
+  const sections = savePublicationSection(section);
+
+  try {
+    const { error } = await upsertWithUniqueSlugRetry(
+      'publication_sections',
+      mapPublicationSectionToRow(section)
+    );
+    if (error) {
+      console.warn('Aviso al guardar apartado en Supabase:', error.message);
+      return { sections, supabaseSuccess: false, error: error.message };
+    }
+    dequeueId(PENDING_SEC_UPSERTS_KEY, section.id);
+    return { sections, supabaseSuccess: true };
+  } catch (err: any) {
+    console.error('Error sincronizando apartado con Supabase:', err);
+    return { sections, supabaseSuccess: false, error: err?.message || 'Error de red' };
+  }
 }
 
 export function deletePublicationSection(sectionId: string): PublicationSection[] {
@@ -255,10 +432,64 @@ export function deletePublicationSection(sectionId: string): PublicationSection[
   const updated = current.filter((s) => s.id !== sectionId);
   try {
     localStorage.setItem(STORAGE_SECTIONS_KEY, JSON.stringify(updated));
+    dequeueId(PENDING_SEC_UPSERTS_KEY, sectionId);
+    enqueueId(PENDING_SEC_DELETES_KEY, sectionId);
   } catch (err) {
-    console.error('Error eliminando apartado:', err);
+    console.error('Error eliminando apartado de localStorage:', err);
   }
   return updated;
+}
+
+export async function removePublicationSection(sectionId: string): Promise<{
+  sections: PublicationSection[];
+  publications: PublicationItem[];
+  supabaseSuccess: boolean;
+  error?: string;
+}> {
+  const sections = deletePublicationSection(sectionId);
+
+  // Reasignar localmente las publicaciones de este apartado hacia sec-links para no perderlas
+  const currentPubs = getPublications();
+  let pubsChanged = false;
+  const updatedPubs = currentPubs.map((p) => {
+    if (p.sectionId === sectionId) {
+      pubsChanged = true;
+      return { ...p, sectionId: 'sec-links' };
+    }
+    return p;
+  });
+  if (pubsChanged) {
+    try {
+      localStorage.setItem(STORAGE_ITEMS_KEY, JSON.stringify(updatedPubs));
+    } catch {
+      /* ignore */
+    }
+  }
+
+  try {
+    await (supabase as any)
+      .from('publications')
+      .update({ section_id: 'sec-links', updated_at: new Date().toISOString() })
+      .eq('section_id', sectionId);
+
+    const { error } = await (supabase as any)
+      .from('publication_sections')
+      .delete()
+      .eq('id', sectionId);
+
+    if (error) {
+      return { sections, publications: updatedPubs, supabaseSuccess: false, error: error.message };
+    }
+    dequeueId(PENDING_SEC_DELETES_KEY, sectionId);
+    return { sections, publications: updatedPubs, supabaseSuccess: true };
+  } catch (err: any) {
+    return {
+      sections,
+      publications: updatedPubs,
+      supabaseSuccess: false,
+      error: err?.message || 'Error de red',
+    };
+  }
 }
 
 // ============================================================================
@@ -289,10 +520,43 @@ export function savePublication(item: PublicationItem): PublicationItem[] {
     : [item, ...current];
   try {
     localStorage.setItem(STORAGE_ITEMS_KEY, JSON.stringify(updated));
+    enqueueId(PENDING_PUB_UPSERTS_KEY, item.id);
+    dequeueId(PENDING_PUB_DELETES_KEY, item.id);
   } catch (err) {
-    console.error('Error guardando publicación:', err);
+    console.error('Error guardando publicación en localStorage:', err);
   }
   return updated;
+}
+
+export async function persistPublication(
+  item: PublicationItem,
+  availableSections?: PublicationSection[]
+): Promise<{ publications: PublicationItem[]; supabaseSuccess: boolean; error?: string }> {
+  const publications = savePublication(item);
+
+  try {
+    // Asegurar que un apartado custom recién creado exista también en Supabase
+    const secSource = availableSections || getPublicationSections();
+    const targetSec = secSource.find((s) => s.id === item.sectionId);
+    if (targetSec) {
+      await upsertWithUniqueSlugRetry(
+        'publication_sections',
+        mapPublicationSectionToRow(targetSec)
+      );
+      dequeueId(PENDING_SEC_UPSERTS_KEY, targetSec.id);
+    }
+
+    const { error } = await upsertWithUniqueSlugRetry('publications', mapPublicationToRow(item));
+    if (error) {
+      console.warn('Aviso al guardar publicación en Supabase:', error.message);
+      return { publications, supabaseSuccess: false, error: error.message };
+    }
+    dequeueId(PENDING_PUB_UPSERTS_KEY, item.id);
+    return { publications, supabaseSuccess: true };
+  } catch (err: any) {
+    console.error('Error sincronizando publicación con Supabase:', err);
+    return { publications, supabaseSuccess: false, error: err?.message || 'Error de red' };
+  }
 }
 
 export function deletePublication(id: string): PublicationItem[] {
@@ -300,10 +564,198 @@ export function deletePublication(id: string): PublicationItem[] {
   const updated = current.filter((p) => p.id !== id);
   try {
     localStorage.setItem(STORAGE_ITEMS_KEY, JSON.stringify(updated));
+    dequeueId(PENDING_PUB_UPSERTS_KEY, id);
+    enqueueId(PENDING_PUB_DELETES_KEY, id);
   } catch (err) {
-    console.error('Error eliminando publicación:', err);
+    console.error('Error eliminando publicación de localStorage:', err);
   }
   return updated;
+}
+
+export async function removePublication(
+  id: string
+): Promise<{ publications: PublicationItem[]; supabaseSuccess: boolean; error?: string }> {
+  const publications = deletePublication(id);
+
+  try {
+    const { error } = await (supabase as any).from('publications').delete().eq('id', id);
+    if (error) {
+      return { publications, supabaseSuccess: false, error: error.message };
+    }
+    dequeueId(PENDING_PUB_DELETES_KEY, id);
+    return { publications, supabaseSuccess: true };
+  } catch (err: any) {
+    return { publications, supabaseSuccess: false, error: err?.message || 'Error de red' };
+  }
+}
+
+async function flushDeleteQueue(
+  queueKey: string,
+  table: 'publication_sections' | 'publications'
+): Promise<Set<string>> {
+  const remaining = new Set(readIdQueue(queueKey));
+  for (const id of Array.from(remaining)) {
+    const { error } = await (supabase as any).from(table).delete().eq('id', id);
+    if (!error) {
+      dequeueId(queueKey, id);
+      remaining.delete(id);
+    }
+  }
+  return remaining;
+}
+
+async function flushUpsertQueue<T extends { id: string }>(
+  queueKey: string,
+  table: 'publication_sections' | 'publications',
+  localMap: Map<string, T>,
+  pendingDeletes: Set<string>,
+  mapper: (item: T) => Record<string, any>
+): Promise<string[]> {
+  const queuedIds = readIdQueue(queueKey);
+  for (const id of queuedIds) {
+    if (pendingDeletes.has(id)) continue;
+    const localItem = localMap.get(id);
+    if (!localItem) {
+      dequeueId(queueKey, id);
+      continue;
+    }
+    const { error } = await upsertWithUniqueSlugRetry(table, mapper(localItem));
+    if (!error) {
+      dequeueId(queueKey, id);
+    }
+  }
+  return queuedIds;
+}
+
+function mergeCloudAndPending<T extends { id: string }>(
+  cloudRows: T[],
+  pendingUpsertIds: string[],
+  localMap: Map<string, T>,
+  pendingDeletes: Set<string>
+): T[] {
+  const map = new Map<string, T>();
+  for (const row of cloudRows) {
+    if (!pendingDeletes.has(row.id)) map.set(row.id, row);
+  }
+  for (const id of pendingUpsertIds) {
+    const localItem = localMap.get(id);
+    if (localItem && !pendingDeletes.has(id)) map.set(localItem.id, localItem);
+  }
+  return Array.from(map.values());
+}
+
+export async function fetchPublicationsDataFromCloud(): Promise<{
+  sections: PublicationSection[];
+  publications: PublicationItem[];
+  cloudSynced: boolean;
+  error?: string;
+}> {
+  const localSections = getPublicationSections();
+  const localPublications = getPublications();
+
+  try {
+    const [secRes, pubRes] = await Promise.all([
+      (supabase as any)
+        .from('publication_sections')
+        .select('*')
+        .order('created_at', { ascending: true }),
+      (supabase as any).from('publications').select('*').order('created_at', { ascending: false }),
+    ]);
+
+    if (secRes.error || pubRes.error) {
+      const errMsg = secRes.error?.message || pubRes.error?.message || 'Error leyendo Supabase';
+      return {
+        sections: localSections,
+        publications: localPublications,
+        cloudSynced: false,
+        error: errMsg,
+      };
+    }
+
+    const cloudSectionsRaw: PublicationSection[] = (secRes.data || []).map(
+      mapRowToPublicationSection
+    );
+    const cloudPubsRaw: PublicationItem[] = (pubRes.data || []).map(mapRowToPublication);
+
+    // Migración única de elementos creados en LocalStorage antes de la integración con Supabase
+    if (localStorage.getItem(MIGRATED_CLOUD_KEY) !== 'true') {
+      const cloudSecIds = new Set(cloudSectionsRaw.map((s) => s.id));
+      const cloudPubIds = new Set(cloudPubsRaw.map((p) => p.id));
+
+      for (const s of localSections) {
+        if (!cloudSecIds.has(s.id)) enqueueId(PENDING_SEC_UPSERTS_KEY, s.id);
+      }
+      for (const p of localPublications) {
+        if (!cloudPubIds.has(p.id) && !p.id.startsWith('pub-init-')) {
+          enqueueId(PENDING_PUB_UPSERTS_KEY, p.id);
+        }
+      }
+      try {
+        localStorage.setItem(MIGRATED_CLOUD_KEY, 'true');
+      } catch {
+        /* ignore */
+      }
+    }
+
+    const pendingSecDeletes = await flushDeleteQueue(PENDING_SEC_DELETES_KEY, 'publication_sections');
+    const pendingPubDeletes = await flushDeleteQueue(PENDING_PUB_DELETES_KEY, 'publications');
+
+    const localSecMap = new Map(localSections.map((s) => [s.id, s]));
+    const pendingSecUpserts = await flushUpsertQueue(
+      PENDING_SEC_UPSERTS_KEY,
+      'publication_sections',
+      localSecMap,
+      pendingSecDeletes,
+      mapPublicationSectionToRow
+    );
+
+    const localPubMap = new Map(localPublications.map((p) => [p.id, p]));
+    const pendingPubUpserts = await flushUpsertQueue(
+      PENDING_PUB_UPSERTS_KEY,
+      'publications',
+      localPubMap,
+      pendingPubDeletes,
+      mapPublicationToRow
+    );
+
+    const mergedSections = mergeCloudAndPending(
+      cloudSectionsRaw,
+      pendingSecUpserts,
+      localSecMap,
+      pendingSecDeletes
+    );
+    const finalSections = ensureSystemSections(
+      mergedSections.length > 0 ? mergedSections : DEFAULT_PUBLICATION_SECTIONS
+    );
+
+    const finalPublications = mergeCloudAndPending(
+      cloudPubsRaw,
+      pendingPubUpserts,
+      localPubMap,
+      pendingPubDeletes
+    ).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+    try {
+      localStorage.setItem(STORAGE_SECTIONS_KEY, JSON.stringify(finalSections));
+      localStorage.setItem(STORAGE_ITEMS_KEY, JSON.stringify(finalPublications));
+    } catch {
+      /* ignore */
+    }
+
+    return {
+      sections: finalSections,
+      publications: finalPublications,
+      cloudSynced: true,
+    };
+  } catch (err: any) {
+    console.warn('Error de red al sincronizar publicaciones con Supabase:', err);
+    return {
+      sections: localSections,
+      publications: localPublications,
+      cloudSynced: false,
+      error: err?.message || 'Error de conexión',
+    };
+  }
 }
 
 // ============================================================================
