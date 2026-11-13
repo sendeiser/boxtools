@@ -4,7 +4,51 @@ export type PhaseSlug = 'all' | 'fase0' | 'fase1' | 'fase2' | 'fase3' | 'fase4';
 
 export type ViewMode = 'criollo' | 'tecnico';
 
-export type ActiveSection = 'vault' | 'pevc' | 'repomix-v7' | 'vibe-guide' | 'combos' | 'onboarding' | 'admin';
+export type ActiveSection = 'vault' | 'publications' | 'pevc' | 'repomix-v7' | 'vibe-guide' | 'combos' | 'onboarding' | 'admin';
+
+export type PublicationResourceType = 'github' | 'video' | 'tutorial' | 'link' | 'articulo' | 'herramienta';
+
+export type PublicationDifficulty = 'inicial' | 'intermedio' | 'avanzado';
+
+export type SectionTone = 'orange' | 'cyan' | 'yellow' | 'emerald' | 'purple' | 'rose' | 'neutral';
+
+export interface PublicationSection {
+  readonly id: string;
+  readonly slug: string;
+  readonly name: string;
+  readonly emoji: string;
+  readonly description: string;
+  readonly tone: SectionTone;
+  readonly isSystem?: boolean;
+  readonly createdAt: string;
+}
+
+export interface PublicationItem {
+  readonly id: string;
+  readonly slug: string;
+  readonly title: string;
+  readonly summary: string;
+  readonly criolloTakeaway: string;
+  readonly technicalNotes: string;
+  readonly url: string;
+  readonly resourceType: PublicationResourceType;
+  readonly sectionId: string; // ID del apartado al que pertenece
+  readonly emoji: string;
+  readonly authorOrChannel: string;
+  readonly thumbnailUrl?: string;
+  readonly videoEmbedUrl?: string;
+  readonly githubStars?: number;
+  readonly githubLanguage?: string;
+  readonly keyPoints: readonly string[];
+  readonly tutorialSteps: readonly string[];
+  readonly tags: readonly string[];
+  readonly difficulty: PublicationDifficulty;
+  readonly estimatedTime: string;
+  readonly isPinned: boolean;
+  readonly isFavorite: boolean;
+  readonly createdByAi: boolean;
+  readonly createdAt: string;
+}
 
 export interface SvgFlowStep {
   readonly icon: string;

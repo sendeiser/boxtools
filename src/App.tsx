@@ -17,6 +17,7 @@ import { MediaLightboxModal } from './components/MediaLightboxModal';
 import { AdminStudio } from './components/AdminStudio';
 import { VibeGuideSection } from './components/VibeGuideSection';
 import { AddToolModal } from './components/AddToolModal';
+import { PublicationsHubSection } from './components/PublicationsHubSection';
 
 export const App: React.FC = () => {
   // Global View States
@@ -348,6 +349,7 @@ export const App: React.FC = () => {
                 {/* Compact Nav Icons */}
                 {[
                   { id: 'vault', label: 'Explorador del Baúl', icon: '🗃️', count: tools.length },
+                  { id: 'publications', label: 'Publicaciones & Links (IA)', icon: '📰', badge: 'IA' },
                   { id: 'pevc', label: 'PEVC V5 (Creación)', icon: '📘', badge: '5F' },
                   { id: 'repomix-v7', label: 'Continuidad V7', icon: '📦', badge: 'V7' },
                   { id: 'vibe-guide', label: 'Jerga & Markdowns', icon: '💡', badge: 'Guía' },
@@ -444,6 +446,23 @@ export const App: React.FC = () => {
                         </span>
                         <span className="bg-black/20 text-[10px] px-1.5 py-0.5 rounded font-mono">
                           {tools.length}
+                        </span>
+                      </button>
+
+                      <button
+                        onClick={() => setCurrentSection('publications')}
+                        data-testid="nav-publications-btn"
+                        className={`w-full flex items-center justify-between px-2.5 py-2 rounded border-2 border-[#121214] font-bold shadow-brutal-sm transition ${
+                          currentSection === 'publications'
+                            ? 'bg-brand-orange text-white'
+                            : 'bg-[#FFF7EE] dark:bg-neutral-800 text-[#121214] dark:text-neutral-200 hover:bg-[#FFD166]'
+                        }`}
+                      >
+                        <span className="flex items-center gap-2">
+                          <span>📰</span> Publicaciones & Links
+                        </span>
+                        <span className="font-mono text-[9px] bg-[#121214] text-white px-1.5 py-0.5 rounded font-bold">
+                          IA + Manual
                         </span>
                       </button>
 
@@ -729,6 +748,20 @@ export const App: React.FC = () => {
                   )}
 
                   <button
+                    onClick={() => setCurrentSection('publications')}
+                    className={`flex items-center gap-1.5 px-2.5 py-1.5 md:py-2 border-2 border-[#121214] rounded font-display font-black text-xs shadow-brutal-sm hover:translate-y-[-1px] transition ${
+                      currentSection === 'publications'
+                        ? 'bg-purple-600 text-white'
+                        : 'bg-purple-100 text-purple-950 hover:bg-purple-200'
+                    }`}
+                    title="Abrir Muro de Publicaciones & Links (GitHub, Videos, Tutoriales)"
+                    data-testid="header-publications-btn"
+                  >
+                    <span>📰</span>
+                    <span className="hidden sm:inline">Publicaciones</span>
+                  </button>
+
+                  <button
                     onClick={() => setIsAddToolModalOpen(true)}
                     className="flex items-center gap-1.5 px-2.5 py-1.5 md:py-2 border-2 border-[#121214] rounded bg-brand-orange text-white font-display font-black text-xs shadow-brutal-sm hover:translate-y-[-1px] transition"
                     title="Subir Herramienta al Baúl con IA"
@@ -858,6 +891,12 @@ export const App: React.FC = () => {
                               className="px-3.5 py-2 bg-orange-100 dark:bg-orange-950/40 text-brand-orangeDark dark:text-brand-orange font-display font-bold text-xs rounded border-2 border-[#121214] shadow-brutal-sm hover:bg-orange-200 transition"
                             >
                               💡 Jerga & Markdowns
+                            </button>
+                            <button
+                              onClick={() => setCurrentSection('publications')}
+                              className="px-3.5 py-2 bg-purple-100 dark:bg-purple-950/40 text-purple-950 dark:text-purple-200 font-display font-black text-xs rounded border-2 border-[#121214] shadow-brutal-sm hover:bg-purple-200 transition"
+                            >
+                              📰 Muro Publicaciones & Links
                             </button>
                             <button
                               onClick={() => setIsAddToolModalOpen(true)}
@@ -993,6 +1032,15 @@ export const App: React.FC = () => {
                     </div>
                   </section>
                 </>
+              )}
+
+              {/* SECTION: PUBLICATIONS & LINKS HUB */}
+              {currentSection === 'publications' && (
+                <PublicationsHubSection
+                  viewMode={viewMode}
+                  onCopy={handleCopy}
+                  onShowToast={showToast}
+                />
               )}
 
               {/* SECTION: WORKFLOW PEVC V5 */}
@@ -1499,6 +1547,15 @@ export const App: React.FC = () => {
                   className="w-full text-left p-2 rounded bg-neutral-100 dark:bg-neutral-800"
                 >
                   🗃️ Explorador del Baúl
+                </button>
+                <button
+                  onClick={() => {
+                    setCurrentSection('publications');
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full text-left p-2 rounded bg-[#FFD166] text-black font-black border border-black"
+                >
+                  📰 Publicaciones & Links (IA / Manual)
                 </button>
                 <button
                   onClick={() => {
